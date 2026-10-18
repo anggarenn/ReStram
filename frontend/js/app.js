@@ -453,13 +453,31 @@ function loadEps(){
 
   (window.ReStram||window.Tatap).episodes(thisSlug).then(function(r){
     if(thisSlug !== cur.slug) return;
-    if(!r.success){
-      if(!cached) $("tm-count").textContent = "error: " + r.error;
+    var eps = (r && r.success && r.data && Array.isArray(r.data.episodes) && r.data.episodes.length) ? r.data.episodes : null;
+    if(!eps && window.NET27_DATA && window.NET27_DATA.getEpisodes){
+      eps = window.NET27_DATA.getEpisodes(thisSlug);
+    }
+    if(!eps && cur.meta && cur.meta.episodes_list && cur.meta.episodes_list.length){
+      eps = cur.meta.episodes_list.map(function(ep){
+        return {
+          ep: ep.ep,
+          episode: ep.ep,
+          title: ep.title || ("Episode " + ep.ep),
+          id: thisSlug + "?ep=" + ep.ep,
+          date: ep.date || "",
+          stream_url: ep.stream_url,
+          servers: ep.servers || [],
+          drive_file_id: ep.drive_file_id || ""
+        };
+      });
+    }
+    if(!eps || !eps.length){
+      if(!cached) $("tm-count").textContent = "error: " + ((r && r.error) || "tidak ada episode");
       return;
     }
-    cur.eps = r.data.episodes || [];
+    cur.eps = eps;
     _epsMemCache[thisSlug] = cur.eps;
-    if(r.data.detail || r.data.synopsis){
+    if(r && r.data && (r.data.detail || r.data.synopsis)){
       var detail = Object.assign({}, cur.meta || {}, r.data.detail || {});
       if(r.data.synopsis && (!detail.synopsis || r.data.synopsis.length > detail.synopsis.length)){
         detail.synopsis = r.data.synopsis;
@@ -793,8 +811,15 @@ function openPlayer(ep, resumeTime){
     if(cur.activeSub){
       prefetchSubtitleTrack(cur.activeSub, r.data.referer);
     }
-    // Embed URL resolution
-    var embedUrl = (r.data && r.data.embedUrl) || "";
+    // Multi-server extraction and embed resolution
+    var item = (window.NET27_DATA && window.NET27_DATA.getItem(cur.slug)) || cur.meta || cur.item;
+    var srvMap = (r.data && r.data.episodeServers) || extractEpisodeServers(item, ep);
+    cur.episodeServers = srvMap;
+
+    var embedUrl = (srvMap && srvMap.blogger) || (r.data && r.data.embedUrl) || "";
+    if(!embedUrl && srvMap && srvMap.mega){
+      embedUrl = srvMap.mega;
+    }
     if(!embedUrl){
       var anilistId = (r.data && r.data.anilist_id) || (cur.item && cur.item.anilist_id) || (window.NET27_DATA && window.NET27_DATA.getItem(cur.slug) && window.NET27_DATA.getItem(cur.slug).anilist_id);
       if(anilistId){
@@ -803,15 +828,20 @@ function openPlayer(ep, resumeTime){
     }
     cur.embedUrl = embedUrl;
 
-    var isStaticVercel = (!apiBase() || (r.data && (r.data.source === "vercel-demo" || r.data.source === "vercel-static")));
-    var preferEmbed = (embedUrl && (cur.playerServer === "embed" || (!cur.playerServer && (isStaticVercel || !!(r.data && r.data.embedUrl))) || (isStaticVercel && cur.playerServer !== "native")));
-
-    if(preferEmbed){
-      applyEmbedPlayer(embedUrl);
-    } else {
+    if(cur.playerServer === "mega" && srvMap && srvMap.mega){
+      applyEmbedPlayer(srvMap.mega, "mega");
+    } else if(cur.playerServer === "native" && srvMap && srvMap.native && (srvMap.native.indexOf(".m3u8") >= 0 || srvMap.native.indexOf("/hls") >= 0)){
       applyNativePlayer();
-      var streamUrl = (r.data.master && (r.data.master.indexOf(".m3u8") >= 0 || r.data.master.indexOf("/hls") >= 0)) ? r.data.master : (picked ? picked.url : "");
-      playUrl(streamUrl,r.data.referer,cur.activeSub,r.data.referer,resumeTime,token);
+      playUrl(srvMap.native, r.data.referer, cur.activeSub, r.data.referer, resumeTime, token);
+    } else {
+      // Default to Server 1: Blogger/Drive
+      if(embedUrl){
+        applyEmbedPlayer(embedUrl, "blogger");
+      } else {
+        applyNativePlayer();
+        var streamUrl = (r.data.master && (r.data.master.indexOf(".m3u8") >= 0 || r.data.master.indexOf("/hls") >= 0)) ? r.data.master : (picked ? picked.url : "");
+        playUrl(streamUrl, r.data.referer, cur.activeSub, r.data.referer, resumeTime, token);
+      }
     }
     (window.ReStram||window.Tatap).saveHist({slug:cur.slug,title:cur.title,episode:ep,mode:cur.mode,progress:resumeTime||0}).then(function(){renderContinue();});
   }).catch(function(err){
@@ -859,8 +889,65 @@ function renderVariants(){
   }
 }
 
-function applyEmbedPlayer(url){
-  cur.playerServer = "embed";
+function extractEpisodeServers(item, epNum){
+  if(!item) return { blogger: "", mega: "", native: "", primary: "" };
+  var epList = item.episodes_list || [];
+  var epObj = null;
+  for(var i = 0; i < epList.length; i++){
+    if(epList[i].ep === epNum){
+      epObj = epList[i];
+      break;
+    }
+  }
+  if(!epObj && epList.length) epObj = epList[0];
+  if(!epObj) return { blogger: "", mega: "", native: "", primary: "" };
+
+  var allUrls = [epObj.stream_url].concat(epObj.servers || []).filter(Boolean);
+  var blogger = "";
+  var mega = "";
+  var native = "";
+  var fallback = "";
+
+  if(epObj.drive_file_id){
+    blogger = "https://drive.google.com/file/d/" + epObj.drive_file_id + "/preview";
+  }
+
+  for(var j = 0; j < allUrls.length; j++){
+    var u = allUrls[j];
+    if(!blogger && (u.indexOf("blogger.com") >= 0 || u.indexOf("drive.google") >= 0 || u.indexOf("gdplayer") >= 0)){
+      blogger = u;
+    }
+    if(!mega && u.indexOf("mega.nz") >= 0){
+      mega = u.replace("/file/", "/embed/");
+    }
+    if(!native && (u.indexOf(".m3u8") >= 0 || u.indexOf("xtwap.top") >= 0 || u.indexOf("/hls") >= 0)){
+      native = u;
+    }
+    if(!fallback && (u.indexOf("mp4upload") >= 0 || u.indexOf("yourupload") >= 0 || u.indexOf("embed") >= 0)){
+      fallback = u;
+    }
+  }
+
+  if(!blogger) blogger = fallback || allUrls[0] || "";
+  if(!mega) mega = fallback || blogger || (allUrls[1] || allUrls[0] || "");
+  if(!native) native = (allUrls.find ? allUrls.find(function(x){ return x.indexOf("mega.nz") === -1; }) : allUrls[0]) || "";
+
+  var primary = blogger || mega || native || allUrls[0] || "";
+  return {
+    blogger: blogger,
+    mega: mega,
+    native: native,
+    primary: primary,
+    all: allUrls
+  };
+}
+
+function applyEmbedPlayer(url, serverName){
+  if(serverName === "mega"){
+    cur.playerServer = "mega";
+  } else {
+    cur.playerServer = "blogger";
+  }
   var v = $("vid");
   if(v){
     try{ v.pause(); }catch(e){}
@@ -869,6 +956,11 @@ function applyEmbedPlayer(url){
   }
   var frame = $("pm-embed-frame");
   if(frame){
+    frame.setAttribute("allow", "autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope");
+    frame.setAttribute("allowfullscreen", "true");
+    frame.setAttribute("webkitallowfullscreen", "true");
+    frame.setAttribute("mozallowfullscreen", "true");
+    frame.setAttribute("frameborder", "0");
     frame.classList.remove("hidden");
     frame.style.display = "block";
     if(url && frame.src !== url){
@@ -884,8 +976,19 @@ function applyEmbedPlayer(url){
   if($("ambient")) $("ambient").classList.add("hidden");
   if($("pm-spinner")) $("pm-spinner").classList.add("hidden");
 
-  if($("pm-server-embed")) $("pm-server-embed").classList.add("active");
-  if($("pm-server-native")) $("pm-server-native").classList.remove("active");
+  var btnBlogger = $("pm-server-embed") || $("pm-server-blogger");
+  var btnMega = $("pm-server-mega");
+  var btnNative = $("pm-server-native");
+
+  if(cur.playerServer === "mega"){
+    if(btnBlogger) btnBlogger.classList.remove("active");
+    if(btnMega) btnMega.classList.add("active");
+    if(btnNative) btnNative.classList.remove("active");
+  } else {
+    if(btnBlogger) btnBlogger.classList.add("active");
+    if(btnMega) btnMega.classList.remove("active");
+    if(btnNative) btnNative.classList.remove("active");
+  }
 }
 
 function applyNativePlayer(){
@@ -906,40 +1009,41 @@ function applyNativePlayer(){
   if($("pm-speed-select")) $("pm-speed-select").classList.remove("hidden");
   if($("ambient")) $("ambient").classList.remove("hidden");
 
-  if($("pm-server-embed")) $("pm-server-embed").classList.remove("active");
-  if($("pm-server-native")) $("pm-server-native").classList.add("active");
+  var btnBlogger = $("pm-server-embed") || $("pm-server-blogger");
+  var btnMega = $("pm-server-mega");
+  var btnNative = $("pm-server-native");
+  if(btnBlogger) btnBlogger.classList.remove("active");
+  if(btnMega) btnMega.classList.remove("active");
+  if(btnNative) btnNative.classList.add("active");
 }
 
 function switchPlayerServer(serverType){
-  cur.playerServer = serverType;
-  if(serverType === "embed"){
-    if(!cur.embedUrl && cur.slug){
-      var anilistId = (cur.res && cur.res.anilist_id) || (cur.item && cur.item.anilist_id) || (window.NET27_DATA && window.NET27_DATA.getItem(cur.slug) && window.NET27_DATA.getItem(cur.slug).anilist_id);
-      if(anilistId){
-        cur.embedUrl = "https://vidlink.pro/anime/" + anilistId + "/" + (cur.ep||1) + "/" + (cur.mode === "dub" ? "dub" : "sub");
-      }
-    }
-    if(cur.embedUrl){
-      applyEmbedPlayer(cur.embedUrl);
-      toast("Beralih ke Server 1: HD Player (Embed)");
+  var item = (window.NET27_DATA && window.NET27_DATA.getItem(cur.slug)) || cur.meta || cur.item;
+  var srvMap = cur.episodeServers || extractEpisodeServers(item, cur.ep || 1);
+  cur.episodeServers = srvMap;
+
+  if(serverType === "mega"){
+    if(srvMap && srvMap.mega){
+      applyEmbedPlayer(srvMap.mega, "mega");
+      toast("Beralih ke Server 2: Mega");
     } else {
-      toast("Server embed tidak tersedia untuk anime ini");
+      toast("Server 2 (Mega) tidak tersedia untuk episode ini");
     }
-  } else {
+  } else if(serverType === "blogger" || serverType === "embed"){
+    var url = (srvMap && srvMap.blogger) ? srvMap.blogger : cur.embedUrl;
+    if(url){
+      applyEmbedPlayer(url, "blogger");
+      toast("Beralih ke Server 1: Blogger/Drive");
+    } else {
+      toast("Server 1 (Blogger/Drive) tidak tersedia");
+    }
+  } else if(serverType === "native"){
     applyNativePlayer();
-    if(cur.res){
-      renderVariants();
-      if(cur.res.subtitles && cur.res.subtitles.length){
-        renderSubtitles(cur.res.subtitles, cur.activeSub);
-      }
-      var picked = cur.res.picked || (cur.res.variants && cur.res.variants[0]) || { q: "HD", url: cur.res.master || "" };
-      var streamUrl = (cur.res.master && (cur.res.master.indexOf(".m3u8") >= 0 || cur.res.master.indexOf("/hls") >= 0)) ? cur.res.master : (picked ? picked.url : "");
-      if(streamUrl){
-        playUrl(streamUrl, cur.res.referer, cur.activeSub, cur.res.referer, 0, cur.playToken);
-        toast("Beralih ke Server 2: HLS Native");
-      } else {
-        toast("Stream HLS native tidak tersedia");
-      }
+    var nativeUrl = (srvMap && srvMap.native) ? srvMap.native : (cur.res && (cur.res.master || (cur.res.picked && cur.res.picked.url)));
+    if(nativeUrl){
+      var ref = (cur.res && cur.res.referer) || "";
+      playUrl(nativeUrl, ref, cur.activeSub, ref, 0, cur.playToken);
+      toast("Beralih ke Server 3: HLS Native");
     } else {
       toast("Stream HLS native tidak tersedia");
     }
@@ -2537,8 +2641,156 @@ var NET_FALLBACK_ANIME = (function(){
   ];
 })();
 
+function loadAnimeDatabase(){
+  return fetch("./data/anime.json")
+    .then(function(res){
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      return res.json();
+    })
+    .then(function(data){
+      if(!Array.isArray(data) || !data.length) return null;
+      var normalized = data.map(function(item){
+        var poster = item.thumbnail || item.poster || item.banner || "";
+        var backdrop = item.banner || item.thumbnail || item.poster || "";
+        var count = item.episodes || (item.episodes_list ? item.episodes_list.length : 12);
+        var counter = item.eps_counter || (count + "/" + count);
+        return Object.assign({}, item, {
+          id: item.id || item.slug,
+          slug: item.slug,
+          title: item.title,
+          poster: poster,
+          thumbnail: item.thumbnail || poster,
+          backdrop: backdrop,
+          banner: item.banner || backdrop,
+          score: item.score ? parseFloat(item.score) : 8.5,
+          type: item.type || "TV",
+          status: item.status || "Ongoing",
+          season: item.season || item.release_year || "Terbaru",
+          episodes: count,
+          eps_counter: counter,
+          synopsis: item.synopsis || "",
+          genres: item.genres || [],
+          episodes_list: item.episodes_list || []
+        });
+      });
+
+      window.ANIME_DB = normalized;
+
+      if(typeof window !== "undefined" && window.NET27_DATA){
+        window.NET27_DATA.items = normalized;
+        window.NET27_DATA.hero = normalized.slice(0, 6);
+
+        var itemMap = {};
+        normalized.forEach(function(it){
+          itemMap[it.slug] = it;
+          if(it.id) itemMap[String(it.id)] = it;
+        });
+
+        window.NET27_DATA.getItem = function(slug){
+          return itemMap[slug] || null;
+        };
+
+        window.NET27_DATA.getEpisodes = function(slug){
+          var it = itemMap[slug];
+          if(it && it.episodes_list && it.episodes_list.length){
+            return it.episodes_list.map(function(ep){
+              return {
+                ep: ep.ep,
+                episode: ep.ep,
+                title: ep.title || ("Episode " + ep.ep),
+                id: (it.slug || slug) + "?ep=" + ep.ep,
+                date: ep.date || "",
+                stream_url: ep.stream_url,
+                servers: ep.servers || [],
+                drive_file_id: ep.drive_file_id || ""
+              };
+            });
+          }
+          var total = (it && it.episodes) ? it.episodes : 12;
+          var arr = [];
+          for(var i = 1; i <= total; i++){
+            arr.push({ ep: i, episode: i, title: "Episode " + i, id: slug + "?ep=" + i });
+          }
+          return arr;
+        };
+
+        window.NET27_DATA.resolveStream = function(slug, ep, mode){
+          ep = parseInt(ep) || 1;
+          mode = (mode === "dub") ? "dub" : "sub";
+          var it = itemMap[slug] || normalized[0];
+          var srvs = extractEpisodeServers(it, ep);
+          var primaryUrl = srvs.blogger || srvs.mega || srvs.native || "";
+
+          return {
+            success: true,
+            data: {
+              slug: slug,
+              episode: ep,
+              mode: mode,
+              source: "anime-json",
+              server: "Server 1: Blogger/Drive",
+              embedUrl: primaryUrl,
+              embed_url: primaryUrl,
+              master: srvs.native || primaryUrl,
+              embedServers: [
+                { id: "blogger", name: "Server 1: Blogger/Drive", type: "iframe", url: srvs.blogger },
+                { id: "mega", name: "Server 2: Mega", type: "iframe", url: srvs.mega },
+                { id: "native", name: "Server 3: HLS Native", type: "video", url: srvs.native }
+              ],
+              servers: [
+                { id: "blogger", name: "Server 1: Blogger/Drive", url: srvs.blogger },
+                { id: "mega", name: "Server 2: Mega", url: srvs.mega },
+                { id: "native", name: "Server 3: HLS Native", url: srvs.native }
+              ],
+              episodeServers: srvs,
+              picked: { q: "HD", url: primaryUrl },
+              variants: [
+                { q: "Server 1", url: srvs.blogger },
+                { q: "Server 2", url: srvs.mega },
+                { q: "Server 3", url: srvs.native }
+              ],
+              subtitles: [
+                { lang: "Indonesian", label: "Indonesian", url: "" },
+                { lang: "English", label: "English", url: "" }
+              ],
+              intro: { start: 90, end: 175 },
+              outro: { start: 1320, end: 1410 },
+              cached: true
+            }
+          };
+        };
+
+        window.NET27_DATA.search = function(query){
+          var q = (query || "").toLowerCase().trim();
+          if(!q) return normalized;
+          return normalized.filter(function(it){
+            var t = (it.title || "").toLowerCase();
+            var g = (it.genres || []).join(" ").toLowerCase();
+            var s = (it.synopsis || "").toLowerCase();
+            return t.indexOf(q) >= 0 || g.indexOf(q) >= 0 || s.indexOf(q) >= 0;
+          });
+        };
+      }
+
+      if(window.NetMirror){
+        if(window.NetMirror.initHero) window.NetMirror.initHero();
+        if(window.NetMirror.refreshHomeRails) window.NetMirror.refreshHomeRails();
+      }
+
+      return normalized;
+    })
+    .catch(function(err){
+      console.warn("loadAnimeDatabase fallback:", err);
+      return null;
+    });
+}
+window.loadAnimeDatabase = loadAnimeDatabase;
+
 var NetMirror = (function(){
   function getHeroData(){
+    if(window.ANIME_DB && window.ANIME_DB.length){
+      return window.ANIME_DB.slice(0, 6);
+    }
     if(typeof window !== "undefined" && window.NET27_DATA && window.NET27_DATA.hero && window.NET27_DATA.hero.length){
       return window.NET27_DATA.hero;
     }
@@ -2553,7 +2805,7 @@ var NetMirror = (function(){
     var card = document.createElement("div");
     card.className = "rail-card";
     card.tabIndex = 0;
-    var posterUrl = a.poster || "";
+    var posterUrl = a.poster || a.thumbnail || "";
     var epText = a.eps_counter ? ("EP " + a.eps_counter) : (a.badge || (a.episode != null ? ("EP " + a.episode) : (a.eps ? (a.eps + " EP") : "TV")));
     var scoreVal = a.score ? parseFloat(a.score) : 8.5;
     var scoreText = "⭐ " + scoreVal.toFixed(1);
@@ -2603,7 +2855,7 @@ var NetMirror = (function(){
 
     var bg = $("hero-backdrop");
     if(bg){
-      var bgImg = a.backdrop || a.poster || "https://s4.anilist.co/file/anilistcdn/media/anime/banner/176496-5oY4k2NRqlYs.jpg";
+      var bgImg = a.backdrop || a.banner || a.poster || a.thumbnail || "https://s4.anilist.co/file/anilistcdn/media/anime/banner/176496-5oY4k2NRqlYs.jpg";
       bg.style.backgroundImage = "url('" + bgImg + "')";
     }
 
@@ -2793,17 +3045,21 @@ var NetMirror = (function(){
   function refreshHomeRails(){
     renderContinue();
 
-    // 1. Render immediately from fallback data so rails are NEVER empty
-    var d = (typeof window !== "undefined") ? window.NET27_DATA : null;
-    var allItems = (d && d.items && d.items.length) ? d.items : NET_FALLBACK_ANIME;
-    renderRailItems($("lane-season"), allItems.slice(0, 10));
-    renderRailItems($("lane-latest"), allItems.slice(2, 12));
-    renderRailItems($("lane-popular"), allItems.slice().sort(function(a,b){ return (b.score||0) - (a.score||0); }).slice(0, 10));
+    // 1. Render immediately from 84-anime database or fallback data so rails are populated with Netflix horizontal items
+    var allItems = (window.ANIME_DB && window.ANIME_DB.length) ? window.ANIME_DB : 
+                   ((typeof window !== "undefined" && window.NET27_DATA && window.NET27_DATA.items && window.NET27_DATA.items.length) ? window.NET27_DATA.items : NET_FALLBACK_ANIME);
 
-    // 2. Fetch live updates if server API is reachable
-    loadTrendingRail();
-    loadLatestRail();
-    loadPopularRail();
+    renderRailItems($("lane-season"), allItems.slice(0, 15));
+    renderRailItems($("lane-latest"), allItems.slice(15, 30));
+    var sorted = allItems.slice().sort(function(a,b){ return (b.score||0) - (a.score||0); });
+    renderRailItems($("lane-popular"), sorted.slice(0, 15));
+
+    // 2. Fetch live updates if server API is reachable and local DB not loaded
+    if(!window.ANIME_DB || !window.ANIME_DB.length){
+      loadTrendingRail();
+      loadLatestRail();
+      loadPopularRail();
+    }
     loadFavoritesRail();
     bindRailNavArrows();
   }
@@ -2816,6 +3072,7 @@ var NetMirror = (function(){
 
   return {
     init: init,
+    initHero: initHero,
     refreshHomeRails: refreshHomeRails,
     setHeroSlide: setHeroSlide,
     fallbackAnime: NET_FALLBACK_ANIME
@@ -2979,10 +3236,16 @@ function init(){
     }
   });
   $("pm-close").addEventListener("click",closePlayer);
-  var btnSrvEmbed = $("pm-server-embed");
+  var btnSrvEmbed = $("pm-server-embed") || $("pm-server-blogger");
   if(btnSrvEmbed){
     btnSrvEmbed.addEventListener("click", function(){
-      switchPlayerServer("embed");
+      switchPlayerServer("blogger");
+    });
+  }
+  var btnSrvMega = $("pm-server-mega");
+  if(btnSrvMega){
+    btnSrvMega.addEventListener("click", function(){
+      switchPlayerServer("mega");
     });
   }
   var btnSrvNative = $("pm-server-native");
@@ -3091,10 +3354,13 @@ function init(){
     recordWatchProgress(true);
   });
 
+  loadAnimeDatabase();
   if(window.NetMirror && window.NetMirror.init){
     window.NetMirror.init();
   }
-  window.Tui.boot();
+  if(window.Tui && window.Tui.boot){
+    window.Tui.boot();
+  }
 }
 
 function toggleCli(forceState){
