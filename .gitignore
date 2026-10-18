@@ -22,3 +22,4 @@ signing.properties
 local.properties
 *.properties
 !gradle/wrapper/gradle-wrapper.properties
+.vercel

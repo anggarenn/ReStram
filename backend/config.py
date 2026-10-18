@@ -13,8 +13,11 @@ HI_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, li
 XOR_KEY = b"otaku-embed-v1"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATABASE_PATH = os.getenv("RESTRAM_DATABASE_PATH", os.getenv("TATAP_DATABASE_PATH", os.path.join(BASE_DIR, "anime.db")))
-CACHE_DIR = os.getenv("RESTRAM_CACHE_DIR", os.getenv("TATAP_CACHE_DIR", os.path.join(BASE_DIR, "cache")))
+IS_VERCEL = bool(os.getenv("VERCEL"))
+default_db = "/tmp/restram.db" if IS_VERCEL else os.path.join(BASE_DIR, "anime.db")
+default_cache = "/tmp/cache" if IS_VERCEL else os.path.join(BASE_DIR, "cache")
+DATABASE_PATH = os.getenv("RESTRAM_DATABASE_PATH", os.getenv("TATAP_DATABASE_PATH", default_db))
+CACHE_DIR = os.getenv("RESTRAM_CACHE_DIR", os.getenv("TATAP_CACHE_DIR", default_cache))
 try:
     if os.path.dirname(DATABASE_PATH):
         os.makedirs(os.path.dirname(DATABASE_PATH), exist_ok=True)
@@ -22,3 +25,4 @@ try:
         os.makedirs(CACHE_DIR, exist_ok=True)
 except Exception:
     pass
+
