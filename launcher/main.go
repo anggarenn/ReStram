@@ -117,7 +117,7 @@ func getLastLogLines(logPath string, maxLines int) string {
 }
 
 func acquireSingleInstance() (release func(), ok bool) {
-	name, _ := windows.UTF16PtrFromString(`Local\TatapSingleInstance_v2`)
+	name, _ := windows.UTF16PtrFromString(`Local\ReStramSingleInstance_v2`)
 	h, err := windows.CreateMutex(nil, false, name)
 	if err != nil {
 		return func() {}, false
@@ -181,7 +181,7 @@ func runWebView(appURL, dataPath string) {
 		AutoFocus: true,
 		DataPath:  dataPath,
 		WindowOptions: webview2.WindowOptions{
-			Title:  "Tatap - Nonton Santai di Lokal",
+			Title:  "ReStram - Nonton Santai di Lokal",
 			Width:  1280,
 			Height: 800,
 			Center: true,
@@ -192,7 +192,7 @@ func runWebView(appURL, dataPath string) {
 		},
 	})
 	if w == nil {
-		showMessage("Tatap - Kesalahan",
+		showMessage("ReStram - Kesalahan",
 			"WebView2 runtime tidak ditemukan.\n\nInstall Microsoft Edge WebView2 Runtime dari:\nhttps://developer.microsoft.com/microsoft-edge/webview2/",
 			MB_OK|MB_ICONERROR)
 		return
@@ -239,7 +239,7 @@ func main() {
 				p, errLook = exec.LookPath("python")
 			}
 			if errLook != nil {
-				showMessage("Tatap - Kesalahan", "Runtime Python tidak ditemukan di folder 'runtime\\python.exe' atau di sistem.", MB_OK|MB_ICONERROR)
+				showMessage("ReStram - Kesalahan", "Runtime Python tidak ditemukan di folder 'runtime\\python.exe' atau di sistem.", MB_OK|MB_ICONERROR)
 				return
 			}
 			pythonExe = p
@@ -247,7 +247,7 @@ func main() {
 
 		backendMain := filepath.Join(appDir, "backend", "main.py")
 		if _, err := os.Stat(backendMain); os.IsNotExist(err) {
-			showMessage("Tatap - Kesalahan", fmt.Sprintf("File backend tidak ditemukan:\n%s", backendMain), MB_OK|MB_ICONERROR)
+			showMessage("ReStram - Kesalahan", fmt.Sprintf("File backend tidak ditemukan:\n%s", backendMain), MB_OK|MB_ICONERROR)
 			return
 		}
 
@@ -271,7 +271,7 @@ func main() {
 		}
 
 		if err := pyCmd.Start(); err != nil {
-			showMessage("Tatap - Gagal Start", fmt.Sprintf("Gagal menyalakan proses backend: %v", err), MB_OK|MB_ICONERROR)
+			showMessage("ReStram - Gagal Start", fmt.Sprintf("Gagal menyalakan proses backend: %v", err), MB_OK|MB_ICONERROR)
 			return
 		}
 
@@ -310,7 +310,7 @@ func main() {
 			if strings.TrimSpace(logSnippet) != "" {
 				msg += "\n\nLog Kesalahan Terakhir:\n" + logSnippet
 			}
-			showMessage("Tatap - Gagal Memulai", msg, MB_OK|MB_ICONERROR)
+			showMessage("ReStram - Gagal Memulai", msg, MB_OK|MB_ICONERROR)
 			return
 		}
 	}

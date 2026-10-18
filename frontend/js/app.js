@@ -1,3 +1,27 @@
+(function migrateOldStorage(){
+  try{
+    for(var i=0; i<localStorage.length; i++){
+      var k = localStorage.key(i);
+      if(k && k.indexOf("tatap_") === 0){
+        var nk = "restram_" + k.substring(6);
+        if(localStorage.getItem(nk) === null){
+          localStorage.setItem(nk, localStorage.getItem(k));
+        }
+      }
+    }
+  }catch(e){}
+})();
+function getAppStorage(k){
+  try{
+    var v = localStorage.getItem("restram_" + k);
+    return v !== null ? v : localStorage.getItem("tatap_" + k);
+  }catch(e){return null;}
+}
+function setAppStorage(k, v){
+  try{
+    localStorage.setItem("restram_" + k, v);
+  }catch(e){}
+}
 var cur = {slug:"", title:"", ep:1, mode:"sub", quality:"best", res:null, eps:[], watched:{}, lastWatchedEp:null,
             subLang:"English",    // preferensi bahasa user dari /api/settings
             activeSub:null,       // URL track subtitle yang sedang aktif (live switch)
@@ -53,12 +77,12 @@ function toast(msg,ms){
 }
 function loadPrefs(){
   try{
-    if(localStorage.getItem("tatap_crt") === "on"){
+    if(getAppStorage("crt") === "on"){
       document.body.classList.remove("no-crt");
     } else {
       document.body.classList.add("no-crt");
     }
-    if(localStorage.getItem("tatap_ambient") === "off"){
+    if(getAppStorage("ambient") === "off"){
       document.body.classList.add("no-ambient");
     }
   }catch(e){}
@@ -74,7 +98,7 @@ function updateBookmarkBtn(isBookmarked){
 }
 
 function checkModalBookmark(slug){
-  window.Tatap.checkBookmark(slug).then(function(r){
+  (window.ReStram||window.Tatap).checkBookmark(slug).then(function(r){
     if(cur.slug !== slug) return;
     if(r && r.success && r.data){
       updateBookmarkBtn(!!r.data.bookmarked);
@@ -90,7 +114,7 @@ function toggleModalBookmark(){
   var nextState = !currentlyBookmarked;
   updateBookmarkBtn(nextState);
   if(nextState){
-    window.Tatap.addBookmark({
+    (window.ReStram||window.Tatap).addBookmark({
       slug: slug,
       title: cur.title,
       poster: cur.poster || "",
@@ -102,7 +126,7 @@ function toggleModalBookmark(){
       }
     });
   } else {
-    window.Tatap.removeBookmark(slug).then(function(){
+    (window.ReStram||window.Tatap).removeBookmark(slug).then(function(){
       if(window.Tui && window.Tui.state && window.Tui.state.view === "favorit"){
         window.Tui.setView("favorit");
       }
@@ -256,7 +280,7 @@ function openTitle(slug,title,poster,type,epsCounter,meta){
 }
 function loadRelations(){
   var thisSlug=cur.slug;
-  window.Tatap.relations(thisSlug, cur.title).then(function(r){
+  (window.ReStram||window.Tatap).relations(thisSlug, cur.title).then(function(r){
     if(thisSlug!==cur.slug)return; // Stale modal
     var sBar=$("tm-seasons");
     var sChips=$("tm-seasons-chips");
@@ -312,15 +336,15 @@ function recordEpisodeWatched(slug, ep){
   }
 
   try {
-    localStorage.setItem("tatap_last_ep_" + slug, String(ep));
-    var wKey = "tatap_watched_" + slug;
+    setAppStorage("last_ep_" + slug, String(ep));
+    var wKey = "watched_" + slug;
     var wObj = {};
-    try { wObj = JSON.parse(localStorage.getItem(wKey) || "{}"); } catch(e){}
+    try { wObj = JSON.parse(getAppStorage(wKey) || "{}"); } catch(e){}
     wObj[ep] = 1;
-    localStorage.setItem(wKey, JSON.stringify(wObj));
+    setAppStorage(wKey, JSON.stringify(wObj));
   } catch(e){}
 
-  window.Tatap.saveHist({
+  (window.ReStram||window.Tatap).saveHist({
     slug: slug,
     title: cur.title || slug,
     episode: ep,
@@ -349,7 +373,7 @@ function renderEpRanges(){
   var lastWatchedEp = cur.lastWatchedEp || -1;
   if(lastWatchedEp <= 0 && cur.slug){
     try {
-      var sLast = localStorage.getItem("tatap_last_ep_" + cur.slug);
+      var sLast = getAppStorage("last_ep_" + cur.slug);
       if(sLast) lastWatchedEp = parseInt(sLast);
     } catch(e){}
   }
@@ -400,9 +424,9 @@ function loadEps(){
   var thisSlug = cur.slug;
   if(thisSlug){
     try {
-      var localWatched = JSON.parse(localStorage.getItem("tatap_watched_" + thisSlug) || "{}");
+      var localWatched = JSON.parse(getAppStorage("watched_" + thisSlug) || "{}");
       cur.watched = Object.assign({}, localWatched);
-      var s = localStorage.getItem("tatap_last_ep_" + thisSlug);
+      var s = getAppStorage("last_ep_" + thisSlug);
       if(s) cur.lastWatchedEp = parseInt(s);
     } catch(e){}
   }
@@ -427,7 +451,7 @@ function loadEps(){
     renderEpGrid();
   }
 
-  window.Tatap.episodes(thisSlug).then(function(r){
+  (window.ReStram||window.Tatap).episodes(thisSlug).then(function(r){
     if(thisSlug !== cur.slug) return;
     if(!r.success){
       if(!cached) $("tm-count").textContent = "error: " + r.error;
@@ -443,7 +467,7 @@ function loadEps(){
       cur.meta = detail;
       renderDetailMeta(detail);
     }
-    window.Tatap.history().then(function(h){
+    (window.ReStram||window.Tatap).history().then(function(h){
       if(thisSlug !== cur.slug) return;
       var foundInHist = false;
       (h.data || []).forEach(function(x){
@@ -456,12 +480,12 @@ function loadEps(){
       });
       if(foundInHist && thisSlug === cur.slug && cur.lastWatchedEp){
         try {
-          var wKey = "tatap_watched_" + thisSlug;
+          var wKey = "watched_" + thisSlug;
           var wObj = {};
-          try { wObj = JSON.parse(localStorage.getItem(wKey) || "{}"); } catch(e){}
+          try { wObj = JSON.parse(getAppStorage(wKey) || "{}"); } catch(e){}
           for(var k in cur.watched){ wObj[k] = 1; }
-          localStorage.setItem(wKey, JSON.stringify(wObj));
-          localStorage.setItem("tatap_last_ep_" + thisSlug, String(cur.lastWatchedEp));
+          setAppStorage(wKey, JSON.stringify(wObj));
+          setAppStorage("last_ep_" + thisSlug, String(cur.lastWatchedEp));
         } catch(e){}
       }
       $("tm-count").textContent = countLabel();
@@ -489,7 +513,7 @@ function renderEpGrid(){
   var lastEp = cur.lastWatchedEp;
   if(!lastEp && cur.slug){
     try {
-      var storedLast = localStorage.getItem("tatap_last_ep_" + cur.slug);
+      var storedLast = getAppStorage("last_ep_" + cur.slug);
       if(storedLast) lastEp = parseInt(storedLast);
     } catch(e){}
   }
@@ -573,7 +597,7 @@ function recordWatchProgress(force){
   var curPos = Math.floor(v.currentTime || 0);
   var dur = Math.floor(v.duration || 0);
   if(curPos <= 0 && !force) return;
-  window.Tatap.saveProgress(cur.slug, cur.ep, curPos, dur).then(function(){
+  (window.ReStram||window.Tatap).saveProgress(cur.slug, cur.ep, curPos, dur).then(function(){
     renderContinue();
   }).catch(function(){});
 }
@@ -614,7 +638,7 @@ function openPlayer(ep, resumeTime){
     var fetchToken = ++_playTokenCounter;
     cur.playToken = fetchToken;
     var reqSlug = cur.slug;
-    window.Tatap.getProgress(reqSlug, ep).then(function(r){
+    (window.ReStram||window.Tatap).getProgress(reqSlug, ep).then(function(r){
       if(cur.playToken !== fetchToken || cur.slug !== reqSlug) return;
       if(r && r.success && r.data && r.data.should_resume && r.data.progress >= 15){
         var p = r.data.progress;
@@ -690,7 +714,7 @@ function openPlayer(ep, resumeTime){
           if(bRestart){
             bRestart.onclick = function(){
               cleanupModal();
-              window.Tatap.saveProgress(reqSlug, ep, 0, dur).catch(function(){});
+              (window.ReStram||window.Tatap).saveProgress(reqSlug, ep, 0, dur).catch(function(){});
               openPlayer(ep, 0);
             };
           }
@@ -740,7 +764,7 @@ function openPlayer(ep, resumeTime){
   updatePrevNext();
   var t0=Date.now();
   var src=cur.source||"";
-  window.Tatap.resolve(cur.slug,ep,cur.mode,cur.quality,src).then(function(r){
+  (window.ReStram||window.Tatap).resolve(cur.slug,ep,cur.mode,cur.quality,src).then(function(r){
     if(cur.playToken !== token || cur.slug !== reqSlug || $("player-modal").classList.contains("hidden")) return;
     if(!r || !r.success){
       $("pm-spinner").classList.add("hidden");
@@ -771,7 +795,7 @@ function openPlayer(ep, resumeTime){
     }
     var streamUrl = (r.data.master && (r.data.master.indexOf(".m3u8") >= 0 || r.data.master.indexOf("/hls") >= 0)) ? r.data.master : (picked ? picked.url : "");
     playUrl(streamUrl,r.data.referer,cur.activeSub,r.data.referer,resumeTime,token);
-    window.Tatap.saveHist({slug:cur.slug,title:cur.title,episode:ep,mode:cur.mode,progress:resumeTime||0}).then(function(){renderContinue();});
+    (window.ReStram||window.Tatap).saveHist({slug:cur.slug,title:cur.title,episode:ep,mode:cur.mode,progress:resumeTime||0}).then(function(){renderContinue();});
   }).catch(function(err){
     if(cur.playToken !== token || cur.slug !== reqSlug || $("player-modal").classList.contains("hidden")) return;
     $("pm-spinner").classList.add("hidden");
@@ -1004,17 +1028,17 @@ function renderSubtitles(subtitles, activeUrl){
       cur.translate=false;
       switchSubtitleTrack(url,"id");
       cur.subLang="Indonesian (GTX+)";
-      window.Tatap.setSetting({sub_lang:"Indonesian (GTX+)"}).then(function(){}).catch(function(){});
+      (window.ReStram||window.Tatap).setSetting({sub_lang:"Indonesian (GTX+)"}).then(function(){}).catch(function(){});
       return;
     }
     // Track AI Fansub: synthetic URL "ai:<url>". Extract realUrl + panggil translate.
     if(url&&url.indexOf("ai:")===0){
       cur.translate=true;
-      try{localStorage.setItem("tatap_translate","1");}catch(e){}
+      setAppStorage("translate","1");
       syncTranslate();
       switchSubtitleTrack(url,"id");
       cur.subLang="Indonesian (AI)";
-      window.Tatap.setSetting({sub_lang:"Indonesian (AI)"}).then(function(){}).catch(function(){});
+      (window.ReStram||window.Tatap).setSetting({sub_lang:"Indonesian (AI)"}).then(function(){}).catch(function(){});
       return;
     }
     // Track Google GTX: synthetic URL "gtx:<url>".
@@ -1022,7 +1046,7 @@ function renderSubtitles(subtitles, activeUrl){
       cur.translate=false;
       switchSubtitleTrack(url,"id");
       cur.subLang="Indonesian (GTX)";
-      window.Tatap.setSetting({sub_lang:"Indonesian (GTX)"}).then(function(){}).catch(function(){});
+      (window.ReStram||window.Tatap).setSetting({sub_lang:"Indonesian (GTX)"}).then(function(){}).catch(function(){});
       return;
     }
     // Update <track> live tanpa pause/reload video.
@@ -1036,11 +1060,11 @@ function renderSubtitles(subtitles, activeUrl){
     }
     if(label){
       cur.subLang=label;
-      window.Tatap.setSetting({sub_lang:label}).then(function(){}).catch(function(){});
+      (window.ReStram||window.Tatap).setSetting({sub_lang:label}).then(function(){}).catch(function(){});
       toast("Subtitle: "+label);
     }else{
       cur.subLang="";
-      window.Tatap.setSetting({sub_lang:""}).then(function(){}).catch(function(){});
+      (window.ReStram||window.Tatap).setSetting({sub_lang:""}).then(function(){}).catch(function(){});
       toast("Subtitle: Off");
     }
   };
@@ -1109,7 +1133,7 @@ function syncFullscreenSubtitles(){
   var isVidFs=isVideoFullscreen();
   for(var i=0;i<v.textTracks.length;i++){
     var t=v.textTracks[i];
-    if(t.label&&t.label.indexOf("Tatap")>=0){
+    if(t.label&&(t.label.indexOf("ReStram")>=0 || t.label.indexOf("Tatap")>=0)){
       t.mode=isVidFs?"showing":"hidden";
     }
   }
@@ -1119,7 +1143,7 @@ function syncNativeTextTrack(vttText, cues, langCode){
   var v=$("vid");
   if(!v)return;
 
-  var oldTracks=v.querySelectorAll("track.tatap-sub-track");
+  var oldTracks=v.querySelectorAll("track.restram-sub-track, track.tatap-sub-track");
   for(var i=0;i<oldTracks.length;i++){
     var trk=oldTracks[i];
     if(trk.src&&trk.src.indexOf("blob:")===0){
@@ -1131,7 +1155,7 @@ function syncNativeTextTrack(vttText, cues, langCode){
   if(v.textTracks){
     for(var j=0;j<v.textTracks.length;j++){
       var tt = v.textTracks[j];
-      if(tt.label&&tt.label.indexOf("Tatap")>=0){
+      if(tt.label&&(tt.label.indexOf("ReStram")>=0 || tt.label.indexOf("Tatap")>=0)){
         tt.mode="disabled";
         if(tt.cues){
           for(var ci=tt.cues.length-1;ci>=0;ci--){
@@ -1146,9 +1170,9 @@ function syncNativeTextTrack(vttText, cues, langCode){
 
   try{
     var trackEl=document.createElement("track");
-    trackEl.className="tatap-sub-track";
+    trackEl.className="restram-sub-track tatap-sub-track";
     trackEl.kind="subtitles";
-    trackEl.label="Tatap Subtitle";
+    trackEl.label="ReStram Subtitle";
     trackEl.srclang=langCode||"id";
     trackEl.default=false;
 
@@ -1534,8 +1558,9 @@ var TouchGestures = {
     rip.classList.add("active");
     setTimeout(function(){ rip.classList.remove("active"); }, 400);
     // Haptic feedback via native bridge or Web Vibration API
-    if(window.TatapNative && window.TatapNative.vibrate){
-      window.TatapNative.vibrate(25);
+    var nbNative = window.ReStramNative || window.TatapNative;
+    if(nbNative && nbNative.vibrate){
+      nbNative.vibrate(25);
     } else if(navigator.vibrate){
       try{ navigator.vibrate(25); }catch(e){}
     }
@@ -1601,8 +1626,9 @@ var TouchGestures = {
         var nb = Math.max(20, Math.min(150, self.initBright + deltaB));
         self.currentBright = nb;
         v.style.filter = "brightness(" + (nb / 100) + ")";
-        if(window.TatapNative && window.TatapNative.setBrightness){
-          window.TatapNative.setBrightness(nb / 100);
+        var nbNative = window.ReStramNative || window.TatapNative;
+        if(nbNative && nbNative.setBrightness){
+          nbNative.setBrightness(nb / 100);
         }
         self.showOSD('<svg class="ui-icon"><use href="#icon-sun"/></svg>', (nb / 150) * 100, Math.round(nb) + "%");
       }
@@ -1997,12 +2023,12 @@ function closePlayer(){
   }
 }
 function playMPV(){
-  window.Tatap.playMPV({slug:cur.slug,title:cur.title,ep:cur.ep||1,mode:cur.mode,quality:cur.quality}).then(function(r){
+  (window.ReStram||window.Tatap).playMPV({slug:cur.slug,title:cur.title,ep:cur.ep||1,mode:cur.mode,quality:cur.quality}).then(function(r){
     toast(r.success?("MPV: "+r.data.picked.q):("ERROR: "+r.error));
   });
 }
 function renderContinue(){
-  window.Tatap.history().then(function(r){
+  (window.ReStram||window.Tatap).history().then(function(r){
     var h=(r.data||[]).slice(0,10);
     var sec=$("continue-sec");
     if(!h.length){sec.classList.add("hidden");return;}
@@ -2117,7 +2143,7 @@ function syncSubSize(){
 function setSubSize(sz){
   if(sz!=="s"&&sz!=="m"&&sz!=="l")return;
   cur.subSize=sz;
-  try{localStorage.setItem("tatap_subsize",sz);}catch(e){}
+  setAppStorage("subsize",sz);
   syncSubSize();
 }
 
@@ -2129,7 +2155,7 @@ function syncTranslate(){
 }
 function setTranslate(on){
   cur.translate=!!on;
-  try{localStorage.setItem("tatap_translate",cur.translate?"1":"0");}catch(e){}
+  setAppStorage("translate",cur.translate?"1":"0");
   syncTranslate();
   // Re-render dropdown agar opsi Indonesian (AI) muncul/hilang.
   var subs=(cur.res&&cur.res.subtitles)||[];
@@ -2170,8 +2196,9 @@ function switchSource(targetSource){
   }
   cur.source = nextSource;
   renderSourceUI();
-  if(window.Tatap && window.Tatap.setSetting){
-    window.Tatap.setSetting({ preferred_source: nextSource }).catch(function(){});
+  var api = window.ReStram || window.Tatap;
+  if(api && api.setSetting){
+    api.setSetting({ preferred_source: nextSource }).catch(function(){});
   }
   var label = nextSource === "otakudesu" ? "Otakudesu (Sub Indo)" : "HiAnime";
   toast("Sumber: " + label);
@@ -2200,7 +2227,7 @@ function closeDrawer(){
 function openUpdateModal(data){
   var m = $("update-modal");
   if(!m) return;
-  $("um-title").textContent = data.release_name || ("Tatap v" + data.latest_version);
+  $("um-title").textContent = data.release_name || ("ReStram v" + data.latest_version);
   $("um-sub").textContent = "Rilis: " + (data.tag_name || "v" + data.latest_version) + " · Terpasang: v" + data.current_version;
   $("um-content").textContent = data.body || "Tidak ada catatan rilis.";
   
@@ -2260,15 +2287,15 @@ function closeUpdateModal(){
 
 function checkForUpdate(manualTrigger){
   if(manualTrigger) toast("Memeriksa update ke GitHub…", 2000);
-  window.Tatap.checkUpdate().then(function(res){
+  (window.ReStram||window.Tatap).checkUpdate().then(function(res){
     if(res && res.success && res.data){
       var d = res.data;
       if(d.has_update){
         openUpdateModal(d);
-        toast("🚀 Pembaruan Tatap v" + d.latest_version + " tersedia!", 4000);
+        toast("🚀 Pembaruan ReStram v" + d.latest_version + " tersedia!", 4000);
       } else {
         if(manualTrigger){
-          toast("✓ Tatap v" + d.current_version + " adalah versi terbaru!", 3000);
+          toast("✓ ReStram v" + d.current_version + " adalah versi terbaru!", 3000);
         }
       }
     } else {
@@ -2302,13 +2329,13 @@ App = {
 function init(){
   loadPrefs();
   try{
-    var sz=localStorage.getItem("tatap_subsize");
+    var sz=getAppStorage("subsize");
     if(sz==="s"||sz==="m"||sz==="l")cur.subSize=sz;
   }catch(e){}
   syncSubSize();
   // Toggle translate ID (persist localStorage tat_translate).
   try{
-    var tr=localStorage.getItem("tatap_translate");
+    var tr=getAppStorage("translate");
     if(tr==="1")cur.translate=true;
   }catch(e){}
   syncTranslate();
@@ -2331,7 +2358,7 @@ function init(){
       var endedEp = cur.ep;
 
       if(endedSlug && endedEp){
-        window.Tatap.saveProgress(endedSlug, endedEp, 0, Math.floor(v.duration||0)).catch(function(){});
+        (window.ReStram||window.Tatap).saveProgress(endedSlug, endedEp, 0, Math.floor(v.duration||0)).catch(function(){});
         recordEpisodeWatched(endedSlug, endedEp);
       }
 
@@ -2357,8 +2384,8 @@ function init(){
       e.preventDefault();
       toggleFullscreen();
     });
-    if(!v._tatapFsHooked){
-      v._tatapFsHooked=true;
+    if(!v._restramFsHooked && !v._tatapFsHooked){
+      v._restramFsHooked=v._tatapFsHooked=true;
       var origFs=v.requestFullscreen||v.webkitRequestFullscreen||v.mozRequestFullScreen||v.msRequestFullscreen;
       var fsHandler=function(options){
         var stage=document.querySelector(".ambient-stage");
@@ -2403,8 +2430,9 @@ function init(){
   if(tmSrc) tmSrc.addEventListener("click",function(){switchSource();});
   // Muat preferensi subtitle dari server (sub_lang). Kalau server gagal,
   // fallback ke default 'English' yang sudah di-set di var cur.
-  if(window.Tatap&&window.Tatap.getSettings){
-    window.Tatap.getSettings().then(function(r){
+  var api = window.ReStram || window.Tatap;
+  if(api && api.getSettings){
+    api.getSettings().then(function(r){
       if(r&&r.success&&r.data){
         if(r.data.sub_lang) cur.subLang=r.data.sub_lang;
         if(r.data.quality) cur.quality=r.data.quality;

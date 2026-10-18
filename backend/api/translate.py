@@ -1493,7 +1493,7 @@ async def call_openai_translate(cues, src, tgt, apikey, model, apiurl, timeout=1
         headers["x-goog-api-key"] = apikey
     if prov == "openrouter":
         headers["HTTP-Referer"] = "http://127.0.0.1"
-        headers["X-Title"] = "Tatap"
+        headers["X-Title"] = "ReStram"
 
     src_lines = [_prep_line(c["text"]) for c in cues]
     n = len(cues)

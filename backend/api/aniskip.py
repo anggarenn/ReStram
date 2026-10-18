@@ -39,7 +39,7 @@ def get_skip_times(mal_id, episode_num: int, timeout: float = 4.0) -> dict:
 
     url = f"https://api.aniskip.com/v2/skip-times/{mal_int}/{ep_int}?types=op&types=ed&types=mixed-op&types=mixed-ed&episodeLength=0"
     headers = {
-        "User-Agent": "Tatap/2.5.0 (https://github.com/asfaraguest/tatap)",
+        "User-Agent": "ReStram/2.9.2 (https://github.com/anggarenn/ReStram)",
         "Accept": "application/json"
     }
 

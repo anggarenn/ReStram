@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=ReStram
+Comment=Pemutar anime lokal ringan tanpa akun
+Exec=AppRun
+Icon=restram
+Categories=AudioVideo;Player;Video;
+Terminal=false
+StartupWMClass=restram

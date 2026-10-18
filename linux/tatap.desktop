@@ -1,9 +1,9 @@
 [Desktop Entry]
 Type=Application
-Name=Tatap
+Name=ReStram
 Comment=Pemutar anime lokal ringan tanpa akun
 Exec=AppRun
-Icon=tatap
+Icon=restram
 Categories=AudioVideo;Player;Video;
 Terminal=false
-StartupWMClass=tatap
+StartupWMClass=restram

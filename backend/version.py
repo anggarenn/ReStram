@@ -1,4 +1,4 @@
-# Single source of truth version for Tatap backend
+# Single source of truth version for ReStram backend
 # Synchronized with root VERSION file by tools/bump_version.py
 
 __version__ = "2.9.2"

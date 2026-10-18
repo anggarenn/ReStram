@@ -21,7 +21,7 @@ async def lifespan(app: FastAPI):
     yield
 
 from version import __version__ as CURRENT_VERSION
-app = FastAPI(title="Tatap", version=CURRENT_VERSION, lifespan=lifespan)
+app = FastAPI(title="ReStram", version=CURRENT_VERSION, lifespan=lifespan)
 
 def ok(data):
     return {"success": True, "data": data}
@@ -41,17 +41,17 @@ async def get_version():
 
 @app.get("/api/update/check")
 async def check_update():
-    """Pemeriksaan pembaruan versi Tatap secara on-demand via GitHub Releases API.
+    """Pemeriksaan pembaruan versi ReStram secara on-demand via GitHub Releases API.
     Memfilter 4 berkas resmi sesuai aturan paten agent.md:
-    1. tatap-release-v<VER>.apk (Official Signed Mobile APK)
-    2. tatap-tv-release-v<VER>.apk (Official Signed Android/Google TV APK)
-    3. tatap-windows-x64-portable.zip (Windows Portable)
-    4. Tatap-x86_64.AppImage (Linux AppImage)
+    1. restram-release-v<VER>.apk (Official Signed Mobile APK)
+    2. restram-tv-release-v<VER>.apk (Official Signed Android/Google TV APK)
+    3. restram-windows-x64-portable.zip (Windows Portable)
+    4. ReStram-x86_64.AppImage (Linux AppImage)
     """
     try:
-        url = "https://api.github.com/repos/asfaraguest/tatap/releases/latest"
+        url = "https://api.github.com/repos/anggarenn/ReStram/releases/latest"
         headers = {
-            "User-Agent": f"Tatap-App/{CURRENT_VERSION} (https://github.com/asfaraguest/tatap)",
+            "User-Agent": f"ReStram-App/{CURRENT_VERSION} (https://github.com/anggarenn/ReStram)",
             "Accept": "application/vnd.github.v3+json"
         }
         async with httpx.AsyncClient(timeout=8.0, follow_redirects=True) as client:
@@ -87,9 +87,9 @@ async def check_update():
         for a in raw_assets:
             fname = (a.get("name") or "").lower()
             dl_url = a.get("browser_download_url") or ""
-            if "tatap-tv-release-" in fname and fname.endswith(".apk") and not fname.endswith(".idsig"):
+            if ("restram-tv-release-" in fname or "tatap-tv-release-" in fname) and fname.endswith(".apk") and not fname.endswith(".idsig"):
                 assets_out["android_tv"] = dl_url
-            elif "tatap-release-" in fname and fname.endswith(".apk") and not fname.endswith(".idsig"):
+            elif ("restram-release-" in fname or "tatap-release-" in fname) and fname.endswith(".apk") and not fname.endswith(".idsig"):
                 assets_out["android"] = dl_url
             elif "windows" in fname and fname.endswith(".zip"):
                 assets_out["windows"] = dl_url
@@ -104,7 +104,7 @@ async def check_update():
             "release_name": rel_data.get("name") or tag_name,
             "body": rel_data.get("body") or "",
             "published_at": rel_data.get("published_at") or "",
-            "release_url": rel_data.get("html_url") or "https://github.com/asfaraguest/tatap/releases/latest",
+            "release_url": rel_data.get("html_url") or "https://github.com/anggarenn/ReStram/releases/latest",
             "assets": assets_out
         })
     except Exception as e:
@@ -674,8 +674,8 @@ ID_TO_EN = {
 @app.get("/api/schedule")
 async def anime_schedule(day: str = Query("today")):
     """Jadwal rilis anime 7 hari mingguan (Senin - Minggu) waktu WIB.
-    HANYA menampilkan anime yang tersedia di aplikasi Tatap (memiliki slug valid).
-    Anime yang tidak ada di aplikasi Tatap otomatis di-remove."""
+    HANYA menampilkan anime yang tersedia di aplikasi ReStram (memiliki slug valid).
+    Anime yang tidak ada di aplikasi ReStram otomatis di-remove."""
     try:
         import datetime as _dt
         loop = asyncio.get_running_loop()
@@ -725,7 +725,7 @@ async def anime_schedule(day: str = Query("today")):
 
             for s, title, _ in pending:
                 slug = slug_by_title.get(title)
-                # FILTER KETAT: Yang tidak ada di dalam app Tatap di-REMOVE dari jadwal
+                # FILTER KETAT: Yang tidak ada di dalam app ReStram di-REMOVE dari jadwal
                 if not slug:
                     continue
 
@@ -1072,7 +1072,7 @@ async def resolve(slug: str = Query(""), ep: int = Query(1), mode: str = Query("
         async def _check_and_prewarm(ep_data):
             try:
                 sub_lang = (await get_setting("sub_lang", "Indonesian")).strip().lower()
-                auto_tr = await get_setting("tatap_translate", "1")
+                auto_tr = await get_setting("restram_translate", await get_setting("tatap_translate", "1"))
                 # Jika preferensi pengguna adalah Indonesia atau auto-translate aktif
                 if sub_lang in ("indonesian", "id") or auto_tr in ("1", "true"):
                     subs = ep_data.get("subtitles") or []
@@ -1324,7 +1324,7 @@ async def _pipe_desync_video(url: str, referer: str):
     headers = {"Referer": referer} if referer else {}
     loop = asyncio.get_running_loop()
     
-    # Playlist m3u8: baca penuh dan rewrite URL agar segmen tetap lewat proxy Tatap
+    # Playlist m3u8: baca penuh dan rewrite URL agar segmen tetap lewat proxy ReStram
     if _is_m3u8_url(url):
         body = await loop.run_in_executor(None, lambda: tls_desync_request(url, headers=headers))
         try:
@@ -1349,7 +1349,7 @@ def _get_video_client(url: str):
     global _direct_client
     import httpx as _hx
     if _direct_client is None:
-        if os.environ.get("TATAP_IS_TV") == "1":
+        if os.environ.get("RESTRAM_IS_TV") == "1" or os.environ.get("TATAP_IS_TV") == "1":
             limits = _hx.Limits(max_connections=30, max_keepalive_connections=20, keepalive_expiry=90.0)
         else:
             limits = _hx.Limits(max_connections=60, max_keepalive_connections=30, keepalive_expiry=90.0)
@@ -2119,7 +2119,7 @@ async def root():
     idx_path = os.path.join(frontend_dir, "index.html")
     if os.path.isfile(idx_path):
         return FileResponse(idx_path)
-    return ok({"status": "running", "app": "Tatap Native Android Backend"})
+    return ok({"status": "running", "app": "ReStram Native Android Backend"})
 
 if __name__ == "__main__":
     import uvicorn

@@ -1,4 +1,4 @@
-"""Scraper dan resolver stream untuk Otakudesu (Secondary Source Tatap).
+"""Scraper dan resolver stream untuk Otakudesu (Secondary Source ReStram).
 Mengambil episode dan mendekripsi stream HLS dari player embed putarin.xyz (AES-256-GCM).
 """
 

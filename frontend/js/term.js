@@ -23,9 +23,12 @@ var Tui = (function () {
   }
   function clearLog(){$("log").classList.add("hidden");$("log").innerHTML="";}
 
-  function loadRecents(){try{return JSON.parse(localStorage.getItem("tatap_recent")||"[]");}catch(e){return [];}}
-  function loadCmdHist(){try{return JSON.parse(localStorage.getItem("tatap_hist")||"[]");}catch(e){return [];}}
-  function saveCmdHist(h){try{localStorage.setItem("tatap_hist",JSON.stringify(h.slice(0,50)));}catch(e){}}
+  var Api = window.ReStram || window.Tatap;
+  function getTermStorage(k){try{var v=localStorage.getItem("restram_"+k);return v!==null?v:localStorage.getItem("tatap_"+k);}catch(e){return null;}}
+  function setTermStorage(k,v){try{localStorage.setItem("restram_"+k,v);}catch(e){}}
+  function loadRecents(){try{return JSON.parse(getTermStorage("recent")||"[]");}catch(e){return [];}}
+  function loadCmdHist(){try{return JSON.parse(getTermStorage("hist")||"[]");}catch(e){return [];}}
+  function saveCmdHist(h){try{setTermStorage("hist",JSON.stringify(h.slice(0,50)));}catch(e){}}
 
   function cmdUsage(){
     return "perintah:\n  cari <judul> | :musim | :lanjutan | :favorit | :katalog\n  :terbaru | :season <winter|spring|summer|fall> <tahun>\n  :switch [hianime|otaku] (ganti sumber video HiAnime / Otakudesu)\n  :filter [key=val...] | :filter reset\n  :genre <slug|title> | :genre | :genre --list | :genre reset\n  :update (cek versi rilis terbaru secara on-demand)\n  :apikey <key> | :ollama <key> | :groq <key> | :gemini <key> | :model <nama> | :apiurl <url>\n  :logs | :crt on|off|toggle | :ambient on|off|toggle\n  :riwayat | :favorit | :status | :bantuan | :q";
@@ -128,22 +131,23 @@ var Tui = (function () {
   }
 
   function apiCall(name){
+    var api = window.ReStram || window.Tatap;
     switch(name){
-      case "musim":return window.Tatap.seasonNow(S.page);
-      case "lanjutan":return window.Tatap.stillAiring(S.page);
-      case "favorit":return window.Tatap.bookmarks();
+      case "musim":return api.seasonNow(S.page);
+      case "lanjutan":return api.stillAiring(S.page);
+      case "favorit":return api.bookmarks();
       case "katalog":{
         var f = S.catalogFilter || {};
         var hasFilter = (f.sort && f.sort !== "popularity") || f.year || f.season || f.month || f.type || f.status || f.genre;
         if(hasFilter) {
-          return window.Tatap.browse(f, S.page);
+          return api.browse(f, S.page);
         }
-        return window.Tatap.catalog(S.page);
+        return api.catalog(S.page);
       }
-      case "terbaru":return window.Tatap.schedule(S.scheduleDay || "today");
+      case "terbaru":return api.schedule(S.scheduleDay || "today");
       case "season-custom":{
         if(!S.seasonFilter)return null;
-        return window.Tatap.seasonBy(S.seasonFilter.season, S.seasonFilter.year, S.page);
+        return api.seasonBy(S.seasonFilter.season, S.seasonFilter.year, S.page);
       }
       case "cari":return null;
     }
@@ -515,7 +519,7 @@ var Tui = (function () {
   function startSearch(q){
     q=q.trim();if(!q)return;
     var recent=loadRecents().filter(function(x){return x!==q;});recent.unshift(q);
-    try{localStorage.setItem("tatap_recent",JSON.stringify(recent.slice(0,6)));}catch(e){}
+    setTermStorage("recent",JSON.stringify(recent.slice(0,6)));
     setViewSilent("cari");
     $("empty-state").style.display="none";
     $("results-title").textContent="Mencari "+q+"...";$("results-meta").textContent="";
@@ -535,7 +539,7 @@ var Tui = (function () {
     }
     try{
       var src = (window.cur && window.cur.source) || "";
-      var r = await window.Tatap.search(q, src);
+      var r = await (window.ReStram||window.Tatap).search(q, src);
       if(!r||!r.success){log("search error: "+(r&&r.error||"??"),"err");return;}
       S.items=r.data.results||[];S.sel=-1;S.total=1;
       $("results-title").textContent=S.items.length?"Hasil untuk \""+q+"\"":"Tidak ketemu \""+q+"\"";
@@ -612,7 +616,7 @@ var Tui = (function () {
   }
   async function loadGenres(){
     if(_genreList)return _genreList;
-    var r=await window.Tatap.genres();
+    var r=await (window.ReStram||window.Tatap).genres();
     var raw=(r&&r.success&&r.data&&r.data.list)||[];
     _genreList=raw.filter(function(g){
       return (g.slug||"").toLowerCase()!=="hentai" && (g.title||"").toLowerCase().indexOf("hentai")<0;
@@ -776,7 +780,7 @@ var Tui = (function () {
     }
     if(!args){
       // Status: tampilkan ketiga nilai translate (mask apikey).
-      var r = await window.Tatap.getSettings();
+      var r = await (window.ReStram||window.Tatap).getSettings();
       var d = (r && r.success && r.data) || {};
       log("apikey : "+maskKey(d.translate_apikey||""),"ok");
       log("model  : "+(d.translate_model||"(default)"),"ok");
@@ -792,7 +796,7 @@ var Tui = (function () {
     }
     if(args === "clear" || args === "reset"){
       var p1 = {}; p1[info.field] = "";
-      try{ await window.Tatap.setSetting(p1); }catch(e){}
+      try{ await (window.ReStram||window.Tatap).setSetting(p1); }catch(e){}
       log(info.label+" dihapus","ok");
       return;
     }
@@ -837,7 +841,7 @@ var Tui = (function () {
       }
     }
     try{
-      var res = await window.Tatap.setSetting(payload);
+      var res = await (window.ReStram||window.Tatap).setSetting(payload);
       if(res && res.success){
         var masked = (cmd === "apikey") ? (" (" + maskKey(args) + ")") : (" (" + args + ")");
         log(info.label + " disimpan" + masked + extra, "ok");
@@ -912,9 +916,9 @@ var Tui = (function () {
         if(window.App && window.App.switchSource){
           var resSrc = window.App.switchSource(nxt);
           log("sumber streaming beralih ke: " + (resSrc === "otakudesu" ? "Otakudesu (Sub Indo)" : "HiAnime"), "ok");
-        }else{
-          if(window.Tatap && window.Tatap.setSetting){
-            window.Tatap.setSetting({ preferred_source: nxt }).catch(function(){});
+          var api = window.ReStram || window.Tatap;
+          if(api && api.setSetting){
+            api.setSetting({ preferred_source: nxt }).catch(function(){});
           }
           log("sumber streaming default: " + nxt, "ok");
         }
@@ -934,18 +938,18 @@ var Tui = (function () {
         if(!args){log("usage: crt on|off|toggle","err");break;}
         var v1=args==="on"?"on":args==="off"?"off":null;
         if(v1===null&&args!=="toggle"){log("usage: crt on|off|toggle","err");break;}
-        var cur=localStorage.getItem("tatap_crt")||"off";
+        var cur=getTermStorage("crt")||"off";
         var nxt=v1||(cur==="on"?"off":"on");
-        try{localStorage.setItem("tatap_crt",nxt);}catch(e){}
+        setTermStorage("crt",nxt);
         document.body.classList.toggle("no-crt",nxt!=="on");
         log("crt "+(nxt==="on"?"ON":"OFF"),"ok");break;
       case "ambient":
         if(!args){log("usage: ambient on|off|toggle","err");break;}
         var v2=args==="on"?"on":args==="off"?"off":null;
         if(v2===null&&args!=="toggle"){log("usage: ambient on|off|toggle","err");break;}
-        var cur2=localStorage.getItem("tatap_ambient")||"on";
+        var cur2=getTermStorage("ambient")||"on";
         var nxt2=v2||(cur2==="on"?"off":"on");
-        try{localStorage.setItem("tatap_ambient",nxt2);}catch(e){}
+        setTermStorage("ambient",nxt2);
         document.body.classList.toggle("no-ambient",nxt2==="off");
         log("ambient "+(nxt2==="on"?"ON":"OFF"),"ok");break;
       case "riwayat":
@@ -959,17 +963,18 @@ var Tui = (function () {
         await cmdTranslateSetting(cmd,args);break;
       case "server":
         if(!args){
-          var curSrv = localStorage.getItem("tatap_server") || (location.origin && location.origin !== "null" ? location.origin : "http://127.0.0.1:8767");
+          var curSrv = getTermStorage("server") || (location.origin && location.origin !== "null" ? location.origin : "http://127.0.0.1:8767");
           log("server backend saat ini: " + curSrv, "ok");
           log("usage: :server <http://ip-komputer:8767> atau :server reset", "dim");
         }else if(args === "reset" || args === "local"){
+          localStorage.removeItem("restram_server");
           localStorage.removeItem("tatap_server");
           log("server backend direset ke default (local)", "ok");
           location.reload();
         }else{
           var sUrl = args.trim().replace(/\/+$/, "");
           if(!/^https?:\/\//i.test(sUrl)) sUrl = "http://" + sUrl;
-          localStorage.setItem("tatap_server", sUrl);
+          setTermStorage("server", sUrl);
           log("server backend disetel ke: " + sUrl, "ok");
           setTimeout(function(){ location.reload(); }, 600);
         }
@@ -985,13 +990,13 @@ var Tui = (function () {
           window.App.checkForUpdate(true);
         } else {
           try{
-            var ures = await window.Tatap.checkUpdate();
+            var ures = await (window.ReStram||window.Tatap).checkUpdate();
             if(ures && ures.success && ures.data){
               if(ures.data.has_update){
                 log("pembaruan tersedia: v" + ures.data.latest_version + " — " + ures.data.release_name,"ok");
                 log("kunjungi: " + ures.data.release_url,"ok");
               } else {
-                log("Tatap v" + ures.data.current_version + " adalah versi terbaru. Tidak ada update.","ok");
+                log("ReStram v" + ures.data.current_version + " adalah versi terbaru. Tidak ada update.","ok");
               }
             } else {
               log("gagal cek update: " + (ures&&ures.error||"unknown"),"err");
@@ -1053,7 +1058,7 @@ var Tui = (function () {
   function submitPrompt(){
     var inp=$("cmd");var raw=inp.value.trim();inp.value="";
     if(!raw)return;
-    log("tatap$ "+raw);
+    log("restram$ "+raw);
     if(raw.indexOf(":")===0){handleCommand(raw.slice(1));}
     else{handleCommand("cari "+raw);}
   }

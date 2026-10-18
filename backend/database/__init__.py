@@ -12,7 +12,7 @@ DB_PATH = DATABASE_PATH
 @asynccontextmanager
 async def _connect_db():
     async with aiosqlite.connect(DB_PATH) as db:
-        if os.environ.get("TATAP_IS_TV") == "1":
+        if os.environ.get("RESTRAM_IS_TV") == "1" or os.environ.get("TATAP_IS_TV") == "1":
             await db.execute("PRAGMA cache_size = -500;")
             await db.execute("PRAGMA temp_store = FILE;")
             await db.execute("PRAGMA mmap_size = 0;")

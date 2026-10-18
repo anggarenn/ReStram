@@ -13,8 +13,8 @@ HI_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, li
 XOR_KEY = b"otaku-embed-v1"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATABASE_PATH = os.getenv("TATAP_DATABASE_PATH", os.path.join(BASE_DIR, "anime.db"))
-CACHE_DIR = os.getenv("TATAP_CACHE_DIR", os.path.join(BASE_DIR, "cache"))
+DATABASE_PATH = os.getenv("RESTRAM_DATABASE_PATH", os.getenv("TATAP_DATABASE_PATH", os.path.join(BASE_DIR, "anime.db")))
+CACHE_DIR = os.getenv("RESTRAM_CACHE_DIR", os.getenv("TATAP_CACHE_DIR", os.path.join(BASE_DIR, "cache")))
 try:
     if os.path.dirname(DATABASE_PATH):
         os.makedirs(os.path.dirname(DATABASE_PATH), exist_ok=True)

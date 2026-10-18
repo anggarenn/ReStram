@@ -1,22 +1,22 @@
 <div align="center">
-  <img src="assets/tatap_icon_512.png" width="112" height="112" alt="Tatap Logo">
-  <h1>Tatap</h1>
+  <img src="assets/restram_icon_512.png" width="112" height="112" alt="ReStram Logo">
+  <h1>ReStram</h1>
   <p>Pemutar dan agregator anime mandiri multiplatform (Android Mobile, Android TV, Windows, Linux, Web) yang ringan, bebas iklan, tanpa registrasi akun, dan menjaga privasi data di penyimpanan lokal.</p>
 
   <p>
-    <a href="https://github.com/asfaraguest/tatap/releases/latest"><img src="https://img.shields.io/github/v/release/asfaraguest/tatap?style=flat-square&color=00dbeb&label=Rilis" alt="Release"></a>
-    <a href="https://somsubhra.github.io/github-release-stats/?username=asfaraguest&repository=tatap" target="_blank" title="Lihat Statistik Unduhan Lengkap"><img src="https://img.shields.io/github/downloads/asfaraguest/tatap/total?style=flat-square&color=3fb950&label=Statistik%20Unduhan" alt="Statistik Unduhan"></a>
-    <a href="https://github.com/asfaraguest/tatap/stargazers"><img src="https://img.shields.io/github/stars/asfaraguest/tatap?style=flat-square&logo=github&color=e3b341&label=Stars" alt="Stars"></a>
-    <a href="https://github.com/asfaraguest/tatap/network/members"><img src="https://img.shields.io/github/forks/asfaraguest/tatap?style=flat-square&logo=github&color=58a6ff&label=Forks" alt="Forks"></a>
-    <a href="https://hits.sh/github.com/asfaraguest/tatap/"><img src="https://hits.sh/github.com/asfaraguest/tatap.svg?style=flat-square&label=Kunjungan&color=00dbeb" alt="Views"></a>
+    <a href="https://github.com/anggarenn/ReStram/releases/latest"><img src="https://img.shields.io/github/v/release/anggarenn/ReStram?style=flat-square&color=00dbeb&label=Rilis" alt="Release"></a>
+    <a href="https://somsubhra.github.io/github-release-stats/?username=anggarenn&repository=ReStram" target="_blank" title="Lihat Statistik Unduhan Lengkap"><img src="https://img.shields.io/github/downloads/anggarenn/ReStram/total?style=flat-square&color=3fb950&label=Statistik%20Unduhan" alt="Statistik Unduhan"></a>
+    <a href="https://github.com/anggarenn/ReStram/stargazers"><img src="https://img.shields.io/github/stars/anggarenn/ReStram?style=flat-square&logo=github&color=e3b341&label=Stars" alt="Stars"></a>
+    <a href="https://github.com/anggarenn/ReStram/network/members"><img src="https://img.shields.io/github/forks/anggarenn/ReStram?style=flat-square&logo=github&color=58a6ff&label=Forks" alt="Forks"></a>
+    <a href="https://hits.sh/github.com/anggarenn/ReStram/"><img src="https://hits.sh/github.com/anggarenn/ReStram.svg?style=flat-square&label=Kunjungan&color=00dbeb" alt="Views"></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/Lisensi-GPL--3.0-blue.svg?style=flat-square" alt="License"></a>
   </p>
 
   <p>
-    <a href="https://github.com/asfaraguest/tatap/releases/latest/download/tatap-release-v2.9.1.apk"><img src="https://img.shields.io/badge/Download-Android%20Mobile-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android Mobile APK"></a>
-    <a href="https://github.com/asfaraguest/tatap/releases/latest/download/tatap-tv-release-v2.9.1.apk"><img src="https://img.shields.io/badge/Download-Android%20TV-0081C9?style=for-the-badge&logo=android&logoColor=white" alt="Android TV APK"></a>
-    <a href="https://github.com/asfaraguest/tatap/releases/latest/download/tatap-windows-x64-portable.zip"><img src="https://img.shields.io/badge/Download-Windows%20x64-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Windows Portable"></a>
-    <a href="https://github.com/asfaraguest/tatap/releases/latest/download/Tatap-x86_64.AppImage"><img src="https://img.shields.io/badge/Download-Linux%20AppImage-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux AppImage"></a>
+    <a href="https://github.com/anggarenn/ReStram/releases/latest/download/restram-release-v2.9.2.apk"><img src="https://img.shields.io/badge/Download-Android%20Mobile-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android Mobile APK"></a>
+    <a href="https://github.com/anggarenn/ReStram/releases/latest/download/restram-tv-release-v2.9.2.apk"><img src="https://img.shields.io/badge/Download-Android%20TV-0081C9?style=for-the-badge&logo=android&logoColor=white" alt="Android TV APK"></a>
+    <a href="https://github.com/anggarenn/ReStram/releases/latest/download/restram-windows-x64-portable.zip"><img src="https://img.shields.io/badge/Download-Windows%20x64-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Windows Portable"></a>
+    <a href="https://github.com/anggarenn/ReStram/releases/latest/download/ReStram-x86_64.AppImage"><img src="https://img.shields.io/badge/Download-Linux%20AppImage-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux AppImage"></a>
   </p>
 
   <p>
@@ -39,7 +39,7 @@
 
 ## Subtitle Engine
 
-Tatap menyediakan sistem takarir multi-tier yang dapat dipilih langsung dari pemutar:
+ReStram menyediakan sistem takarir multi-tier yang dapat dipilih langsung dari pemutar:
 
 | Subtitle Engine | Nama di Pemutar | Keterangan |
 | :--- | :--- | :--- |
@@ -70,20 +70,20 @@ Pilih paket instalasi resmi sesuai perangkat Anda:
 
 | Platform Perangkat | Tombol Unduh Langsung | Format Berkas | Keterangan & Kompatibilitas |
 | :--- | :---: | :---: | :--- |
-| **Android Ponsel / Tablet** | [![Unduh Android APK](https://img.shields.io/badge/Download-Android%20APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/asfaraguest/tatap/releases/latest/download/tatap-release-v2.9.1.apk) | `.apk` (~35 MB) | Signed Production APK (Android 7.0 s/d 16, Watch Portrait View & Adaptive Icons) |
-| **Android TV / Google TV** | [![Unduh Android TV APK](https://img.shields.io/badge/Download-Android%20TV%20APK-0081C9?style=for-the-badge&logo=android&logoColor=white)](https://github.com/asfaraguest/tatap/releases/latest/download/tatap-tv-release-v2.9.1.apk) | `.apk` (~35 MB) | Signed Production APK khusus TV (Leanback 10-foot UI & Remote D-pad) |
-| **Windows (x64)** | [![Unduh Windows Portable](https://img.shields.io/badge/Download-Windows%20Portable-0078D6?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/asfaraguest/tatap/releases/latest/download/tatap-windows-x64-portable.zip) | `.zip` (~26 MB) | Standalone Portable (Ekstrak zip & jalankan `Tatap.exe`) |
-| **Linux (x86_64)** | [![Unduh Linux AppImage](https://img.shields.io/badge/Download-Linux%20AppImage-FCC624?style=for-the-badge&logo=linux&logoColor=black)](https://github.com/asfaraguest/tatap/releases/latest/download/Tatap-x86_64.AppImage) | `.AppImage` (~58 MB) | Standalone AppImage (Berikan izin `chmod +x` lalu jalankan) |
+| **Android Ponsel / Tablet** | [![Unduh Android APK](https://img.shields.io/badge/Download-Android%20APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/anggarenn/ReStram/releases/latest/download/restram-release-v2.9.2.apk) | `.apk` (~35 MB) | Signed Production APK (Android 7.0 s/d 16, Watch Portrait View & Adaptive Icons) |
+| **Android TV / Google TV** | [![Unduh Android TV APK](https://img.shields.io/badge/Download-Android%20TV%20APK-0081C9?style=for-the-badge&logo=android&logoColor=white)](https://github.com/anggarenn/ReStram/releases/latest/download/restram-tv-release-v2.9.2.apk) | `.apk` (~35 MB) | Signed Production APK khusus TV (Leanback 10-foot UI & Remote D-pad) |
+| **Windows (x64)** | [![Unduh Windows Portable](https://img.shields.io/badge/Download-Windows%20Portable-0078D6?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/anggarenn/ReStram/releases/latest/download/restram-windows-x64-portable.zip) | `.zip` (~26 MB) | Standalone Portable (Ekstrak zip & jalankan `ReStram.exe`) |
+| **Linux (x86_64)** | [![Unduh Linux AppImage](https://img.shields.io/badge/Download-Linux%20AppImage-FCC624?style=for-the-badge&logo=linux&logoColor=black)](https://github.com/anggarenn/ReStram/releases/latest/download/ReStram-x86_64.AppImage) | `.AppImage` (~58 MB) | Standalone AppImage (Berikan izin `chmod +x` lalu jalankan) |
 
 > [!TIP]
 > **Mengalami Kendala Pemasangan pada Android (Samsung One UI, Xiaomi/HyperOS, dll.)?**  
 > Jika ponsel Anda (khususnya Samsung One UI 6.0+) memblokir pemasangan dengan pesan *"Pemasangan diblokir (Auto Blocker)"* atau *"Diblokir oleh Play Protect"*, ikuti solusi langkah-demi-langkah pada **[Panduan Pemecahan Masalah Instalasi Android](docs/TROUBLESHOOTING_ANDROID.md)**.
 
-Seluruh arsip versi rilis stabil sebelumnya tersedia di [Halaman Rilis Resmi GitHub](https://github.com/asfaraguest/tatap/releases). Untuk memantau grafik dan riwayat total unduhan secara transparan, kunjungi [Dasbor Statistik Unduhan Tatap](https://somsubhra.github.io/github-release-stats/?username=asfaraguest&repository=tatap).
+Seluruh arsip versi rilis stabil sebelumnya tersedia di [Halaman Rilis Resmi GitHub](https://github.com/anggarenn/ReStram/releases). Untuk memantau grafik dan riwayat total unduhan secara transparan, kunjungi [Dasbor Statistik Unduhan ReStram](https://somsubhra.github.io/github-release-stats/?username=anggarenn&repository=ReStram).
 
 ### Menjalankan Versi Self-Hosted (Web Server / VPS / Localhost)
 
-Bagi pengguna yang ingin menjalankan Tatap sebagai layanan web mandiri (*self-hosted*) di server lokal, HomeLab, maupun VPS Linux:
+Bagi pengguna yang ingin menjalankan ReStram sebagai layanan web mandiri (*self-hosted*) di server lokal, HomeLab, maupun VPS Linux:
 
 1. **Prasyarat Sistem:**
    - Python 3.11 atau lebih baru (`python3 --version`)
@@ -91,8 +91,8 @@ Bagi pengguna yang ingin menjalankan Tatap sebagai layanan web mandiri (*self-ho
 
 2. **Kloning & Pemasangan Otomatis:**
    ```bash
-   git clone https://github.com/asfaraguest/tatap.git
-   cd tatap
+   git clone https://github.com/anggarenn/ReStram.git
+   cd ReStram
    ./install.sh
    ```
    *Skrip `./install.sh` akan menyiapkan virtual environment Python (`venv/`), memasang seluruh pustaka dependensi (`requirements.txt`), serta menginisialisasi basis data SQLite lokal.*

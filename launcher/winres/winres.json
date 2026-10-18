@@ -6,7 +6,7 @@
   },
   "RT_MANIFEST": {
     "#1": {
-      "0409": "tatap.manifest"
+      "0409": "restram.manifest"
     }
   },
   "RT_VERSION": {
@@ -18,12 +18,12 @@
         },
         "info": {
           "0409": {
-            "CompanyName": "Tatap",
-            "FileDescription": "Tatap - Nonton Santai di Lokal",
+            "CompanyName": "ReStram",
+            "FileDescription": "ReStram - Nonton Santai di Lokal",
             "FileVersion": "2.9.2.0",
-            "InternalName": "Tatap.exe",
-            "OriginalFilename": "Tatap.exe",
-            "ProductName": "Tatap",
+            "InternalName": "ReStram.exe",
+            "OriginalFilename": "ReStram.exe",
+            "ProductName": "ReStram",
             "ProductVersion": "2.9.2.0"
           }
         }
