@@ -2342,143 +2342,95 @@ function checkForUpdate(manualTrigger){
 // =========================================================================
 // NETMIRROR CONTROLLER (Netflix-style Hero Carousel & Content Rails)
 // =========================================================================
-var NET_FALLBACK_ANIME = [
-  {
-    id: "solo-leveling-season-2-arise-from-the-shadows-19413",
-    title: "Solo Leveling Season 2: Arise from the Shadow",
-    poster: "https://cdn.myanimelist.net/images/anime/1944/144967.jpg",
-    backdrop: "https://images.alphacoders.com/135/1351185.jpeg",
-    score: 8.9,
-    type: "TV",
-    season: "Winter 2025",
-    badge: "TRENDING NOW",
-    eps_counter: "12",
-    synopsis: "Sung Jinwoo melanjutkan perjalanannya sebagai Shadow Monarch yang mengendalikan pasukan bayangan tak terkalahkan. Ancaman Dungeon misterius semakin dekat ke dunia manusia dan perang antar Monarch tak terhindarkan.",
-    genres: ["Action", "Adventure", "Fantasy"]
-  },
-  {
-    id: "frieren-beyond-journeys-end-18418",
-    title: "Sousou no Frieren (Beyond Journey's End)",
-    poster: "https://cdn.myanimelist.net/images/anime/1015/138006.jpg",
-    backdrop: "https://images.alphacoders.com/133/1336444.jpeg",
-    score: 9.3,
-    type: "TV",
-    season: "Fall 2023",
-    badge: "TOP RATED",
-    eps_counter: "28",
-    synopsis: "Setelah mengalahkan Raja Iblis bersama pahlawan Himmel dan kawan-kawan, penyihir elf Frieren memulai perjalanan baru melintasi benua untuk memahami perasaan manusia dan makna waktu.",
-    genres: ["Adventure", "Drama", "Fantasy"]
-  },
-  {
-    id: "dandadan-19319",
-    title: "Dandadan",
-    poster: "https://cdn.myanimelist.net/images/anime/1032/144673.jpg",
-    backdrop: "https://images.alphacoders.com/137/1376842.jpeg",
-    score: 8.6,
-    type: "TV",
-    season: "Fall 2024",
-    badge: "POPULER",
-    eps_counter: "12",
-    synopsis: "Momo Ayase yang percaya hantu dan Ken Takakura (Okarun) yang percaya alien bertaruh di tempat angker. Tanpa diduga, mereka berdua terjerumus ke dalam perang misterius antara arwah turbo dan invasi alien.",
-    genres: ["Action", "Comedy", "Supernatural"]
-  },
-  {
-    id: "jujutsu-kaisen-2nd-season-18413",
-    title: "Jujutsu Kaisen Season 2 (Shibuya Incident)",
-    poster: "https://cdn.myanimelist.net/images/anime/1792/138042.jpg",
-    backdrop: "https://images.alphacoders.com/132/1322234.jpeg",
-    score: 8.8,
-    type: "TV",
-    season: "Summer 2023",
-    badge: "HOT ACTION",
-    eps_counter: "23",
-    synopsis: "Tragedi besar Shibuya pecah pada malam Halloween. Gojo Satoru terperangkap dalam Prison Realm, sementara Yuji Itadori dan para penyihir jujutsu harus bertarung mati-matian melawan roh kutukan khusus.",
-    genres: ["Action", "Fantasy", "Supernatural"]
-  },
-  {
-    id: "demon-slayer-kimetsu-no-yaiba-hashira-training-arc-19146",
-    title: "Demon Slayer: Hashira Training Arc",
-    poster: "https://cdn.myanimelist.net/images/anime/1094/142345.jpg",
-    backdrop: "https://images.alphacoders.com/135/1359178.jpeg",
-    score: 8.5,
-    type: "TV",
-    season: "Spring 2024",
-    badge: "ONGOING",
-    eps_counter: "8",
-    synopsis: "Tanjiro dan korps pembasmi iblis menjalani latihan fisik dan teknik pedang intensif bersama para Hashira terkuat sebagai persiapan menghadapi pertempuran akhir melawan Muzan Kibutsuji.",
-    genres: ["Action", "Fantasy", "Historical"]
-  },
-  {
-    id: "one-piece-100",
-    title: "One Piece (Egghead Arc)",
-    poster: "https://cdn.myanimelist.net/images/anime/1244/138851.jpg",
-    backdrop: "https://images.alphacoders.com/134/1347895.jpeg",
-    score: 8.9,
-    type: "TV",
-    season: "Continuous",
-    badge: "EPISODE BARU",
-    eps_counter: "1122",
-    synopsis: "Luffy dan Bajak Laut Topi Jerami tiba di Pulau Masa Depan Egghead, laboratorium rahasia Dr. Vegapunk, di mana misteri Abad Kekosongan mulai terkuak ke hadapan Pemerintah Dunia.",
-    genres: ["Action", "Adventure", "Fantasy"]
-  },
-  {
-    id: "attack-on-titan-final-season-the-final-chapters-18322",
-    title: "Attack on Titan: The Final Season",
-    poster: "https://cdn.myanimelist.net/images/anime/1279/131078.jpg",
-    backdrop: "https://images.alphacoders.com/130/1304218.jpeg",
-    score: 9.0,
-    type: "TV",
-    season: "Special",
-    badge: "TAMAT",
-    eps_counter: "Finale",
-    synopsis: "Gemuruh Rumbling meluluhlantakkan dunia di luar dinding. Armin, Mikasa, Levi, dan aliansi prajurit berjuang dalam keputusasaan untuk menghentikan sahabat mereka, Eren Yeager.",
-    genres: ["Action", "Drama", "Suspense"]
-  },
-  {
-    id: "chainsaw-man-17406",
-    title: "Chainsaw Man",
-    poster: "https://cdn.myanimelist.net/images/anime/1806/126216.jpg",
-    backdrop: "https://images.alphacoders.com/128/1284724.jpg",
-    score: 8.5,
-    type: "TV",
-    season: "Fall 2022",
-    badge: "ACTION",
-    eps_counter: "12",
-    synopsis: "Denji hidup dalam kemiskinan ekstrem bersama iblis anjing gergaji bernama Pochita, hingga suatu hari sebuah pengkhianatan melahirkannya kembali sebagai hibrida manusia-gergaji.",
-    genres: ["Action", "Horror", "Supernatural"]
-  },
-  {
-    id: "kaiju-no-8-19131",
-    title: "Kaiju No. 8",
-    poster: "https://cdn.myanimelist.net/images/anime/1908/142271.jpg",
-    backdrop: "https://images.alphacoders.com/136/1361271.jpeg",
-    score: 8.4,
-    type: "TV",
-    season: "Spring 2024",
-    badge: "SCI-FI",
-    eps_counter: "12",
-    synopsis: "Kafka Hibino yang bekerja di tim pembersih bangkai monster tiba-tiba tertelan makhluk aneh dan memperoleh kekuatan luar biasa untuk berubah menjadi Kaiju nomor 8.",
-    genres: ["Action", "Sci-Fi"]
-  },
-  {
-    id: "bleach-thousand-year-blood-war-the-conflict-19323",
-    title: "Bleach: Thousand-Year Blood War (Part 3)",
-    poster: "https://cdn.myanimelist.net/images/anime/1897/144675.jpg",
-    backdrop: "https://images.alphacoders.com/127/1273872.jpg",
-    score: 8.8,
-    type: "TV",
-    season: "Fall 2024",
-    badge: "ACTION",
-    eps_counter: "13",
-    synopsis: "Pertempuran antara Shinigami Soul Society dan Wandenreich Quincy mencapai puncaknya di Istana Raja Roh. Ichigo Kurosaki bangkit dengan kekuatan sejatinya.",
-    genres: ["Action", "Adventure", "Supernatural"]
+var NET_FALLBACK_ANIME = (function(){
+  if(typeof window !== "undefined" && window.NET27_DATA && window.NET27_DATA.items && window.NET27_DATA.items.length){
+    return window.NET27_DATA.items;
   }
-];
+  return [
+    {
+      id: "solo-leveling-season-2-arise-from-the-shadows-19413",
+      slug: "solo-leveling-season-2-arise-from-the-shadows-19413",
+      title: "Solo Leveling Season 2 -Arise from the Shadow-",
+      poster: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx176496-9BDMjAZGEbq4.png",
+      backdrop: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/176496-5oY4k2NRqlYs.jpg",
+      score: 8.9,
+      type: "TV",
+      season: "Winter 2025",
+      badge: "TRENDING NOW",
+      eps_counter: "13/13",
+      synopsis: "Sung Jinwoo melanjutkan perjalanannya sebagai Shadow Monarch yang mengendalikan pasukan bayangan tak terkalahkan. Ancaman Dungeon misterius semakin dekat ke dunia manusia dan perang antar Monarch tak terhindarkan.",
+      genres: ["Action", "Adventure", "Fantasy"]
+    },
+    {
+      id: "frieren-beyond-journeys-end-18418",
+      slug: "frieren-beyond-journeys-end-18418",
+      title: "Frieren: Beyond Journey’s End",
+      poster: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx154587-qQTzQnEJJ3oB.jpg",
+      backdrop: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/154587-ivXNJ23SM1xB.jpg",
+      score: 9.3,
+      type: "TV",
+      season: "Fall 2023",
+      badge: "TOP RATED",
+      eps_counter: "28/28",
+      synopsis: "Setelah mengalahkan Raja Iblis bersama pahlawan Himmel dan kawan-kawan, penyihir elf Frieren memulai perjalanan baru melintasi benua untuk memahami perasaan manusia dan makna waktu.",
+      genres: ["Adventure", "Drama", "Fantasy"]
+    },
+    {
+      id: "dandadan-19343",
+      slug: "dandadan-19343",
+      title: "DAN DA DAN",
+      poster: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx171018-60q1B6GK2Ghb.jpg",
+      backdrop: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/171018-SpwPNAduszXl.jpg",
+      score: 8.6,
+      type: "TV",
+      season: "Fall 2024",
+      badge: "POPULER",
+      eps_counter: "12/12",
+      synopsis: "Momo Ayase yang percaya hantu dan Ken Takakura (Okarun) yang percaya alien bertaruh di tempat angker, terjerumus ke dalam perang misterius antara arwah dan invasi alien.",
+      genres: ["Action", "Comedy", "Supernatural"]
+    },
+    {
+      id: "jujutsu-kaisen-2nd-season-18413",
+      slug: "jujutsu-kaisen-2nd-season-18413",
+      title: "JUJUTSU KAISEN Season 2",
+      poster: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx145064-hSNRJM03pvv1.jpg",
+      backdrop: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/145064-esDtAY2He7sk.jpg",
+      score: 8.8,
+      type: "TV",
+      season: "Summer 2023",
+      badge: "HOT ACTION",
+      eps_counter: "23/23",
+      synopsis: "Tragedi besar Shibuya pecah pada malam Halloween. Gojo Satoru terperangkap dalam Prison Realm, sementara Yuji Itadori harus bertarung mati-matian melawan roh kutukan khusus.",
+      genres: ["Action", "Fantasy", "Supernatural"]
+    },
+    {
+      id: "demon-slayer-kimetsu-no-yaiba-47",
+      slug: "demon-slayer-kimetsu-no-yaiba-47",
+      title: "Demon Slayer: Kimetsu no Yaiba",
+      poster: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101922-WBsBl0ClmgYL.jpg",
+      backdrop: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/101922-33MtJGsUSxga.jpg",
+      score: 8.5,
+      type: "TV",
+      season: "Spring 2019",
+      badge: "ONGOING",
+      eps_counter: "26/26",
+      synopsis: "Tanjiro dan korps pembasmi iblis menjalani latihan fisik dan teknik pedang intensif sebagai persiapan menghadapi pertempuran akhir melawan Muzan Kibutsuji.",
+      genres: ["Action", "Fantasy", "Historical"]
+    }
+  ];
+})();
 
 var NetMirror = (function(){
+  function getHeroData(){
+    if(typeof window !== "undefined" && window.NET27_DATA && window.NET27_DATA.hero && window.NET27_DATA.hero.length){
+      return window.NET27_DATA.hero;
+    }
+    return NET_FALLBACK_ANIME.slice(0, 5);
+  }
+
   var heroIndex = 0;
   var heroTimer = null;
-  var heroSlides = NET_FALLBACK_ANIME.slice(0, 5);
+  var heroSlides = getHeroData();
 
   function createRailCard(a){
     var card = document.createElement("div");
@@ -2489,7 +2441,7 @@ var NetMirror = (function(){
     var scoreVal = a.score ? parseFloat(a.score) : 8.5;
     var scoreText = "⭐ " + scoreVal.toFixed(1);
 
-    var isTam = a.badge === "TAMAT" || a.is_finished;
+    var isTam = a.badge === "TAMAT" || a.is_finished || a.status === "finished";
     var statusCls = isTam ? "card-badge-status finished" : "card-badge-status";
 
     card.innerHTML = 
@@ -2506,13 +2458,15 @@ var NetMirror = (function(){
 
     var targetId = a.id || a.slug;
     card.addEventListener("click", function(){
-      App.openTitle(targetId, a.title, a.poster, a.type, a.eps_counter, a);
+      if(typeof App !== "undefined" && App.openTitle){
+        App.openTitle(targetId, a.title, a.poster, a.type, a.eps_counter, a);
+      }
     });
     return card;
   }
 
   function renderRailItems(trackEl, items){
-    if(!trackEl) return;
+    if(!trackEl || !items || !items.length) return;
     trackEl.innerHTML = "";
     var frag = document.createDocumentFragment();
     for(var i = 0; i < items.length; i++){
@@ -2522,6 +2476,9 @@ var NetMirror = (function(){
   }
 
   function setHeroSlide(idx){
+    if(!heroSlides || !heroSlides.length){
+      heroSlides = getHeroData();
+    }
     if(!heroSlides || !heroSlides.length) return;
     heroIndex = (idx + heroSlides.length) % heroSlides.length;
     var a = heroSlides[heroIndex];
@@ -2529,8 +2486,8 @@ var NetMirror = (function(){
 
     var bg = $("hero-backdrop");
     if(bg){
-      var bgImg = a.backdrop || a.poster || "";
-      bg.style.backgroundImage = bgImg ? ("url('" + bgImg + "')") : "none";
+      var bgImg = a.backdrop || a.poster || "https://s4.anilist.co/file/anilistcdn/media/anime/banner/176496-5oY4k2NRqlYs.jpg";
+      bg.style.backgroundImage = "url('" + bgImg + "')";
     }
 
     var tEl = $("hero-title");
@@ -2554,16 +2511,20 @@ var NetMirror = (function(){
     var btnPlay = $("hero-btn-play");
     if(btnPlay){
       btnPlay.onclick = function(){
-        App.openTitle(a.id || a.slug, a.title, a.poster, a.type, a.eps_counter, a);
-        setTimeout(function(){
-          App.openPlayer(1);
-        }, 150);
+        if(typeof App !== "undefined" && App.openTitle){
+          App.openTitle(a.id || a.slug, a.title, a.poster, a.type, a.eps_counter, a);
+          setTimeout(function(){
+            App.openPlayer(1);
+          }, 150);
+        }
       };
     }
     var btnDetail = $("hero-btn-detail");
     if(btnDetail){
       btnDetail.onclick = function(){
-        App.openTitle(a.id || a.slug, a.title, a.poster, a.type, a.eps_counter, a);
+        if(typeof App !== "undefined" && App.openTitle){
+          App.openTitle(a.id || a.slug, a.title, a.poster, a.type, a.eps_counter, a);
+        }
       };
     }
   }
@@ -2583,6 +2544,7 @@ var NetMirror = (function(){
   }
 
   function initHero(){
+    heroSlides = getHeroData();
     var dotsContainer = $("hero-dots");
     if(dotsContainer){
       dotsContainer.innerHTML = "";
@@ -2657,10 +2619,7 @@ var NetMirror = (function(){
   function loadTrendingRail(){
     var track = $("lane-season");
     var api = window.ReStram || window.Tatap;
-    if(!api || !api.seasonNow) {
-      renderRailItems(track, NET_FALLBACK_ANIME.slice(0, 10));
-      return;
-    }
+    if(!api || !api.seasonNow) return;
     api.seasonNow(1).then(function(r){
       if(r && r.success && r.data && Array.isArray(r.data.items) && r.data.items.length){
         renderRailItems(track, r.data.items);
@@ -2668,51 +2627,33 @@ var NetMirror = (function(){
           heroSlides = r.data.items.slice(0, 5);
           initHero();
         }
-      } else {
-        renderRailItems(track, NET_FALLBACK_ANIME.slice(0, 10));
       }
-    }).catch(function(){
-      renderRailItems(track, NET_FALLBACK_ANIME.slice(0, 10));
-    });
+    }).catch(function(){});
   }
 
   function loadLatestRail(){
     var track = $("lane-latest");
     var api = window.ReStram || window.Tatap;
-    if(!api || !api.schedule) {
-      renderRailItems(track, NET_FALLBACK_ANIME.slice(2, 10));
-      return;
-    }
+    if(!api || !api.schedule) return;
     api.schedule("today").then(function(r){
       if(r && r.success && r.data){
         var items = r.data.items || (Array.isArray(r.data) ? r.data : []);
         if(items.length){
           renderRailItems(track, items);
-          return;
         }
       }
-      renderRailItems(track, NET_FALLBACK_ANIME.slice(2, 10));
-    }).catch(function(){
-      renderRailItems(track, NET_FALLBACK_ANIME.slice(2, 10));
-    });
+    }).catch(function(){});
   }
 
   function loadPopularRail(){
     var track = $("lane-popular");
     var api = window.ReStram || window.Tatap;
-    if(!api || !api.catalog) {
-      renderRailItems(track, NET_FALLBACK_ANIME.slice(1, 10));
-      return;
-    }
+    if(!api || !api.catalog) return;
     api.catalog(1).then(function(r){
       if(r && r.success && r.data && Array.isArray(r.data.items) && r.data.items.length){
         renderRailItems(track, r.data.items);
-      } else {
-        renderRailItems(track, NET_FALLBACK_ANIME.slice(1, 10));
       }
-    }).catch(function(){
-      renderRailItems(track, NET_FALLBACK_ANIME.slice(1, 10));
-    });
+    }).catch(function(){});
   }
 
   function loadFavoritesRail(){
@@ -2734,6 +2675,15 @@ var NetMirror = (function(){
 
   function refreshHomeRails(){
     renderContinue();
+
+    // 1. Render immediately from fallback data so rails are NEVER empty
+    var d = (typeof window !== "undefined") ? window.NET27_DATA : null;
+    var allItems = (d && d.items && d.items.length) ? d.items : NET_FALLBACK_ANIME;
+    renderRailItems($("lane-season"), allItems.slice(0, 10));
+    renderRailItems($("lane-latest"), allItems.slice(2, 12));
+    renderRailItems($("lane-popular"), allItems.slice().sort(function(a,b){ return (b.score||0) - (a.score||0); }).slice(0, 10));
+
+    // 2. Fetch live updates if server API is reachable
     loadTrendingRail();
     loadLatestRail();
     loadPopularRail();
@@ -3002,13 +2952,43 @@ function init(){
   if(rm) rm.addEventListener("click", function(e){
     if(e.target === rm) dismissResumeModal();
   });
+  // CLI Collapsible Toggle Listeners
+  var btnCliToggle = $("btn-cli-toggle");
+  if(btnCliToggle) btnCliToggle.addEventListener("click", function(){ toggleCli(); });
+  var btnCliClose = $("btn-cli-close");
+  if(btnCliClose) btnCliClose.addEventListener("click", function(){ toggleCli(false); });
+
   window.addEventListener("beforeunload", function(){
     recordWatchProgress(true);
   });
 
-  window.Tui.boot();
   if(window.NetMirror && window.NetMirror.init){
     window.NetMirror.init();
   }
+  window.Tui.boot();
 }
-init();
+
+function toggleCli(forceState){
+  var bb = $("bottom-bar");
+  var btn = $("btn-cli-toggle");
+  if(!bb) return;
+  var willShow = (forceState !== undefined) ? forceState : bb.classList.contains("collapsed");
+  if(willShow){
+    bb.classList.remove("collapsed");
+    if(btn) btn.classList.add("active");
+    var inp = $("cmd");
+    if(inp) inp.focus();
+  } else {
+    bb.classList.add("collapsed");
+    if(btn) btn.classList.remove("active");
+    var inp = $("cmd");
+    if(inp) inp.blur();
+  }
+}
+window.toggleCli = toggleCli;
+
+if(document.readyState === "loading"){
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}

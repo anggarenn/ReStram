@@ -5,7 +5,7 @@
 <meta name="application-name" content="ReStram">
 <meta name="apple-mobile-web-app-title" content="ReStram">
 <title>ReStram — nonton santai di lokal</title>
-<link rel="stylesheet" href="./css/style.css">
+<link rel="stylesheet" href="./css/style.css?v=20261019_2">
 <link rel="icon" type="image/x-icon" href="./favicon.ico">
 <link rel="icon" type="image/png" sizes="192x192" href="./assets/icon-192.png">
 <link rel="apple-touch-icon" href="./assets/icon-512.png">
@@ -243,7 +243,7 @@
     <!-- HERO SECTION: CINEMATIC CAROUSEL (70-80vh) -->
     <section id="net-hero" class="net-hero" aria-label="Sorotan Anime">
       <div class="hero-backdrop-container">
-        <div id="hero-backdrop" class="hero-backdrop"></div>
+        <div id="hero-backdrop" class="hero-backdrop" style="background-image: url('https://s4.anilist.co/file/anilistcdn/media/anime/banner/176496-5oY4k2NRqlYs.jpg');"></div>
         <div class="hero-vignette-bottom"></div>
         <div class="hero-vignette-left"></div>
         <div class="hero-vignette-top"></div>
@@ -260,10 +260,10 @@
           Sung Jinwoo melanjutkan perjalanannya sebagai Shadow Monarch yang mengendalikan pasukan bayangan. Ancaman Dungeon misterius semakin dekat ke dunia manusia.
         </p>
         <div class="hero-actions">
-          <button id="hero-btn-play" class="hero-btn-play" title="Tonton sekarang">
+          <button id="hero-btn-play" class="hero-btn-play btn-play" title="Tonton sekarang">
             <svg class="ui-icon"><use href="#icon-play"/></svg> Tonton Sekarang
           </button>
-          <button id="hero-btn-detail" class="hero-btn-detail" title="Lihat detail & episode">
+          <button id="hero-btn-detail" class="hero-btn-detail btn-info" title="Lihat detail & episode">
             <svg class="ui-icon"><use href="#icon-tv"/></svg> Detail
           </button>
         </div>
@@ -695,7 +695,7 @@
   </div>
 </div>
 
-<footer class="bottom-bar">
+<footer class="bottom-bar collapsed" id="bottom-bar">
   <div class="bottom-search-row">
     <div class="search-input-wrap">
       <span class="prompt-ps1">restram$</span>
@@ -704,6 +704,7 @@
     </div>
     <div class="bottom-actions">
       <span id="health" class="health" title="Status koneksi scraper backend">…</span>
+      <button id="btn-cli-close" class="icon-btn" title="Tutup Terminal CLI (Esc)" aria-label="Tutup Terminal"><svg class="ui-icon"><use href="#icon-close"/></svg></button>
       <button id="btn-drawer" class="icon-btn header-drawer-btn" title="Buka Menu & Navigasi (☰)" aria-label="Menu">
         <span class="drawer-btn-icon"><svg class="ui-icon"><use href="#icon-menu"/></svg></span>
       </button>
@@ -715,7 +716,7 @@
       <span><b>enter</b> buka</span>
       <span><b>tab</b> ganti tampilan</span>
       <span><b>[ ]</b> halaman</span>
-      <span><b>esc</b> reset</span>
+      <span><b>esc</b> sembunyikan</span>
       <span><b>:update</b> cek rilis</span>
     </div>
     <div class="sb-meta">
@@ -724,6 +725,12 @@
     </div>
   </div>
 </footer>
+
+<!-- Floating CLI widget toggle at bottom-right corner -->
+<button id="btn-cli-toggle" class="btn-cli-toggle" title="Buka / Tutup Terminal CLI (:perintah)" aria-label="Terminal CLI">
+  <svg class="ui-icon"><use href="#icon-help"/></svg>
+  <span>CLI</span>
+</button>
 
 <!-- TITLE / EPISODE MODAL -->
 <div id="title-modal" class="overlay hidden" role="dialog" aria-modal="true">
@@ -837,9 +844,9 @@
 <div id="toast" class="toast hidden"><span id="toast-msg"></span></div>
 
 <script src="./js/vendor/hls.min.js"></script>
-<script src="./js/fallback-data.js"></script>
-<script src="./js/api.js"></script>
-<script src="./js/term.js"></script>
-<script src="./js/app.js"></script>
+<script src="./js/fallback-data.js?v=20261019_2"></script>
+<script src="./js/api.js?v=20261019_2"></script>
+<script src="./js/term.js?v=20261019_2"></script>
+<script src="./js/app.js?v=20261019_2"></script>
 </body>
 </html>

@@ -1049,13 +1049,26 @@ var Tui = (function () {
     var typing = t==="INPUT"||t==="SELECT"||t==="TEXTAREA";
     if(e.key==="Escape"){
       if(isModalOpen()){App.onKeyPlayer(e);return;}
+      if(window.toggleCli) window.toggleCli(false);
       if(typing){$("cmd").blur();S.promptFoc=false;return;}
       $("cmd").value="";clearLog();e.preventDefault();return;
     }
     if(isModalOpen()){App.onKeyPlayer(e);return;}
-    if(e.key==="/"){e.preventDefault();focusPrompt();return;}
-    if(typing){if(e.key==="Escape"){$("cmd").blur();S.promptFoc=false;}return;}
-    if(e.key==="Escape"){$("cmd").value="";clearLog();e.preventDefault();return;}
+    if(e.key==="/"){
+      e.preventDefault();
+      var navInp = $("nav-search-input");
+      if(navInp){ navInp.focus(); } else { focusPrompt(); }
+      return;
+    }
+    if(e.key===":"){
+      if(!typing){
+        e.preventDefault();
+        focusPrompt();
+        $("cmd").value=":";
+        return;
+      }
+    }
+    if(typing){return;}
     if(e.key==="Tab"){e.preventDefault();cycleView();return;}
     if(e.key==="ArrowUp"){
       e.preventDefault();
@@ -1074,12 +1087,12 @@ var Tui = (function () {
     }
     if(e.key==="["||e.key===","){e.preventDefault();pagePrev();return;}
     if(e.key==="]"||e.key==="."){e.preventDefault();pageNext();return;}
-    if(!typing&&e.key.length===1&&!e.ctrlKey&&!e.metaKey){focusPrompt();}
   }
 
   function focusPrompt(){
     S.promptFoc=true;
-    var inp=$("cmd");inp.focus();
+    if(window.toggleCli) window.toggleCli(true);
+    var inp=$("cmd");if(inp) inp.focus();
   }
   function submitPrompt(){
     var inp=$("cmd");var raw=inp.value.trim();inp.value="";
@@ -1167,7 +1180,7 @@ var Tui = (function () {
     var inp=$("cmd");
     inp.addEventListener("keydown",function(e){
       if(e.key==="Enter"){e.preventDefault();_hPos=loadCmdHist().length;submitPrompt();}
-      else if(e.key==="Escape"){inp.blur();}
+      else if(e.key==="Escape"){inp.blur();if(window.toggleCli) window.toggleCli(false);}
       else if(e.key==="ArrowUp"&&!S.items.length){e.preventDefault();cmdHistory(-1);}
       else if(e.key==="ArrowDown"&&!S.items.length){e.preventDefault();cmdHistory(1);}
       else if(e.key==="Tab"){e.preventDefault();cycleView();}
