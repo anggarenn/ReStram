@@ -1713,18 +1713,22 @@ function playUrl(url,referrer,sub,subRef,resumeTime,token){
     if(v.volume===0) v.volume=1.0;
   }
   var b = (typeof apiBase === "function") ? apiBase() : "";
-  var prox=b+"/api/player/video?url="+encodeURIComponent(url)+"&referer="+encodeURIComponent(referrer||"");
-  try{
-    var m=/^(.*\/)index-(f\d+-v\d+-a\d+)\.m3u8/.exec(url);
-    if(m){
-      for(var wi=1;wi<=2;wi++){
-        (function(n){
-          var seg=m[1]+"seg-"+n+"-"+m[2]+".jpg";
-          fetch("/api/player/video?url="+encodeURIComponent(seg)+"&referer="+encodeURIComponent(referrer||""),{mode:"no-cors"}).catch(function(){});
-        })(wi);
+  var isRemoteHttp = (url.indexOf("http://") === 0 || url.indexOf("https://") === 0);
+  var isStaticDeployment = !b && (location.hostname !== "localhost" && location.hostname !== "127.0.0.1");
+  var prox = (isStaticDeployment && isRemoteHttp) ? url : (b + "/api/player/video?url=" + encodeURIComponent(url) + "&referer=" + encodeURIComponent(referrer || ""));
+  if(!isStaticDeployment){
+    try{
+      var m=/^(.*\/)index-(f\d+-v\d+-a\d+)\.m3u8/.exec(url);
+      if(m){
+        for(var wi=1;wi<=2;wi++){
+          (function(n){
+            var seg=m[1]+"seg-"+n+"-"+m[2]+".jpg";
+            fetch((b||"")+"/api/player/video?url="+encodeURIComponent(seg)+"&referer="+encodeURIComponent(referrer||""),{mode:"no-cors"}).catch(function(){});
+          })(wi);
+        }
       }
-    }
-  }catch(e){}
+    }catch(e){}
+  }
   // Bersihkan <track> lama lalu pasang track subtitle aktif (live switch).
   // Fungsi switchSubtitleTrack() menhandle Off (hapus semua) dan replace.
   switchSubtitleTrack(sub || null);
@@ -1813,10 +1817,10 @@ function playUrl(url,referrer,sub,subRef,resumeTime,token){
         }
         if(nxt&&nxt.url){
           var fetchTarget = nxt.url;
-          if(!fetchTarget.startsWith("/api/player/video") && !fetchTarget.startsWith("/api/")){
-            fetchTarget = "/api/player/video?url="+encodeURIComponent(nxt.url)+"&referer="+encodeURIComponent(referrer||"");
+          if(!isStaticDeployment && !fetchTarget.startsWith("/api/player/video") && !fetchTarget.startsWith("/api/")){
+            fetchTarget = (b||"") + "/api/player/video?url="+encodeURIComponent(nxt.url)+"&referer="+encodeURIComponent(referrer||"");
+            fetch(fetchTarget,{mode:"no-cors",priority:"low"}).catch(function(){});
           }
-          fetch(fetchTarget,{mode:"no-cors",priority:"low"}).catch(function(){});
         }
       }catch(e){}
     });
