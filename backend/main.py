@@ -2183,7 +2183,7 @@ async def get_set():
         # sumber (Megaplay, ZokoAnime) punya English sebagai track default. Kalau
         # user pernah pilih bahasa lain, disimpan di sini dan dipakai frontend
         # untuk auto-select track di episode berikutnya.
-        "sub_lang": await get_setting("sub_lang", "English"),
+        "sub_lang": await get_setting("sub_lang", "Indonesian (GTX+)"),
         # Translate API (opsional). User isi via settings panel. Fallback ke
         # MyMemory kalau kosong. translate_apikey tidak pernah di-log.
         "translate_apikey": await get_setting("translate_apikey", ""),

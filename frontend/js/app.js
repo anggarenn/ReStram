@@ -23,11 +23,11 @@ function setAppStorage(k, v){
   }catch(e){}
 }
 var cur = {slug:"", title:"", ep:1, mode:"sub", quality:"best", res:null, eps:[], watched:{}, lastWatchedEp:null,
-            subLang:"English",    // preferensi bahasa user dari /api/settings
+            subLang:"Indonesian (GTX+)",    // preferensi bahasa user default Indonesian (GTX+)
             activeSub:null,       // URL track subtitle yang sedang aktif (live switch)
             cues:[],              // cue subtitle hasil parse VTT (render overlay milik app)
             subSize:"m",          // ukuran subtitle overlay: s|m|l
-            translate:false,      // toggle translate subtitle Indonesia (persist localStorage)
+            translate:true,       // toggle translate subtitle Indonesia default ON
             eps_counter:""
            };
 var _playTokenCounter = 0;
@@ -3121,11 +3121,12 @@ function init(){
     if(sz==="s"||sz==="m"||sz==="l")cur.subSize=sz;
   }catch(e){}
   syncSubSize();
-  // Toggle translate ID (persist localStorage tat_translate).
+  // Toggle translate ID (default ON kecuali user eksplisit set "0").
   try{
     var tr=getAppStorage("translate");
-    if(tr==="1")cur.translate=true;
-  }catch(e){}
+    if(tr === "0") cur.translate = false;
+    else cur.translate = true;
+  }catch(e){ cur.translate = true; }
   syncTranslate();
   var trBtn=$("pm-translate");
   if(trBtn) trBtn.addEventListener("click",function(){setTranslate(!cur.translate);});
