@@ -793,8 +793,26 @@ function openPlayer(ep, resumeTime){
     if(cur.activeSub){
       prefetchSubtitleTrack(cur.activeSub, r.data.referer);
     }
-    var streamUrl = (r.data.master && (r.data.master.indexOf(".m3u8") >= 0 || r.data.master.indexOf("/hls") >= 0)) ? r.data.master : (picked ? picked.url : "");
-    playUrl(streamUrl,r.data.referer,cur.activeSub,r.data.referer,resumeTime,token);
+    // Embed URL resolution
+    var embedUrl = (r.data && r.data.embedUrl) || "";
+    if(!embedUrl){
+      var anilistId = (r.data && r.data.anilist_id) || (cur.item && cur.item.anilist_id) || (window.NET27_DATA && window.NET27_DATA.getItem(cur.slug) && window.NET27_DATA.getItem(cur.slug).anilist_id);
+      if(anilistId){
+        embedUrl = "https://vidlink.pro/anime/" + anilistId + "/" + ep + "/" + (cur.mode === "dub" ? "dub" : "sub");
+      }
+    }
+    cur.embedUrl = embedUrl;
+
+    var isStaticVercel = (!apiBase() || (r.data && (r.data.source === "vercel-demo" || r.data.source === "vercel-static")));
+    var preferEmbed = (embedUrl && (cur.playerServer === "embed" || (!cur.playerServer && (isStaticVercel || !!(r.data && r.data.embedUrl))) || (isStaticVercel && cur.playerServer !== "native")));
+
+    if(preferEmbed){
+      applyEmbedPlayer(embedUrl);
+    } else {
+      applyNativePlayer();
+      var streamUrl = (r.data.master && (r.data.master.indexOf(".m3u8") >= 0 || r.data.master.indexOf("/hls") >= 0)) ? r.data.master : (picked ? picked.url : "");
+      playUrl(streamUrl,r.data.referer,cur.activeSub,r.data.referer,resumeTime,token);
+    }
     (window.ReStram||window.Tatap).saveHist({slug:cur.slug,title:cur.title,episode:ep,mode:cur.mode,progress:resumeTime||0}).then(function(){renderContinue();});
   }).catch(function(err){
     if(cur.playToken !== token || cur.slug !== reqSlug || $("player-modal").classList.contains("hidden")) return;
@@ -837,6 +855,93 @@ function renderVariants(){
       sel.classList.add("hidden");
     } else {
       sel.classList.remove("hidden");
+    }
+  }
+}
+
+function applyEmbedPlayer(url){
+  cur.playerServer = "embed";
+  var v = $("vid");
+  if(v){
+    try{ v.pause(); }catch(e){}
+    v.classList.add("hidden");
+    v.style.display = "none";
+  }
+  var frame = $("pm-embed-frame");
+  if(frame){
+    frame.classList.remove("hidden");
+    frame.style.display = "block";
+    if(url && frame.src !== url){
+      frame.src = url;
+    }
+  }
+  if($("pm-gesture-stage")) $("pm-gesture-stage").classList.add("hidden");
+  if($("pm-subs-overlay")) $("pm-subs-overlay").classList.add("hidden");
+  if($("pm-skip-btn")) $("pm-skip-btn").classList.add("hidden");
+  if($("pm-speed-select")) $("pm-speed-select").classList.add("hidden");
+  if($("pm-quality-select")) $("pm-quality-select").classList.add("hidden");
+  if($("pm-subs-wrap")) $("pm-subs-wrap").classList.add("hidden");
+  if($("ambient")) $("ambient").classList.add("hidden");
+  if($("pm-spinner")) $("pm-spinner").classList.add("hidden");
+
+  if($("pm-server-embed")) $("pm-server-embed").classList.add("active");
+  if($("pm-server-native")) $("pm-server-native").classList.remove("active");
+}
+
+function applyNativePlayer(){
+  cur.playerServer = "native";
+  var frame = $("pm-embed-frame");
+  if(frame){
+    frame.classList.add("hidden");
+    frame.style.display = "none";
+    frame.src = "about:blank";
+  }
+  var v = $("vid");
+  if(v){
+    v.classList.remove("hidden");
+    v.style.display = "block";
+  }
+  if($("pm-gesture-stage")) $("pm-gesture-stage").classList.remove("hidden");
+  if($("pm-subs-overlay")) $("pm-subs-overlay").classList.remove("hidden");
+  if($("pm-speed-select")) $("pm-speed-select").classList.remove("hidden");
+  if($("ambient")) $("ambient").classList.remove("hidden");
+
+  if($("pm-server-embed")) $("pm-server-embed").classList.remove("active");
+  if($("pm-server-native")) $("pm-server-native").classList.add("active");
+}
+
+function switchPlayerServer(serverType){
+  cur.playerServer = serverType;
+  if(serverType === "embed"){
+    if(!cur.embedUrl && cur.slug){
+      var anilistId = (cur.res && cur.res.anilist_id) || (cur.item && cur.item.anilist_id) || (window.NET27_DATA && window.NET27_DATA.getItem(cur.slug) && window.NET27_DATA.getItem(cur.slug).anilist_id);
+      if(anilistId){
+        cur.embedUrl = "https://vidlink.pro/anime/" + anilistId + "/" + (cur.ep||1) + "/" + (cur.mode === "dub" ? "dub" : "sub");
+      }
+    }
+    if(cur.embedUrl){
+      applyEmbedPlayer(cur.embedUrl);
+      toast("Beralih ke Server 1: HD Player (Embed)");
+    } else {
+      toast("Server embed tidak tersedia untuk anime ini");
+    }
+  } else {
+    applyNativePlayer();
+    if(cur.res){
+      renderVariants();
+      if(cur.res.subtitles && cur.res.subtitles.length){
+        renderSubtitles(cur.res.subtitles, cur.activeSub);
+      }
+      var picked = cur.res.picked || (cur.res.variants && cur.res.variants[0]) || { q: "HD", url: cur.res.master || "" };
+      var streamUrl = (cur.res.master && (cur.res.master.indexOf(".m3u8") >= 0 || cur.res.master.indexOf("/hls") >= 0)) ? cur.res.master : (picked ? picked.url : "");
+      if(streamUrl){
+        playUrl(streamUrl, cur.res.referer, cur.activeSub, cur.res.referer, 0, cur.playToken);
+        toast("Beralih ke Server 2: HLS Native");
+      } else {
+        toast("Stream HLS native tidak tersedia");
+      }
+    } else {
+      toast("Stream HLS native tidak tersedia");
     }
   }
 }
@@ -1995,6 +2100,14 @@ function closePlayer(){
     try{v.pause();}catch(e){}
     v.removeAttribute("src");
     try{v.load();}catch(e){}
+    v.classList.remove("hidden");
+    v.style.display = "";
+  }
+  var frame = $("pm-embed-frame");
+  if(frame){
+    frame.src = "about:blank";
+    frame.classList.add("hidden");
+    frame.style.display = "none";
   }
   if(window._hls){try{window._hls.destroy();window._hls=null;}catch(e){}}
   cur.cues=[];
@@ -2866,6 +2979,18 @@ function init(){
     }
   });
   $("pm-close").addEventListener("click",closePlayer);
+  var btnSrvEmbed = $("pm-server-embed");
+  if(btnSrvEmbed){
+    btnSrvEmbed.addEventListener("click", function(){
+      switchPlayerServer("embed");
+    });
+  }
+  var btnSrvNative = $("pm-server-native");
+  if(btnSrvNative){
+    btnSrvNative.addEventListener("click", function(){
+      switchPlayerServer("native");
+    });
+  }
   $("player-modal").addEventListener("click",function(e){
     if(Date.now() - (cur.playerOpenedAt || 0) < 500) return;
     if(e.target===this) closePlayer();

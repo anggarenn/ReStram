@@ -766,9 +766,12 @@ button{font-family:inherit}
 .player-head-btns button,.player-head-btns select{background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:var(--r);padding:6px 12px;cursor:pointer;font:inherit;display:inline-flex;align-items:center;gap:6px;line-height:1}
 .player-head-btns select{padding:6px 10px;font-size:12px;font-weight:600;outline:none}
 .player-head-btns button:hover,.player-head-btns select:hover,.player-head-btns select:focus{border-color:var(--acc)}
+.player-server-seg{display:inline-flex;margin-right:2px}
+.player-server-seg button{font-size:11px;font-weight:600;padding:5px 9px;letter-spacing:0.2px}
+.player-server-seg button.active{background:var(--acc);color:#04121f}
 .ambient-stage{position:relative;border-radius:4px;background:#000;flex:1 1 auto;min-height:0}
 .ambient-stage.idle{cursor:none}
-.ambient-stage video{position:relative;z-index:2;width:100%;aspect-ratio:16/9;max-height:clamp(240px,66vh,640px);background:#000;display:block;border-radius:4px;object-fit:contain}
+.ambient-stage video,.ambient-stage iframe,.embed-player{position:relative;z-index:2;width:100%;aspect-ratio:16/9;max-height:clamp(240px,66vh,640px);background:#000;display:block;border-radius:4px;object-fit:contain;border:0}
 .player-shell.idle .player-foot,.player-shell.idle .player-hint{opacity:0;pointer-events:none}
 .player-foot,.player-hint{transition:opacity .4s ease}
 #ambient,#ambient-fallback{position:absolute;left:-60px;right:-60px;top:-60px;bottom:-60px;z-index:1;width:calc(100% + 120px);height:calc(100% + 120px);pointer-events:none;transform:translate3d(0,0,0)}
@@ -884,8 +887,11 @@ body.no-ambient #ambient,body.no-ambient #ambient-fallback{display:none}
   width:100vw;height:100vh;max-height:100vh;display:flex;align-items:center;justify-content:center;background:#000;border-radius:0;
 }
 .ambient-stage:fullscreen video,
+.ambient-stage:fullscreen iframe,
 .ambient-stage:-webkit-full-screen video,
-.ambient-stage:-moz-full-screen video {
+.ambient-stage:-webkit-full-screen iframe,
+.ambient-stage:-moz-full-screen video,
+.ambient-stage:-moz-full-screen iframe {
   width:100vw;height:100vh;max-height:100vh;aspect-ratio:unset;border-radius:0;object-fit:contain;
 }
 .ambient-stage:fullscreen #ambient,

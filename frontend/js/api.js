@@ -53,7 +53,8 @@ function mockJget(u){
   if(parsedUrl === "/api/stream/resolve"){
     var slug = params.slug || "";
     var ep = parseInt(params.ep) || 1;
-    return d.resolveStream(slug, ep);
+    var mode = params.mode || "sub";
+    return d.resolveStream(slug, ep, mode);
   }
   if(parsedUrl === "/api/bookmarks"){
     var b = [];

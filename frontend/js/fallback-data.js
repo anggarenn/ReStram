@@ -427,16 +427,100 @@
   }
 ];
 
+  // Metadata pemetaan ID eksternal (TMDB, MAL, Season) untuk sinkronisasi embed anime asli
+  var ANIME_METADATA = {
+    "solo-leveling-season-2-arise-from-the-shadows-19413": { tmdb_id: 127532, mal_id: 58567, season_num: 2 },
+    "frieren-beyond-journeys-end-18418": { tmdb_id: 209867, mal_id: 52991, season_num: 1 },
+    "dandadan-19343": { tmdb_id: 240411, mal_id: 57334, season_num: 1 },
+    "jujutsu-kaisen-2nd-season-18413": { tmdb_id: 95479, mal_id: 51009, season_num: 2 },
+    "demon-slayer-kimetsu-no-yaiba-47": { tmdb_id: 85937, mal_id: 38000, season_num: 1 },
+    "attack-on-titan-112": { tmdb_id: 1429, mal_id: 16498, season_num: 1 },
+    "chainsaw-man-17406": { tmdb_id: 114410, mal_id: 44511, season_num: 1 },
+    "one-piece-100": { tmdb_id: 37854, mal_id: 21, season_num: 1 },
+    "bleach-thousand-year-blood-war-18150": { tmdb_id: 100100, mal_id: 41006, season_num: 1 },
+    "oshi-no-ko-18342": { tmdb_id: 203737, mal_id: 52034, season_num: 1 },
+    "kaiju-no-8-19139": { tmdb_id: 207347, mal_id: 52588, season_num: 1 },
+    "spy-x-family-17978": { tmdb_id: 120089, mal_id: 50265, season_num: 1 },
+    "bocchi-the-rock-18153": { tmdb_id: 99578, mal_id: 51179, season_num: 2 },
+    "blue-lock-vs-u-20-japan-19342": { tmdb_id: 199951, mal_id: 54865, season_num: 2 },
+    "demon-slayer-kimetsu-no-yaiba-hashira-training-arc-19146": { tmdb_id: 85937, mal_id: 55701, season_num: 4 }
+  };
+
+  // Multi-server embed provider mapping untuk anime asli (VidLink, VidSrc, AutoEmbed, Embed.su, 2Embed)
+  function getEmbedServers(item, ep, mode){
+    ep = parseInt(ep) || 1;
+    var anilistId = (item && item.anilist_id) || 176496;
+    var meta = (item && item.slug && ANIME_METADATA[item.slug]) || {};
+    var tmdbId = (item && item.tmdb_id) || meta.tmdb_id || anilistId;
+    var sNum = (item && item.season_num) || meta.season_num || 1;
+    var m = (mode === "dub") ? "dub" : "sub";
+
+    return [
+      {
+        id: "vidlink",
+        name: "Server 1: VidLink (Multi-Sub HD)",
+        type: "iframe",
+        url: "https://vidlink.pro/anime/" + anilistId + "/" + ep + "/" + m
+      },
+      {
+        id: "vidsrc_cc",
+        name: "Server 2: VidSrc CC (Fast Stream)",
+        type: "iframe",
+        url: "https://vidsrc.cc/v2/embed/anime/" + anilistId + "/" + ep + "/" + m
+      },
+      {
+        id: "autoembed",
+        name: "Server 3: AutoEmbed (Global CDN)",
+        type: "iframe",
+        url: "https://player.autoembed.cc/embed/anime/" + anilistId + "/" + ep
+      },
+      {
+        id: "embedsu",
+        name: "Server 4: Embed.su (Multi-Track)",
+        type: "iframe",
+        url: "https://embed.su/embed/anime/" + anilistId + "/" + ep
+      },
+      {
+        id: "vidsrc_xyz",
+        name: "Server 5: VidSrc.xyz (Cloud Backup)",
+        type: "iframe",
+        url: "https://vidsrc.xyz/embed/anime?anilist=" + anilistId + "&ep=" + ep
+      },
+      {
+        id: "twoembed",
+        name: "Server 6: 2Embed (TMDB TV)",
+        type: "iframe",
+        url: "https://www.2embed.cc/embedtv/" + tmdbId + "&s=" + sNum + "&e=" + ep
+      }
+    ];
+  }
+
+  // Enrich setiap anime di ITEMS dengan metadata & server embed anime asli
+  ITEMS.forEach(function(it){
+    var meta = ANIME_METADATA[it.slug] || {};
+    it.tmdb_id = it.tmdb_id || meta.tmdb_id;
+    it.mal_id = it.mal_id || meta.mal_id;
+    it.season_num = it.season_num || meta.season_num || 1;
+    var srvs = getEmbedServers(it, 1, "sub");
+    it.embed_servers = srvs;
+    it.embed_url = srvs[0].url;
+    it.stream_url = srvs[0].url;
+  });
+
   // Map slug ke objek item cepat
   var ITEM_MAP = {};
   ITEMS.forEach(function(it){ ITEM_MAP[it.slug] = it; });
 
-  // 1. Hero Spotlight Items (5 Top Highlights dengan banner/backdrop lebar)
+  // 1. Hero Spotlight Items (5 Top Highlights dengan banner/backdrop lebar & embed stream anime asli)
   var HERO_ITEMS = ITEMS.slice(0, 5).map(function(it){
+    var srvs = getEmbedServers(it, 1, "sub");
     return Object.assign({}, it, {
       spotlight: true,
       quality: "HD 1080p",
-      badge: it.status === "releasing" ? "SEDANG TAYANG" : "LENGKAP"
+      badge: it.status === "releasing" ? "SEDANG TAYANG" : "LENGKAP",
+      embed_url: srvs[0].url,
+      stream_url: srvs[0].url,
+      embed_servers: srvs
     });
   });
 
@@ -474,16 +558,21 @@
     }
   ];
 
-  // Helper untuk membuat daftar episode mock yang dinamis
+  // Helper untuk membuat daftar episode mock yang dinamis dengan embed video stream asli
   function generateEpisodes(slug){
     var item = ITEM_MAP[slug] || ITEMS[0];
     var count = item.eps_total || item.episodes || 12;
     var list = [];
     for(var i = 1; i <= count; i++){
+      var srvs = getEmbedServers(item, i, "sub");
       list.push({
         ep: i,
         title: "Episode " + i,
         id: slug + "?ep=" + i,
+        embedUrl: srvs[0].url,
+        embed_url: srvs[0].url,
+        master: srvs[0].url,
+        servers: srvs,
         intro: { start: 90, end: 175 },
         outro: { start: 1320, end: 1410 }
       });
@@ -491,25 +580,38 @@
     return list;
   }
 
-  // Helper untuk resolve stream HLS demo yang 100% playable di browser / Vercel
-  function resolveFallbackStream(slug, ep){
+  // Helper untuk resolve stream anime ASLI (Multi-Server Embed & Native HLS master)
+  function resolveFallbackStream(slug, ep, mode){
+    ep = parseInt(ep) || 1;
+    mode = (mode === "dub") ? "dub" : "sub";
     var item = ITEM_MAP[slug] || ITEMS[0];
+    var servers = getEmbedServers(item, ep, mode);
+    var primary = servers[0];
+    var embedUrl = primary.url;
+    // ponytail: fallback m3u8 native untuk Server 2; upgrade ke direct scrapers saat backend aktif
+    var masterHls = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
+
     return {
       success: true,
       data: {
         slug: slug,
         episode: ep,
-        source: "vercel-demo",
-        server: "Vercel Static CDN (Demo)",
-        master: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+        mode: mode,
+        source: "embed-multiserver",
+        server: primary.name,
+        embedUrl: embedUrl,
+        embed_url: embedUrl,
+        master: masterHls,
+        embedServers: servers,
+        servers: servers,
         picked: {
           q: "1080p",
-          url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+          url: embedUrl
         },
         variants: [
-          { q: "1080p", url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" },
-          { q: "720p", url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" },
-          { q: "480p", url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" }
+          { q: "1080p", url: embedUrl },
+          { q: "720p", url: (servers[1] ? servers[1].url : embedUrl) },
+          { q: "480p", url: (servers[2] ? servers[2].url : embedUrl) }
         ],
         subtitles: [
           { lang: "Indonesian", label: "Indonesian", url: "" },
@@ -541,6 +643,7 @@
     getItem: function(slug){ return ITEM_MAP[slug] || null; },
     getEpisodes: generateEpisodes,
     resolveStream: resolveFallbackStream,
+    getEmbedServers: getEmbedServers,
     search: searchFallback
   };
 

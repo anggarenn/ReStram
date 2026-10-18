@@ -786,6 +786,10 @@
     <div class="player-head">
       <div class="player-title"><span id="pm-title">–</span><span id="pm-meta" class="dim"></span></div>
       <div class="player-head-btns">
+        <div class="seg player-server-seg" id="pm-server-seg">
+          <button id="pm-server-embed" class="active" title="Server 1: HD Player (Embed)">Server 1: HD Player (Embed)</button>
+          <button id="pm-server-native" title="Server 2: HLS Native">Server 2: HLS Native</button>
+        </div>
         <select id="pm-speed-select" class="speed-select" title="Kecepatan Putar Video ([ / ])" aria-label="Kecepatan">
           <option value="0.5">0.5x</option>
           <option value="0.75">0.75x</option>
@@ -805,6 +809,7 @@
       <div id="ambient-fallback" aria-hidden="true"></div>
       <canvas id="ambient" width="96" height="54" aria-hidden="true"></canvas>
       <video id="vid" controls playsinline preload="auto"></video>
+      <iframe id="pm-embed-frame" class="embed-player hidden" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope" frameborder="0"></iframe>
       <div id="pm-gesture-stage" class="gesture-stage" aria-hidden="true">
         <div id="pm-ripple-left" class="gesture-ripple left"><span class="ripple-icon"><svg class="ui-icon"><use href="#icon-rewind"/></svg></span><span class="ripple-text">-10s</span></div>
         <div id="pm-ripple-right" class="gesture-ripple right"><span class="ripple-icon"><svg class="ui-icon"><use href="#icon-forward"/></svg></span><span class="ripple-text">+10s</span></div>
