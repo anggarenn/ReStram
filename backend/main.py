@@ -2226,6 +2226,15 @@ if os.path.isdir(os.path.join(frontend_dir, "css")):
     app.mount("/css", StaticFiles(directory=os.path.join(frontend_dir, "css")), name="css")
 if os.path.isdir(os.path.join(frontend_dir, "assets")):
     app.mount("/assets", StaticFiles(directory=os.path.join(frontend_dir, "assets")), name="assets")
+if os.path.isdir(os.path.join(frontend_dir, "data")):
+    app.mount("/data", StaticFiles(directory=os.path.join(frontend_dir, "data")), name="data")
+
+@app.get("/favicon.ico")
+async def favicon():
+    fav_path = os.path.join(frontend_dir, "favicon.ico")
+    if os.path.isfile(fav_path):
+        return FileResponse(fav_path)
+    return Response(status_code=404)
 
 @app.get("/")
 async def root():
@@ -2233,6 +2242,7 @@ async def root():
     if os.path.isfile(idx_path):
         return FileResponse(idx_path)
     return ok({"status": "running", "app": "ReStram Native Android Backend"})
+
 
 if __name__ == "__main__":
     import uvicorn
