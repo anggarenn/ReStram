@@ -2029,25 +2029,42 @@ function playMPV(){
 }
 function renderContinue(){
   (window.ReStram||window.Tatap).history().then(function(r){
-    var h=(r.data||[]).slice(0,10);
+    var h=(r.data||[]).slice(0,12);
     var sec=$("continue-sec");
+    if(!sec) return;
     if(!h.length){sec.classList.add("hidden");return;}
-    var inCari=!window.Tui||Tui.view()==="cari";
-    sec.classList.toggle("hidden",!inCari);
-    var box=$("continue-row");box.innerHTML="";
+    var inHome = !window.Tui || Tui.view() === "home" || Tui.view() === "beranda" || Tui.view() === "cari";
+    sec.classList.toggle("hidden",!inHome);
+    var box=$("continue-row");
+    if(!box) return;
+    box.innerHTML="";
     for(var i=0;i<h.length;i++){
       (function(x){
-        var d=document.createElement("div");d.className="hist-card";
-        var b=document.createElement("b");b.textContent=x.title;d.appendChild(b);
-        var s=document.createElement("span");
-        var progStr = (x.progress && x.progress >= 15) ? (" · " + formatTimeSec(x.progress)) : "";
-        s.textContent="ep "+x.episode+progStr+" · "+x.mode+" · lanjutkan ▶";
-        d.appendChild(s);
-        d.addEventListener("click",function(){
+        var card = document.createElement("div");
+        card.className = "rail-card continue-card";
+        card.tabIndex = 0;
+        var p = x.progress || 0;
+        var dur = x.duration || 0;
+        var pct = dur > 0 ? Math.min(100, Math.max(5, Math.round((p / dur) * 100))) : (p > 0 ? 50 : 0);
+        var pStr = p >= 15 ? formatTimeSec(p) : "";
+        var posterUrl = x.poster || "";
+        card.innerHTML = 
+          '<div class="rail-card-poster-wrap">' +
+            (posterUrl ? '<img class="rail-card-img" src="' + esc(posterUrl) + '" alt="' + esc(x.title) + '" loading="lazy">' : '<div class="rail-card-img no-img" style="background:#151922;display:flex;align-items:center;justify-content:center;color:#64748b;font-size:24px;">▶</div>') +
+            (pct > 0 ? '<div class="card-progress-bar"><div class="card-progress-fill" style="width:' + pct + '%"></div></div>' : '') +
+            '<div class="rail-card-overlay"><div class="card-play-btn"><svg class="ui-icon"><use href="#icon-play"/></svg></div></div>' +
+            '<span class="card-badge-status">EP ' + (x.episode || 1) + '</span>' +
+          '</div>' +
+          '<div class="rail-card-info">' +
+            '<h3 class="rail-card-title">' + esc(x.title) + '</h3>' +
+            '<div class="rail-card-meta">Ep ' + (x.episode || 1) + (pStr ? (' · ' + pStr) : '') + ' · ' + (x.mode || 'sub').toUpperCase() + '</div>' +
+          '</div>';
+        card.addEventListener("click",function(){
           cur.slug=x.slug;cur.title=x.title;cur.mode=x.mode||"sub";syncSeg();
-          openTitle(x.slug,x.title);openPlayer(x.episode);
+          openTitle(x.slug,x.title,x.poster);
+          openPlayer(x.episode);
         });
-        box.appendChild(d);
+        box.appendChild(card);
       })(h[i]);
     }
   }).catch(function(){});
@@ -2185,6 +2202,18 @@ function renderSourceUI(){
     tm.textContent = "SRC: " + badgeTxt;
     tm.classList.toggle("otaku", isOtaku);
   }
+  var navLbl = $("nav-source-label");
+  if(navLbl){
+    navLbl.textContent = isOtaku ? "SRC: OTAKUDESU" : "SRC: HIANIME";
+  }
+  var navBtn = $("nav-source-btn");
+  if(navBtn){
+    navBtn.classList.toggle("otaku", isOtaku);
+  }
+  var pHi = $("pill-src-hianime");
+  if(pHi) pHi.classList.toggle("active", !isOtaku);
+  var pOt = $("pill-src-otakudesu");
+  if(pOt) pOt.classList.toggle("active", isOtaku);
 }
 
 function switchSource(targetSource){
@@ -2309,6 +2338,423 @@ function checkForUpdate(manualTrigger){
     }
   });
 }
+
+// =========================================================================
+// NETMIRROR CONTROLLER (Netflix-style Hero Carousel & Content Rails)
+// =========================================================================
+var NET_FALLBACK_ANIME = [
+  {
+    id: "solo-leveling-season-2-arise-from-the-shadows-19413",
+    title: "Solo Leveling Season 2: Arise from the Shadow",
+    poster: "https://cdn.myanimelist.net/images/anime/1944/144967.jpg",
+    backdrop: "https://images.alphacoders.com/135/1351185.jpeg",
+    score: 8.9,
+    type: "TV",
+    season: "Winter 2025",
+    badge: "TRENDING NOW",
+    eps_counter: "12",
+    synopsis: "Sung Jinwoo melanjutkan perjalanannya sebagai Shadow Monarch yang mengendalikan pasukan bayangan tak terkalahkan. Ancaman Dungeon misterius semakin dekat ke dunia manusia dan perang antar Monarch tak terhindarkan.",
+    genres: ["Action", "Adventure", "Fantasy"]
+  },
+  {
+    id: "frieren-beyond-journeys-end-18418",
+    title: "Sousou no Frieren (Beyond Journey's End)",
+    poster: "https://cdn.myanimelist.net/images/anime/1015/138006.jpg",
+    backdrop: "https://images.alphacoders.com/133/1336444.jpeg",
+    score: 9.3,
+    type: "TV",
+    season: "Fall 2023",
+    badge: "TOP RATED",
+    eps_counter: "28",
+    synopsis: "Setelah mengalahkan Raja Iblis bersama pahlawan Himmel dan kawan-kawan, penyihir elf Frieren memulai perjalanan baru melintasi benua untuk memahami perasaan manusia dan makna waktu.",
+    genres: ["Adventure", "Drama", "Fantasy"]
+  },
+  {
+    id: "dandadan-19319",
+    title: "Dandadan",
+    poster: "https://cdn.myanimelist.net/images/anime/1032/144673.jpg",
+    backdrop: "https://images.alphacoders.com/137/1376842.jpeg",
+    score: 8.6,
+    type: "TV",
+    season: "Fall 2024",
+    badge: "POPULER",
+    eps_counter: "12",
+    synopsis: "Momo Ayase yang percaya hantu dan Ken Takakura (Okarun) yang percaya alien bertaruh di tempat angker. Tanpa diduga, mereka berdua terjerumus ke dalam perang misterius antara arwah turbo dan invasi alien.",
+    genres: ["Action", "Comedy", "Supernatural"]
+  },
+  {
+    id: "jujutsu-kaisen-2nd-season-18413",
+    title: "Jujutsu Kaisen Season 2 (Shibuya Incident)",
+    poster: "https://cdn.myanimelist.net/images/anime/1792/138042.jpg",
+    backdrop: "https://images.alphacoders.com/132/1322234.jpeg",
+    score: 8.8,
+    type: "TV",
+    season: "Summer 2023",
+    badge: "HOT ACTION",
+    eps_counter: "23",
+    synopsis: "Tragedi besar Shibuya pecah pada malam Halloween. Gojo Satoru terperangkap dalam Prison Realm, sementara Yuji Itadori dan para penyihir jujutsu harus bertarung mati-matian melawan roh kutukan khusus.",
+    genres: ["Action", "Fantasy", "Supernatural"]
+  },
+  {
+    id: "demon-slayer-kimetsu-no-yaiba-hashira-training-arc-19146",
+    title: "Demon Slayer: Hashira Training Arc",
+    poster: "https://cdn.myanimelist.net/images/anime/1094/142345.jpg",
+    backdrop: "https://images.alphacoders.com/135/1359178.jpeg",
+    score: 8.5,
+    type: "TV",
+    season: "Spring 2024",
+    badge: "ONGOING",
+    eps_counter: "8",
+    synopsis: "Tanjiro dan korps pembasmi iblis menjalani latihan fisik dan teknik pedang intensif bersama para Hashira terkuat sebagai persiapan menghadapi pertempuran akhir melawan Muzan Kibutsuji.",
+    genres: ["Action", "Fantasy", "Historical"]
+  },
+  {
+    id: "one-piece-100",
+    title: "One Piece (Egghead Arc)",
+    poster: "https://cdn.myanimelist.net/images/anime/1244/138851.jpg",
+    backdrop: "https://images.alphacoders.com/134/1347895.jpeg",
+    score: 8.9,
+    type: "TV",
+    season: "Continuous",
+    badge: "EPISODE BARU",
+    eps_counter: "1122",
+    synopsis: "Luffy dan Bajak Laut Topi Jerami tiba di Pulau Masa Depan Egghead, laboratorium rahasia Dr. Vegapunk, di mana misteri Abad Kekosongan mulai terkuak ke hadapan Pemerintah Dunia.",
+    genres: ["Action", "Adventure", "Fantasy"]
+  },
+  {
+    id: "attack-on-titan-final-season-the-final-chapters-18322",
+    title: "Attack on Titan: The Final Season",
+    poster: "https://cdn.myanimelist.net/images/anime/1279/131078.jpg",
+    backdrop: "https://images.alphacoders.com/130/1304218.jpeg",
+    score: 9.0,
+    type: "TV",
+    season: "Special",
+    badge: "TAMAT",
+    eps_counter: "Finale",
+    synopsis: "Gemuruh Rumbling meluluhlantakkan dunia di luar dinding. Armin, Mikasa, Levi, dan aliansi prajurit berjuang dalam keputusasaan untuk menghentikan sahabat mereka, Eren Yeager.",
+    genres: ["Action", "Drama", "Suspense"]
+  },
+  {
+    id: "chainsaw-man-17406",
+    title: "Chainsaw Man",
+    poster: "https://cdn.myanimelist.net/images/anime/1806/126216.jpg",
+    backdrop: "https://images.alphacoders.com/128/1284724.jpg",
+    score: 8.5,
+    type: "TV",
+    season: "Fall 2022",
+    badge: "ACTION",
+    eps_counter: "12",
+    synopsis: "Denji hidup dalam kemiskinan ekstrem bersama iblis anjing gergaji bernama Pochita, hingga suatu hari sebuah pengkhianatan melahirkannya kembali sebagai hibrida manusia-gergaji.",
+    genres: ["Action", "Horror", "Supernatural"]
+  },
+  {
+    id: "kaiju-no-8-19131",
+    title: "Kaiju No. 8",
+    poster: "https://cdn.myanimelist.net/images/anime/1908/142271.jpg",
+    backdrop: "https://images.alphacoders.com/136/1361271.jpeg",
+    score: 8.4,
+    type: "TV",
+    season: "Spring 2024",
+    badge: "SCI-FI",
+    eps_counter: "12",
+    synopsis: "Kafka Hibino yang bekerja di tim pembersih bangkai monster tiba-tiba tertelan makhluk aneh dan memperoleh kekuatan luar biasa untuk berubah menjadi Kaiju nomor 8.",
+    genres: ["Action", "Sci-Fi"]
+  },
+  {
+    id: "bleach-thousand-year-blood-war-the-conflict-19323",
+    title: "Bleach: Thousand-Year Blood War (Part 3)",
+    poster: "https://cdn.myanimelist.net/images/anime/1897/144675.jpg",
+    backdrop: "https://images.alphacoders.com/127/1273872.jpg",
+    score: 8.8,
+    type: "TV",
+    season: "Fall 2024",
+    badge: "ACTION",
+    eps_counter: "13",
+    synopsis: "Pertempuran antara Shinigami Soul Society dan Wandenreich Quincy mencapai puncaknya di Istana Raja Roh. Ichigo Kurosaki bangkit dengan kekuatan sejatinya.",
+    genres: ["Action", "Adventure", "Supernatural"]
+  }
+];
+
+var NetMirror = (function(){
+  var heroIndex = 0;
+  var heroTimer = null;
+  var heroSlides = NET_FALLBACK_ANIME.slice(0, 5);
+
+  function createRailCard(a){
+    var card = document.createElement("div");
+    card.className = "rail-card";
+    card.tabIndex = 0;
+    var posterUrl = a.poster || "";
+    var epText = a.eps_counter ? ("EP " + a.eps_counter) : (a.badge || (a.episode != null ? ("EP " + a.episode) : (a.eps ? (a.eps + " EP") : "TV")));
+    var scoreVal = a.score ? parseFloat(a.score) : 8.5;
+    var scoreText = "⭐ " + scoreVal.toFixed(1);
+
+    var isTam = a.badge === "TAMAT" || a.is_finished;
+    var statusCls = isTam ? "card-badge-status finished" : "card-badge-status";
+
+    card.innerHTML = 
+      '<div class="rail-card-poster-wrap">' +
+        (posterUrl ? '<img class="rail-card-img" src="' + esc(posterUrl) + '" alt="' + esc(a.title) + '" loading="lazy" decoding="async">' : '<div class="rail-card-img no-img" style="background:#151922;display:flex;align-items:center;justify-content:center;color:#64748b;font-size:24px;">▶</div>') +
+        '<div class="rail-card-overlay"><div class="card-play-btn"><svg class="ui-icon"><use href="#icon-play"/></svg></div></div>' +
+        '<span class="card-badge-score">' + esc(scoreText) + '</span>' +
+        '<span class="' + statusCls + '">' + esc(epText) + '</span>' +
+      '</div>' +
+      '<div class="rail-card-info">' +
+        '<h3 class="rail-card-title">' + esc(a.title) + '</h3>' +
+        '<div class="rail-card-meta">' + esc((a.type || "TV") + (a.season ? (" · " + a.season) : "")) + '</div>' +
+      '</div>';
+
+    var targetId = a.id || a.slug;
+    card.addEventListener("click", function(){
+      App.openTitle(targetId, a.title, a.poster, a.type, a.eps_counter, a);
+    });
+    return card;
+  }
+
+  function renderRailItems(trackEl, items){
+    if(!trackEl) return;
+    trackEl.innerHTML = "";
+    var frag = document.createDocumentFragment();
+    for(var i = 0; i < items.length; i++){
+      frag.appendChild(createRailCard(items[i]));
+    }
+    trackEl.appendChild(frag);
+  }
+
+  function setHeroSlide(idx){
+    if(!heroSlides || !heroSlides.length) return;
+    heroIndex = (idx + heroSlides.length) % heroSlides.length;
+    var a = heroSlides[heroIndex];
+    if(!a) return;
+
+    var bg = $("hero-backdrop");
+    if(bg){
+      var bgImg = a.backdrop || a.poster || "";
+      bg.style.backgroundImage = bgImg ? ("url('" + bgImg + "')") : "none";
+    }
+
+    var tEl = $("hero-title");
+    if(tEl) tEl.textContent = a.title || "";
+    var synEl = $("hero-synopsis");
+    if(synEl) synEl.textContent = a.synopsis || "Anime pilihan terbaik untuk streaming berkualitas di ReStram.";
+    var scEl = $("hero-score-val");
+    if(scEl) scEl.textContent = a.score ? parseFloat(a.score).toFixed(1) : "8.9";
+    var typEl = $("hero-type");
+    if(typEl) typEl.textContent = a.type || "TV Series";
+    var ssnEl = $("hero-season");
+    if(ssnEl) ssnEl.textContent = a.season || "Populer";
+
+    // Dots indicator update
+    var dots = document.querySelectorAll("#hero-dots .hero-dot");
+    dots.forEach(function(dot, dIdx){
+      dot.classList.toggle("active", dIdx === heroIndex);
+    });
+
+    // Button actions
+    var btnPlay = $("hero-btn-play");
+    if(btnPlay){
+      btnPlay.onclick = function(){
+        App.openTitle(a.id || a.slug, a.title, a.poster, a.type, a.eps_counter, a);
+        setTimeout(function(){
+          App.openPlayer(1);
+        }, 150);
+      };
+    }
+    var btnDetail = $("hero-btn-detail");
+    if(btnDetail){
+      btnDetail.onclick = function(){
+        App.openTitle(a.id || a.slug, a.title, a.poster, a.type, a.eps_counter, a);
+      };
+    }
+  }
+
+  function startHeroTimer(){
+    stopHeroTimer();
+    heroTimer = setInterval(function(){
+      setHeroSlide(heroIndex + 1);
+    }, 7000);
+  }
+
+  function stopHeroTimer(){
+    if(heroTimer){
+      clearInterval(heroTimer);
+      heroTimer = null;
+    }
+  }
+
+  function initHero(){
+    var dotsContainer = $("hero-dots");
+    if(dotsContainer){
+      dotsContainer.innerHTML = "";
+      heroSlides.forEach(function(_, i){
+        var dot = document.createElement("button");
+        dot.className = "hero-dot" + (i === 0 ? " active" : "");
+        dot.setAttribute("aria-label", "Slide " + (i + 1));
+        dot.addEventListener("click", function(){
+          setHeroSlide(i);
+          startHeroTimer();
+        });
+        dotsContainer.appendChild(dot);
+      });
+    }
+
+    var btnPrev = $("hero-prev");
+    if(btnPrev){
+      btnPrev.onclick = function(){
+        setHeroSlide(heroIndex - 1);
+        startHeroTimer();
+      };
+    }
+    var btnNext = $("hero-next");
+    if(btnNext){
+      btnNext.onclick = function(){
+        setHeroSlide(heroIndex + 1);
+        startHeroTimer();
+      };
+    }
+
+    var heroSec = $("net-hero");
+    if(heroSec){
+      heroSec.addEventListener("mouseenter", stopHeroTimer);
+      heroSec.addEventListener("mouseleave", startHeroTimer);
+    }
+
+    setHeroSlide(0);
+    startHeroTimer();
+  }
+
+  function bindRailNavArrows(){
+    document.querySelectorAll(".rail-slider-wrapper").forEach(function(wrap){
+      var track = wrap.querySelector(".rail-track");
+      var prevBtn = wrap.querySelector(".rail-nav-btn.prev");
+      var nextBtn = wrap.querySelector(".rail-nav-btn.next");
+      if(!track) return;
+      if(prevBtn && !prevBtn._navBound){
+        prevBtn._navBound = true;
+        prevBtn.addEventListener("click", function(){
+          track.scrollBy({ left: -Math.max(280, track.clientWidth * 0.75), behavior: "smooth" });
+        });
+      }
+      if(nextBtn && !nextBtn._navBound){
+        nextBtn._navBound = true;
+        nextBtn.addEventListener("click", function(){
+          track.scrollBy({ left: Math.max(280, track.clientWidth * 0.75), behavior: "smooth" });
+        });
+      }
+    });
+
+    document.querySelectorAll(".rail-see-all-btn[data-rail-view]").forEach(function(btn){
+      if(!btn._bound){
+        btn._bound = true;
+        btn.addEventListener("click", function(){
+          var v = btn.getAttribute("data-rail-view");
+          if(window.Tui && window.Tui.setView) window.Tui.setView(v);
+        });
+      }
+    });
+  }
+
+  function loadTrendingRail(){
+    var track = $("lane-season");
+    var api = window.ReStram || window.Tatap;
+    if(!api || !api.seasonNow) {
+      renderRailItems(track, NET_FALLBACK_ANIME.slice(0, 10));
+      return;
+    }
+    api.seasonNow(1).then(function(r){
+      if(r && r.success && r.data && Array.isArray(r.data.items) && r.data.items.length){
+        renderRailItems(track, r.data.items);
+        if(r.data.items.length >= 3){
+          heroSlides = r.data.items.slice(0, 5);
+          initHero();
+        }
+      } else {
+        renderRailItems(track, NET_FALLBACK_ANIME.slice(0, 10));
+      }
+    }).catch(function(){
+      renderRailItems(track, NET_FALLBACK_ANIME.slice(0, 10));
+    });
+  }
+
+  function loadLatestRail(){
+    var track = $("lane-latest");
+    var api = window.ReStram || window.Tatap;
+    if(!api || !api.schedule) {
+      renderRailItems(track, NET_FALLBACK_ANIME.slice(2, 10));
+      return;
+    }
+    api.schedule("today").then(function(r){
+      if(r && r.success && r.data){
+        var items = r.data.items || (Array.isArray(r.data) ? r.data : []);
+        if(items.length){
+          renderRailItems(track, items);
+          return;
+        }
+      }
+      renderRailItems(track, NET_FALLBACK_ANIME.slice(2, 10));
+    }).catch(function(){
+      renderRailItems(track, NET_FALLBACK_ANIME.slice(2, 10));
+    });
+  }
+
+  function loadPopularRail(){
+    var track = $("lane-popular");
+    var api = window.ReStram || window.Tatap;
+    if(!api || !api.catalog) {
+      renderRailItems(track, NET_FALLBACK_ANIME.slice(1, 10));
+      return;
+    }
+    api.catalog(1).then(function(r){
+      if(r && r.success && r.data && Array.isArray(r.data.items) && r.data.items.length){
+        renderRailItems(track, r.data.items);
+      } else {
+        renderRailItems(track, NET_FALLBACK_ANIME.slice(1, 10));
+      }
+    }).catch(function(){
+      renderRailItems(track, NET_FALLBACK_ANIME.slice(1, 10));
+    });
+  }
+
+  function loadFavoritesRail(){
+    var track = $("lane-favorites");
+    var sec = $("lane-favorites-sec");
+    var api = window.ReStram || window.Tatap;
+    if(!api || !api.bookmarks) return;
+    api.bookmarks().then(function(r){
+      if(r && r.success && Array.isArray(r.data) && r.data.length){
+        renderRailItems(track, r.data);
+        if(sec) sec.classList.remove("hidden");
+      } else {
+        if(sec) sec.classList.add("hidden");
+      }
+    }).catch(function(){
+      if(sec) sec.classList.add("hidden");
+    });
+  }
+
+  function refreshHomeRails(){
+    renderContinue();
+    loadTrendingRail();
+    loadLatestRail();
+    loadPopularRail();
+    loadFavoritesRail();
+    bindRailNavArrows();
+  }
+
+  function init(){
+    initHero();
+    bindRailNavArrows();
+    refreshHomeRails();
+  }
+
+  return {
+    init: init,
+    refreshHomeRails: refreshHomeRails,
+    setHeroSlide: setHeroSlide,
+    fallbackAnime: NET_FALLBACK_ANIME
+  };
+})();
+window.NetMirror = NetMirror;
 
 App = {
   openTitle:openTitle, openPlayer:openPlayer, playMPV:playMPV,
@@ -2561,5 +3007,8 @@ function init(){
   });
 
   window.Tui.boot();
+  if(window.NetMirror && window.NetMirror.init){
+    window.NetMirror.init();
+  }
 }
 init();

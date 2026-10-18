@@ -5,10 +5,10 @@
 <meta name="application-name" content="ReStram">
 <meta name="apple-mobile-web-app-title" content="ReStram">
 <title>ReStram — nonton santai di lokal</title>
-<link rel="stylesheet" href="/css/style.css">
-<link rel="icon" type="image/x-icon" href="/favicon.ico">
-<link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png">
-<link rel="apple-touch-icon" href="/assets/icon-512.png">
+<link rel="stylesheet" href="./css/style.css">
+<link rel="icon" type="image/x-icon" href="./favicon.ico">
+<link rel="icon" type="image/png" sizes="192x192" href="./assets/icon-192.png">
+<link rel="apple-touch-icon" href="./assets/icon-512.png">
 </head>
 <body class="no-crt" style="background:#08090c;color:#d6dae2;">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none" id="restram-icons">
@@ -195,35 +195,182 @@
 <div id="crt" aria-hidden="true"></div>
 <div id="bg-glow" aria-hidden="true"></div>
 
-<header class="tui-head">
-  <div class="head-brand">
-    <span class="brand-name">ReStram</span>
-    <span class="brand-ver" id="brand-ver">v2.9.2</span>
-  </div>
-  <div class="head-actions">
-    <button id="btn-drawer-head" class="icon-btn header-drawer-btn" title="Buka Menu & Navigasi (☰)" aria-label="Menu">
-      <span class="drawer-btn-icon"><svg class="ui-icon"><use href="#icon-menu"/></svg></span>
-    </button>
+<header class="tui-head net-navbar" id="net-navbar">
+  <div class="nav-container">
+    <div class="nav-main-row">
+      <div class="head-brand" id="nav-brand-logo" role="button" tabindex="0" title="Beranda ReStram">
+        <span class="brand-name net-logo">ReStram</span>
+        <span class="brand-ver" id="brand-ver">v2.9.2</span>
+      </div>
+      
+      <!-- Rounded-full search pill in center -->
+      <div class="nav-search-pill" id="nav-search-wrap">
+        <span class="search-pill-icon"><svg class="ui-icon"><use href="#icon-search"/></svg></span>
+        <input id="nav-search-input" type="search" placeholder="Cari anime, genre, judul, atau :perintah..." autocomplete="off" spellcheck="false" autocapitalize="off" aria-label="Cari anime">
+        <button id="nav-search-clear" class="search-pill-clear hidden" title="Hapus pencarian" aria-label="Hapus pencarian"><svg class="ui-icon"><use href="#icon-close"/></svg></button>
+      </div>
+      
+      <div class="head-actions">
+        <button id="nav-source-btn" class="nav-source-badge" title="Klik untuk beralih sumber stream (HiAnime / Otakudesu)">
+          <span id="nav-source-label">SRC: HIANIME</span>
+          <svg class="ui-icon"><use href="#icon-switch"/></svg>
+        </button>
+        <button id="btn-drawer-head" class="icon-btn header-drawer-btn" title="Buka Menu & Navigasi (☰)" aria-label="Menu">
+          <span class="drawer-btn-icon"><svg class="ui-icon"><use href="#icon-menu"/></svg></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Scrollable category filter pills -->
+    <nav class="nav-pills-bar" id="nav-pills-bar" aria-label="Filter Kategori">
+      <button class="nav-pill active" data-view="home"><svg class="ui-icon"><use href="#icon-tv"/></svg> Beranda</button>
+      <button class="nav-pill" data-view="trending"><svg class="ui-icon"><use href="#icon-fire"/></svg> Trending</button>
+      <button class="nav-pill" data-view="populer"><svg class="ui-icon"><use href="#icon-star"/></svg> Populer</button>
+      <button class="nav-pill" data-view="ongoing"><svg class="ui-icon"><use href="#icon-circle-dot"/></svg> Ongoing</button>
+      <button class="nav-pill" data-view="movies"><svg class="ui-icon"><use href="#icon-film"/></svg> Movies</button>
+      <button class="nav-pill" data-view="musim"><svg class="ui-icon"><use href="#icon-season"/></svg> Musim Ini</button>
+      <button class="nav-pill" data-view="terbaru"><svg class="ui-icon"><use href="#icon-clock"/></svg> Jadwal Rilis</button>
+      <button class="nav-pill" data-view="favorit"><svg class="ui-icon"><use href="#icon-heart"/></svg> Favorit</button>
+      <button class="nav-pill pill-source" data-source="hianime" id="pill-src-hianime">HiAnime</button>
+      <button class="nav-pill pill-source" data-source="otakudesu" id="pill-src-otakudesu">Otakudesu</button>
+    </nav>
   </div>
 </header>
 
 <main>
-  <section id="continue-sec" class="hidden">
-    <div class="sec-head"><h2>Lanjutkan menonton</h2><button class="link-btn" id="clear-hist">hapus</button></div>
-    <div id="continue-row" class="hscroll"></div>
-  </section>
+  <!-- NETFLIX / NETMIRROR HOME SECTION -->
+  <div id="net-home-container" class="net-home-container">
+    <!-- HERO SECTION: CINEMATIC CAROUSEL (70-80vh) -->
+    <section id="net-hero" class="net-hero" aria-label="Sorotan Anime">
+      <div class="hero-backdrop-container">
+        <div id="hero-backdrop" class="hero-backdrop"></div>
+        <div class="hero-vignette-bottom"></div>
+        <div class="hero-vignette-left"></div>
+        <div class="hero-vignette-top"></div>
+      </div>
+      <div class="hero-content">
+        <div class="hero-badge-wrap">
+          <span class="hero-badge-trending"><svg class="ui-icon"><use href="#icon-fire"/></svg> TRENDING NOW</span>
+          <span id="hero-score" class="hero-score-badge"><svg class="ui-icon"><use href="#icon-star-filled"/></svg> <b id="hero-score-val">8.9</b></span>
+          <span id="hero-type" class="hero-type-badge">TV Series</span>
+          <span id="hero-season" class="hero-season-badge dim">Winter 2025</span>
+        </div>
+        <h1 id="hero-title" class="hero-title">Solo Leveling Season 2: Arise from the Shadow</h1>
+        <p id="hero-synopsis" class="hero-synopsis">
+          Sung Jinwoo melanjutkan perjalanannya sebagai Shadow Monarch yang mengendalikan pasukan bayangan. Ancaman Dungeon misterius semakin dekat ke dunia manusia.
+        </p>
+        <div class="hero-actions">
+          <button id="hero-btn-play" class="hero-btn-play" title="Tonton sekarang">
+            <svg class="ui-icon"><use href="#icon-play"/></svg> Tonton Sekarang
+          </button>
+          <button id="hero-btn-detail" class="hero-btn-detail" title="Lihat detail & episode">
+            <svg class="ui-icon"><use href="#icon-tv"/></svg> Detail
+          </button>
+        </div>
+      </div>
+      <div class="hero-controls">
+        <button id="hero-prev" class="hero-arrow-btn prev" title="Slide sebelumnya" aria-label="Slide sebelumnya"><svg class="ui-icon"><use href="#icon-prev"/></svg></button>
+        <div id="hero-dots" class="hero-dots" role="tablist" aria-label="Indikator Carousel"></div>
+        <button id="hero-next" class="hero-arrow-btn next" title="Slide berikutnya" aria-label="Slide berikutnya"><svg class="ui-icon"><use href="#icon-next"/></svg></button>
+      </div>
+    </section>
 
-  <section id="lane-season-sec" class="hidden">
-    <div class="sec-head"><h2 id="lane-season-title">Tayang musim ini</h2></div>
-    <div id="lane-season" class="hscroll"></div>
-  </section>
+    <!-- HORIZONTAL CONTENT RAILS -->
+    <div id="net-rails-container" class="net-rails-container">
+      <!-- Rail 1: Lanjutkan Menonton -->
+      <section id="continue-sec" class="net-rail hidden">
+        <div class="rail-header">
+          <div class="rail-title-wrap">
+            <h2 class="rail-title"><svg class="ui-icon"><use href="#icon-clock"/></svg> Lanjutkan Menonton</h2>
+          </div>
+          <button class="rail-link-btn" id="clear-hist" title="Hapus riwayat tontonan">Hapus Riwayat</button>
+        </div>
+        <div class="rail-slider-wrapper">
+          <button class="rail-nav-btn prev" aria-label="Scroll ke kiri"><svg class="ui-icon"><use href="#icon-prev"/></svg></button>
+          <div id="continue-row" class="rail-track"></div>
+          <button class="rail-nav-btn next" aria-label="Scroll ke kanan"><svg class="ui-icon"><use href="#icon-next"/></svg></button>
+        </div>
+      </section>
 
-  <section id="lane-still-sec" class="hidden">
-    <div class="sec-head"><h2>Masih tayang (lanjut)</h2></div>
-    <div id="lane-still" class="hscroll"></div>
-  </section>
+      <!-- Rail 2: Sedang Hangat (Trending Musim Ini) -->
+      <section id="lane-season-sec" class="net-rail">
+        <div class="rail-header">
+          <div class="rail-title-wrap">
+            <h2 id="lane-season-title" class="rail-title"><svg class="ui-icon"><use href="#icon-fire"/></svg> Sedang Hangat (Musim Ini)</h2>
+          </div>
+          <button class="rail-see-all-btn" data-rail-view="musim">Lihat Semua <svg class="ui-icon"><use href="#icon-next"/></svg></button>
+        </div>
+        <div class="rail-slider-wrapper">
+          <button class="rail-nav-btn prev" aria-label="Scroll ke kiri"><svg class="ui-icon"><use href="#icon-prev"/></svg></button>
+          <div id="lane-season" class="rail-track"></div>
+          <button class="rail-nav-btn next" aria-label="Scroll ke kanan"><svg class="ui-icon"><use href="#icon-next"/></svg></button>
+        </div>
+      </section>
 
-  <section id="search-sec">
+      <!-- Rail 3: Episode Baru Rilis (Update Hari Ini) -->
+      <section id="lane-latest-sec" class="net-rail">
+        <div class="rail-header">
+          <div class="rail-title-wrap">
+            <h2 class="rail-title"><svg class="ui-icon"><use href="#icon-clock"/></svg> Episode Baru Rilis</h2>
+          </div>
+          <button class="rail-see-all-btn" data-rail-view="terbaru">Jadwal Lengkap <svg class="ui-icon"><use href="#icon-next"/></svg></button>
+        </div>
+        <div class="rail-slider-wrapper">
+          <button class="rail-nav-btn prev" aria-label="Scroll ke kiri"><svg class="ui-icon"><use href="#icon-prev"/></svg></button>
+          <div id="lane-latest" class="rail-track"></div>
+          <button class="rail-nav-btn next" aria-label="Scroll ke kanan"><svg class="ui-icon"><use href="#icon-next"/></svg></button>
+        </div>
+      </section>
+
+      <!-- Rail 4: Rekomendasi Anime Populer -->
+      <section id="lane-popular-sec" class="net-rail">
+        <div class="rail-header">
+          <div class="rail-title-wrap">
+            <h2 class="rail-title"><svg class="ui-icon"><use href="#icon-star"/></svg> Rekomendasi Anime Populer</h2>
+          </div>
+          <button class="rail-see-all-btn" data-rail-view="katalog">Katalog Lengkap <svg class="ui-icon"><use href="#icon-next"/></svg></button>
+        </div>
+        <div class="rail-slider-wrapper">
+          <button class="rail-nav-btn prev" aria-label="Scroll ke kiri"><svg class="ui-icon"><use href="#icon-prev"/></svg></button>
+          <div id="lane-popular" class="rail-track"></div>
+          <button class="rail-nav-btn next" aria-label="Scroll ke kanan"><svg class="ui-icon"><use href="#icon-next"/></svg></button>
+        </div>
+      </section>
+
+      <!-- Rail 5: Masih Tayang (Ongoing) -->
+      <section id="lane-still-sec" class="net-rail hidden">
+        <div class="rail-header">
+          <div class="rail-title-wrap">
+            <h2 class="rail-title"><svg class="ui-icon"><use href="#icon-circle-dot"/></svg> Masih Tayang (Lanjut)</h2>
+          </div>
+          <button class="rail-see-all-btn" data-rail-view="lanjutan">Lihat Semua <svg class="ui-icon"><use href="#icon-next"/></svg></button>
+        </div>
+        <div class="rail-slider-wrapper">
+          <button class="rail-nav-btn prev" aria-label="Scroll ke kiri"><svg class="ui-icon"><use href="#icon-prev"/></svg></button>
+          <div id="lane-still" class="rail-track"></div>
+          <button class="rail-nav-btn next" aria-label="Scroll ke kanan"><svg class="ui-icon"><use href="#icon-next"/></svg></button>
+        </div>
+      </section>
+
+      <!-- Rail 6: Anime Favorit -->
+      <section id="lane-favorites-sec" class="net-rail hidden">
+        <div class="rail-header">
+          <div class="rail-title-wrap">
+            <h2 class="rail-title"><svg class="ui-icon"><use href="#icon-heart"/></svg> Anime Favorit</h2>
+          </div>
+          <button class="rail-see-all-btn" data-rail-view="favorit">Semua Favorit <svg class="ui-icon"><use href="#icon-next"/></svg></button>
+        </div>
+        <div class="rail-slider-wrapper">
+          <button class="rail-nav-btn prev" aria-label="Scroll ke kiri"><svg class="ui-icon"><use href="#icon-prev"/></svg></button>
+          <div id="lane-favorites" class="rail-track"></div>
+          <button class="rail-nav-btn next" aria-label="Scroll ke kanan"><svg class="ui-icon"><use href="#icon-next"/></svg></button>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- SEARCH & FULL CATALOG GRID VIEW -->
+  <section id="search-sec" class="hidden">
     <div id="log" class="log hidden"></div>
     <div class="sec-head">
       <div class="sec-title-wrap">
@@ -689,9 +836,10 @@
 
 <div id="toast" class="toast hidden"><span id="toast-msg"></span></div>
 
-<script src="/js/vendor/hls.min.js"></script>
-<script src="/js/api.js"></script>
-<script src="/js/term.js"></script>
-<script src="/js/app.js"></script>
+<script src="./js/vendor/hls.min.js"></script>
+<script src="./js/fallback-data.js"></script>
+<script src="./js/api.js"></script>
+<script src="./js/term.js"></script>
+<script src="./js/app.js"></script>
 </body>
 </html>

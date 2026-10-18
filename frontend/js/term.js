@@ -59,19 +59,45 @@ var Tui = (function () {
     });
   }
 
+  function syncNavPills(activeKey){
+    document.querySelectorAll("#nav-pills-bar .nav-pill[data-view]").forEach(function(pill){
+      var v = pill.getAttribute("data-view");
+      pill.classList.toggle("active", v === activeKey);
+    });
+  }
+
   function setView(v){
     S.view=v;S.page=1;S.sel=-1;S.items=[];clearLog();
+
+    // Check if switching to Netflix Home view
+    if(v === "home" || v === "beranda"){
+      var homeSec = $("net-home-container");
+      if(homeSec) homeSec.classList.remove("hidden");
+      var searchSec = $("search-sec");
+      if(searchSec) searchSec.classList.add("hidden");
+      $("sb-view").textContent="view: beranda";
+      syncNavPills("home");
+      if(window.NetMirror && window.NetMirror.refreshHomeRails){
+        window.NetMirror.refreshHomeRails();
+      }
+      return;
+    }
+
+    // Otherwise, show Grid Search view
+    var homeSec = $("net-home-container");
+    if(homeSec) homeSec.classList.add("hidden");
+    var searchSec = $("search-sec");
+    if(searchSec) searchSec.classList.remove("hidden");
+
+    syncNavPills(v);
     $("empty-state").style.display="none";
     $("results").innerHTML="";$("results-title").textContent="memuat...";$("results-meta").textContent="";
     $("pager").classList.add("hidden");
-    $("lane-season-sec").classList.toggle("hidden",v!=="musim");
-    $("lane-still-sec").classList.toggle("hidden",v!=="lanjutan");
     var sBar = $("schedule-days-bar");
     if(sBar) sBar.classList.toggle("hidden", v !== "terbaru");
     if(v === "terbaru") updateScheduleChips();
     var cfBtn = $("btn-catalog-filter");
     if(cfBtn) cfBtn.classList.toggle("hidden", v !== "katalog");
-    $("continue-sec").classList.add("hidden");
     switch(v){
       case "cari":$("results-title").textContent="cari judul";$("empty-state").style.display="";break;
       case "musim":$("results-title").textContent="Tayang musim ini";break;
@@ -1265,9 +1291,92 @@ var Tui = (function () {
     if(btnPgPrev) btnPgPrev.addEventListener("click", function(e){ e.preventDefault(); pagePrev(); });
     var btnPgNext = $("pg-next");
     if(btnPgNext) btnPgNext.addEventListener("click", function(e){ e.preventDefault(); pageNext(); });
-    $("sb-view").textContent="view: "+S.view;
-    renderRecents();
-    renderPager();
+
+    // NetMirror Navbar Wireup
+    var navLogo = $("nav-brand-logo");
+    if(navLogo){
+      navLogo.addEventListener("click", function(){ setView("home"); });
+      navLogo.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" ") { e.preventDefault(); setView("home"); } });
+    }
+
+    var navSearch = $("nav-search-input");
+    var navClear = $("nav-search-clear");
+    if(navSearch){
+      navSearch.addEventListener("input", function(){
+        var val = this.value;
+        if(navClear) navClear.classList.toggle("hidden", !val);
+        var bottomCmd = $("cmd");
+        if(bottomCmd && bottomCmd !== document.activeElement) bottomCmd.value = val;
+      });
+      navSearch.addEventListener("keydown", function(e){
+        if(e.key === "Enter"){
+          e.preventDefault();
+          var q = this.value.trim();
+          if(!q){ setView("home"); return; }
+          if(q.indexOf(":") === 0){
+            var bottomCmd = $("cmd");
+            if(bottomCmd) bottomCmd.value = q;
+            submitPrompt();
+            return;
+          }
+          startSearch(q);
+        } else if(e.key === "Escape"){
+          e.preventDefault();
+          this.value = "";
+          if(navClear) navClear.classList.add("hidden");
+          setView("home");
+        }
+      });
+    }
+
+    if(navClear){
+      navClear.addEventListener("click", function(){
+        if(navSearch) { navSearch.value = ""; navSearch.focus(); }
+        navClear.classList.add("hidden");
+        var bottomCmd = $("cmd");
+        if(bottomCmd) bottomCmd.value = "";
+        setView("home");
+      });
+    }
+
+    document.querySelectorAll("#nav-pills-bar .nav-pill").forEach(function(pill){
+      pill.addEventListener("click", function(){
+        var targetView = pill.getAttribute("data-view");
+        var targetSource = pill.getAttribute("data-source");
+        if(targetSource){
+          if(typeof App !== "undefined" && App.switchSource) App.switchSource(targetSource);
+          return;
+        }
+        if(!targetView) return;
+        if(targetView === "trending"){
+          setView("musim");
+        } else if(targetView === "populer"){
+          S.catalogFilter = {sort: "popularity", year: "", season: "", month: "", type: "", status: "", genre: ""};
+          setView("katalog");
+        } else if(targetView === "ongoing"){
+          setView("lanjutan");
+        } else if(targetView === "movies"){
+          S.catalogFilter = {sort: "popularity", year: "", season: "", month: "", type: "movie", status: "", genre: ""};
+          setView("katalog");
+        } else {
+          setView(targetView);
+        }
+      });
+    });
+
+    var navSrcBtn = $("nav-source-btn");
+    if(navSrcBtn){
+      navSrcBtn.addEventListener("click", function(){
+        if(typeof App !== "undefined" && App.switchSource) App.switchSource();
+      });
+    }
+
+    window.addEventListener("scroll", function(){
+      var nb = $("net-navbar");
+      if(nb) nb.classList.toggle("scrolled", window.scrollY > 25);
+    }, {passive: true});
+
+    setView("home");
   }
 
   return {boot:boot,log:log,clearLog:clearLog,setView:setView,loadView:loadView,moveSel:moveSel,renderSel:renderSel,openSelected:openSelected,startSearch:startSearch,doSearch:doSearch,renderResults:renderResults,renderPager:renderPager,renderRecents:renderRecents,cmdUsage:cmdUsage,openGenreModal:openGenreModal,openCatalogFilterModal:openCatalogFilterModal,closeCatalogFilterModal:closeCatalogFilterModal,view:function(){return S.view;},state:function(){return S;}};

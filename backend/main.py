@@ -1,7 +1,7 @@
 import sys, os, re, time, html
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import asyncio, subprocess, tempfile
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, Query, HTTPException, Request
 from fastapi.responses import JSONResponse, FileResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
@@ -196,6 +196,119 @@ async def genres():
         filtered = [g for g in out if (g.get("slug") or "").lower() != "hentai" and "hentai" not in (g.get("title") or "").lower()]
         await set_browse_cache(key, {"list": filtered})
         return ok({"list": filtered, "cached": False})
+    except Exception as e:
+        return fail(str(e))
+
+# =====================================================================
+# Synchronized Provider Endpoints (/api/hianime, /api/otakudesu, /api/anilist)
+# =====================================================================
+
+@app.get("/api/hianime/search")
+async def api_hianime_search(q: str = Query(""), limit: int = 15):
+    q = (q or "").strip()
+    if not q:
+        return fail("missing q")
+    loop = asyncio.get_running_loop()
+    try:
+        res = await loop.run_in_executor(None, lambda: hi.hianime_search(q, limit))
+        return ok({"results": res, "cached": False})
+    except Exception as e:
+        return fail(str(e))
+
+@app.get("/api/hianime/catalog")
+async def api_hianime_catalog(page: int = Query(1, ge=1, le=100)):
+    loop = asyncio.get_running_loop()
+    try:
+        res = await loop.run_in_executor(None, lambda: hi.browse({}, page))
+        return ok(res)
+    except Exception as e:
+        return fail(str(e))
+
+@app.get("/api/hianime/browse")
+async def api_hianime_browse(request: Request, page: int = Query(1, ge=1, le=100)):
+    filters = dict(request.query_params)
+    filters.pop("page", None)
+    loop = asyncio.get_running_loop()
+    try:
+        res = await loop.run_in_executor(None, lambda: hi.browse(filters, page))
+        return ok(res)
+    except Exception as e:
+        return fail(str(e))
+
+@app.get("/api/hianime/detail/{slug:path}")
+async def api_hianime_detail(slug: str):
+    loop = asyncio.get_running_loop()
+    try:
+        res = await loop.run_in_executor(None, lambda: hi.hianime_details(slug))
+        return ok(res)
+    except Exception as e:
+        return fail(str(e))
+
+@app.get("/api/hianime/episodes/{slug:path}")
+async def api_hianime_episodes(slug: str):
+    loop = asyncio.get_running_loop()
+    try:
+        eps = await loop.run_in_executor(None, lambda: hi.hianime_episodes(slug))
+        return ok({"episodes": eps})
+    except Exception as e:
+        return fail(str(e))
+
+@app.get("/api/otakudesu/search")
+async def api_otakudesu_search(q: str = Query(""), limit: int = 15):
+    q = (q or "").strip()
+    if not q:
+        return fail("missing q")
+    loop = asyncio.get_running_loop()
+    try:
+        from api import otakudesu as ot
+        res = await loop.run_in_executor(None, lambda: ot.search(q, limit))
+        return ok({"results": res, "cached": False})
+    except Exception as e:
+        return fail(str(e))
+
+@app.get("/api/otakudesu/episodes/{slug:path}")
+async def api_otakudesu_episodes(slug: str):
+    loop = asyncio.get_running_loop()
+    try:
+        from api import otakudesu as ot
+        clean_slug = slug[len("otakudesu:"):] if slug.startswith("otakudesu:") else slug
+        eps = await loop.run_in_executor(None, lambda: ot.episodes(clean_slug))
+        return ok({"episodes": eps})
+    except Exception as e:
+        return fail(str(e))
+
+@app.get("/api/anilist/seasonal")
+async def api_anilist_seasonal(page: int = Query(1, ge=1, le=50), per_page: int = 20):
+    loop = asyncio.get_running_loop()
+    try:
+        res = await loop.run_in_executor(None, lambda: al.seasonal_page(None, None, page, per_page))
+        return ok(res)
+    except Exception as e:
+        return fail(str(e))
+
+@app.get("/api/anilist/schedule")
+async def api_anilist_schedule(days: int = Query(7, ge=1, le=14)):
+    loop = asyncio.get_running_loop()
+    try:
+        res = await loop.run_in_executor(None, lambda: al.upcoming_episodes_days(days))
+        return ok(res)
+    except Exception as e:
+        return fail(str(e))
+
+@app.get("/api/net27/rails")
+async def api_net27_rails():
+    """Endpoint rails dan spotlight hero untuk layout net27.cc."""
+    try:
+        loop = asyncio.get_running_loop()
+        cat = await loop.run_in_executor(None, lambda: hi.browse({}, 1))
+        items = (cat or {}).get("items") or []
+        hero = items[:5]
+        rails = [
+            {"id": "trending", "title": "🔥 Sedang Tren Minggu Ini", "items": items[:8]},
+            {"id": "popular", "title": "⭐ Anime Populer", "items": items[8:16] if len(items) >= 16 else items},
+            {"id": "action", "title": "⚔️ Action & Petualangan", "items": [x for x in items if any(g in (x.get("genres") or []) for g in ["Action", "Adventure"])][:8]}
+        ]
+        return ok({"hero": hero, "rails": rails, "items": items})
     except Exception as e:
         return fail(str(e))
 
