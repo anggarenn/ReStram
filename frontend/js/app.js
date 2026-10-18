@@ -261,6 +261,7 @@ function openTitle(slug,title,poster,type,epsCounter,meta){
   cur.watched={};
   cur.activeEpRange=null;
   cur.meta=meta||null;
+  cur.playerServer=null;
   setPlaySpeed(1.0, false);
   renderSourceUI();
   $("tm-title").textContent=title;
@@ -813,6 +814,12 @@ function openPlayer(ep, resumeTime){
     }
     // Multi-server extraction and embed resolution
     var item = (window.NET27_DATA && window.NET27_DATA.getItem(cur.slug)) || cur.meta || cur.item;
+    if(!item && window.NET27_DATA && window.NET27_DATA.items && cur.title){
+      var cleanTitle = (cur.title || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+      item = window.NET27_DATA.items.find(function(it){
+        return (it.title || "").toLowerCase().replace(/[^a-z0-9]/g, "") === cleanTitle;
+      });
+    }
     var srvMap = (r.data && r.data.episodeServers) || extractEpisodeServers(item, ep);
     cur.episodeServers = srvMap;
 
@@ -828,18 +835,19 @@ function openPlayer(ep, resumeTime){
     }
     cur.embedUrl = embedUrl;
 
+    var streamUrl = (r.data && r.data.master && (r.data.master.indexOf(".m3u8") >= 0 || r.data.master.indexOf("/hls") >= 0)) ? r.data.master : (picked ? picked.url : ((srvMap && srvMap.native) || ""));
+
     if(cur.playerServer === "mega" && srvMap && srvMap.mega){
       applyEmbedPlayer(srvMap.mega, "mega");
-    } else if(cur.playerServer === "native" && srvMap && srvMap.native && (srvMap.native.indexOf(".m3u8") >= 0 || srvMap.native.indexOf("/hls") >= 0)){
+    } else if(cur.playerServer === "native" && streamUrl){
       applyNativePlayer();
-      playUrl(srvMap.native, r.data.referer, cur.activeSub, r.data.referer, resumeTime, token);
+      playUrl(streamUrl, r.data.referer, cur.activeSub, r.data.referer, resumeTime, token);
     } else {
       // Default to Server 1: Blogger/Drive
       if(embedUrl){
         applyEmbedPlayer(embedUrl, "blogger");
       } else {
         applyNativePlayer();
-        var streamUrl = (r.data.master && (r.data.master.indexOf(".m3u8") >= 0 || r.data.master.indexOf("/hls") >= 0)) ? r.data.master : (picked ? picked.url : "");
         playUrl(streamUrl, r.data.referer, cur.activeSub, r.data.referer, resumeTime, token);
       }
     }
@@ -1922,22 +1930,18 @@ function playUrl(url,referrer,sub,subRef,resumeTime,token){
     if(v.volume===0) v.volume=1.0;
   }
   var b = (typeof apiBase === "function") ? apiBase() : "";
-  var isRemoteHttp = (url.indexOf("http://") === 0 || url.indexOf("https://") === 0);
-  var isStaticDeployment = !b && (location.hostname !== "localhost" && location.hostname !== "127.0.0.1");
-  var prox = (isStaticDeployment && isRemoteHttp) ? url : (b + "/api/player/video?url=" + encodeURIComponent(url) + "&referer=" + encodeURIComponent(referrer || ""));
-  if(!isStaticDeployment){
-    try{
-      var m=/^(.*\/)index-(f\d+-v\d+-a\d+)\.m3u8/.exec(url);
-      if(m){
-        for(var wi=1;wi<=2;wi++){
-          (function(n){
-            var seg=m[1]+"seg-"+n+"-"+m[2]+".jpg";
-            fetch((b||"")+"/api/player/video?url="+encodeURIComponent(seg)+"&referer="+encodeURIComponent(referrer||""),{mode:"no-cors"}).catch(function(){});
-          })(wi);
-        }
+  var prox = (url.indexOf("/api/player/video") === 0) ? url : ((b || "") + "/api/player/video?url=" + encodeURIComponent(url) + "&referer=" + encodeURIComponent(referrer || ""));
+  try{
+    var m=/^(.*\/)index-(f\d+-v\d+-a\d+)\.m3u8/.exec(url);
+    if(m){
+      for(var wi=1;wi<=2;wi++){
+        (function(n){
+          var seg=m[1]+"seg-"+n+"-"+m[2]+".jpg";
+          fetch((b||"")+"/api/player/video?url="+encodeURIComponent(seg)+"&referer="+encodeURIComponent(referrer||""),{mode:"no-cors"}).catch(function(){});
+        })(wi);
       }
-    }catch(e){}
-  }
+    }
+  }catch(e){}
   // Bersihkan <track> lama lalu pasang track subtitle aktif (live switch).
   // Fungsi switchSubtitleTrack() menhandle Off (hapus semua) dan replace.
   switchSubtitleTrack(sub || null);
@@ -2026,7 +2030,7 @@ function playUrl(url,referrer,sub,subRef,resumeTime,token){
         }
         if(nxt&&nxt.url){
           var fetchTarget = nxt.url;
-          if(!isStaticDeployment && !fetchTarget.startsWith("/api/player/video") && !fetchTarget.startsWith("/api/")){
+          if(!fetchTarget.startsWith("/api/player/video") && !fetchTarget.startsWith("/api/")){
             fetchTarget = (b||"") + "/api/player/video?url="+encodeURIComponent(nxt.url)+"&referer="+encodeURIComponent(referrer||"");
             fetch(fetchTarget,{mode:"no-cors",priority:"low"}).catch(function(){});
           }
@@ -2098,9 +2102,22 @@ function playUrl(url,referrer,sub,subRef,resumeTime,token){
       if(d.fatal){
         if(d.type===Hls.ErrorTypes.NETWORK_ERROR){
           h._networkRetryCount = (h._networkRetryCount || 0) + 1;
-          if(h._networkRetryCount <= 4){
-            $("pm-status").textContent="mencoba memulihkan koneksi stream ("+h._networkRetryCount+"/4)...";
+          if(h._networkRetryCount <= 3){
+            $("pm-status").textContent="mencoba memulihkan koneksi stream ("+h._networkRetryCount+"/3)...";
             setTimeout(function(){ try{h.startLoad();}catch(_){} }, 600);
+            return;
+          }
+          if(cur.episodeServers && cur.episodeServers.blogger){
+            toast("Koneksi HLS terganggu, beralih ke Server 1 (Blogger/Drive)...");
+            applyEmbedPlayer(cur.episodeServers.blogger, "blogger");
+            return;
+          } else if(cur.episodeServers && cur.episodeServers.mega){
+            toast("Koneksi HLS terganggu, beralih ke Server 2 (Mega)...");
+            applyEmbedPlayer(cur.episodeServers.mega, "mega");
+            return;
+          } else if(cur.embedUrl){
+            toast("Koneksi HLS terganggu, beralih ke server alternatif...");
+            applyEmbedPlayer(cur.embedUrl, "blogger");
             return;
           }
         }else if(d.type===Hls.ErrorTypes.MEDIA_ERROR){
@@ -2196,6 +2213,7 @@ function stepEp(d){
 function closePlayer(){
   // 1. Invalidate all pending async playback tokens immediately
   cur.playToken = ++_playTokenCounter;
+  cur.playerServer = null;
 
   // 2. Safely stop and destroy video & HLS stream
   var v=$("vid");
