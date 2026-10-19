@@ -124,6 +124,10 @@ body.no-crt #crt{display:none}
   background:rgba(255,255,255,0.12);color:#fff;
   border-color:rgba(255,255,255,0.25);transform:translateY(-1px);
 }
+.nav-pill:active{
+  transform:scale(0.95);
+  transition:transform 0.08s ease;
+}
 .nav-pill.active{
   background:var(--net-red);border-color:var(--net-red);color:#fff;
   box-shadow:0 0 14px rgba(229,9,20,0.45);font-weight:700;
@@ -190,6 +194,10 @@ body.drawer-open{overflow:hidden!important;touch-action:none}
   border-color:var(--net-red);color:#fff;
   background:rgba(229,9,20,0.18);
   box-shadow:0 0 12px rgba(229,9,20,0.35);
+}
+.header-drawer-btn:active{
+  transform:scale(0.93);
+  transition:transform 0.08s ease;
 }
 
 /* ---- DRAWER SLIDE-OVER NAVIGATION PANEL (NETFLIX MODERN GLASS) ---- */
@@ -411,6 +419,10 @@ main{width:100%;margin:0;padding:0 0 48px;position:relative;z-index:1;flex:1 0 a
   background:#f1f5f9;transform:scale(1.05);
   box-shadow:0 6px 20px rgba(255,255,255,0.3);
 }
+.hero-btn-play:active, .btn-play:active{
+  transform:scale(0.96);
+  transition:transform 0.08s ease;
+}
 .hero-btn-detail, .btn-info{
   background:rgba(255,255,255,0.2);backdrop-filter:blur(12px);
   -webkit-backdrop-filter:blur(12px);color:#FFFFFF;font-weight:700;
@@ -422,6 +434,10 @@ main{width:100%;margin:0;padding:0 0 48px;position:relative;z-index:1;flex:1 0 a
 .hero-btn-detail:hover, .btn-info:hover{
   background:rgba(255,255,255,0.32);transform:scale(1.05);
   border-color:rgba(255,255,255,0.5);
+}
+.hero-btn-detail:active, .btn-info:active{
+  transform:scale(0.96);
+  transition:transform 0.08s ease;
 }
 
 .hero-controls{
@@ -482,8 +498,8 @@ main{width:100%;margin:0;padding:0 0 48px;position:relative;z-index:1;flex:1 0 a
 }
 .rail-track{
   display:flex;overflow-x:auto;scroll-behavior:smooth;gap:16px;
-  padding:12px var(--pad-x);scrollbar-width:none;-webkit-overflow-scrolling:touch;
-  width:100%;
+  padding:16px var(--pad-x) 22px;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  width:100%;box-sizing:border-box;
 }
 .rail-track::-webkit-scrollbar{display:none}
 
@@ -510,10 +526,11 @@ main{width:100%;margin:0;padding:0 0 48px;position:relative;z-index:1;flex:1 0 a
   width:180px;min-width:180px;flex:0 0 180px;
   cursor:pointer;position:relative;user-select:none;
   display:flex;flex-direction:column;outline:none;
-  transition:transform .25s cubic-bezier(0.2,0.8,0.2,1);
+  transform-origin:center center;
+  transition:transform .28s cubic-bezier(0.2,0.8,0.2,1);
 }
 .rail-card:hover,.rail-card:focus-visible{
-  transform:scale(1.05);z-index:10;
+  transform:translateY(-6px) scale(1.04);z-index:10;
 }
 .rail-card-poster-wrap{
   width:180px;height:260px;min-height:260px;
