@@ -60,9 +60,19 @@ var Tui = (function () {
   }
 
   function syncNavPills(activeKey){
+    var keyMap = {
+      "musim": "trending",
+      "katalog": "populer",
+      "lanjutan": "ongoing",
+      "home": "home",
+      "beranda": "home",
+      "terbaru": "terbaru",
+      "favorit": "favorit"
+    };
+    var targetPill = keyMap[activeKey] || activeKey;
     document.querySelectorAll("#nav-pills-bar .nav-pill[data-view]").forEach(function(pill){
       var v = pill.getAttribute("data-view");
-      pill.classList.toggle("active", v === activeKey);
+      pill.classList.toggle("active", v === targetPill);
     });
   }
 
@@ -263,7 +273,7 @@ var Tui = (function () {
     var box=$("results");box.innerHTML="";
     var sBar = $("schedule-days-bar");
     if(sBar) sBar.classList.toggle("hidden", S.view !== "terbaru");
-    var isTxt = S.view==="cari" || S.view==="terbaru";
+    var isTxt = S.view==="terbaru";
     if(!S.items.length){
       var emptyMsg = S.view==="favorit" ? "Belum ada anime favorit tersimpan. Ketuk tombol + FAVORIT pada detail anime untuk menyimpannya ke sini." : "Kosong.";
       box.innerHTML="<p class='dim'>"+emptyMsg+"</p>";
@@ -566,22 +576,42 @@ var Tui = (function () {
     try{
       var src = (window.cur && window.cur.source) || "";
       var r = await (window.ReStram||window.Tatap).search(q, src);
-      if(!r||!r.success){log("search error: "+(r&&r.error||"??"),"err");return;}
+      if(!r||!r.success){
+        log("search error: "+(r&&r.error||"??"),"err");
+        S.items=[];S.sel=-1;S.total=1;
+        $("results-title").textContent="Gagal mencari \""+q+"\"";
+        $("results-meta").textContent=(r&&r.error)||"Kesalahan koneksi / server";
+        renderResults();renderPager();
+        return;
+      }
       S.items=r.data.results||[];S.sel=-1;S.total=1;
       $("results-title").textContent=S.items.length?"Hasil untuk \""+q+"\"":"Tidak ketemu \""+q+"\"";
       $("results-meta").textContent=S.items.length+" judul · "+(Date.now()-t0)+"ms"+(r.data.cached?" · cached":"");
       renderResults();renderPager();
-    }catch(e){log("err: "+e.message,"err");}
+    }catch(e){
+      log("err: "+e.message,"err");
+      S.items=[];S.sel=-1;S.total=1;
+      $("results-title").textContent="Gagal mencari \""+q+"\"";
+      $("results-meta").textContent=e.message||"Error";
+      renderResults();renderPager();
+    }
   }
 
   function setViewSilent(v){
     S.view=v;S.page=1;
+    var homeSec = $("net-home-container");
+    if(homeSec) homeSec.classList.add("hidden");
+    var searchSec = $("search-sec");
+    if(searchSec) searchSec.classList.remove("hidden");
+    syncNavPills(v);
     $("pager").classList.add("hidden");
     $("continue-sec").classList.add("hidden");
     $("lane-season-sec").classList.add("hidden");
     $("lane-still-sec").classList.add("hidden");
     var sBar = $("schedule-days-bar");
     if(sBar) sBar.classList.toggle("hidden", v !== "terbaru");
+    var cfBtn = $("btn-catalog-filter");
+    if(cfBtn) cfBtn.classList.toggle("hidden", v !== "katalog");
   }
 
   // ==== :filter (Catalog Cross-Filter) ====
@@ -1314,16 +1344,30 @@ var Tui = (function () {
 
     var navSearch = $("nav-search-input");
     var navClear = $("nav-search-clear");
+    var searchDebounceTimer = null;
     if(navSearch){
       navSearch.addEventListener("input", function(){
         var val = this.value;
         if(navClear) navClear.classList.toggle("hidden", !val);
         var bottomCmd = $("cmd");
         if(bottomCmd && bottomCmd !== document.activeElement) bottomCmd.value = val;
+        clearTimeout(searchDebounceTimer);
+        var q = val.trim();
+        if(!q){
+          setView("home");
+          return;
+        }
+        if(q.indexOf(":") === 0) return;
+        if(q.length >= 2){
+          searchDebounceTimer = setTimeout(function(){
+            startSearch(q);
+          }, 320);
+        }
       });
       navSearch.addEventListener("keydown", function(e){
         if(e.key === "Enter"){
           e.preventDefault();
+          clearTimeout(searchDebounceTimer);
           var q = this.value.trim();
           if(!q){ setView("home"); return; }
           if(q.indexOf(":") === 0){
@@ -1335,15 +1379,27 @@ var Tui = (function () {
           startSearch(q);
         } else if(e.key === "Escape"){
           e.preventDefault();
+          clearTimeout(searchDebounceTimer);
           this.value = "";
           if(navClear) navClear.classList.add("hidden");
           setView("home");
         }
       });
+      navSearch.addEventListener("search", function(){
+        clearTimeout(searchDebounceTimer);
+        var q = this.value.trim();
+        if(!q){
+          if(navClear) navClear.classList.add("hidden");
+          setView("home");
+          return;
+        }
+        startSearch(q);
+      });
     }
 
     if(navClear){
       navClear.addEventListener("click", function(){
+        clearTimeout(searchDebounceTimer);
         if(navSearch) { navSearch.value = ""; navSearch.focus(); }
         navClear.classList.add("hidden");
         var bottomCmd = $("cmd");
@@ -1392,5 +1448,22 @@ var Tui = (function () {
     setView("home");
   }
 
-  return {boot:boot,log:log,clearLog:clearLog,setView:setView,loadView:loadView,moveSel:moveSel,renderSel:renderSel,openSelected:openSelected,startSearch:startSearch,doSearch:doSearch,renderResults:renderResults,renderPager:renderPager,renderRecents:renderRecents,cmdUsage:cmdUsage,openGenreModal:openGenreModal,openCatalogFilterModal:openCatalogFilterModal,closeCatalogFilterModal:closeCatalogFilterModal,view:function(){return S.view;},state:function(){return S;}};
+  var exportsObj = {
+    boot:boot,log:log,clearLog:clearLog,setView:setView,loadView:loadView,moveSel:moveSel,renderSel:renderSel,
+    openSelected:openSelected,startSearch:startSearch,doSearch:doSearch,renderResults:renderResults,
+    renderSearchResults:renderResults,
+    showSearchResults:function(items, title){
+      S.view="cari"; S.items=items||[];
+      if(title) $("results-title").textContent=title;
+      setViewSilent("cari");
+      renderResults(); renderPager();
+    },
+    renderPager:renderPager,renderRecents:renderRecents,cmdUsage:cmdUsage,openGenreModal:openGenreModal,
+    openCatalogFilterModal:openCatalogFilterModal,closeCatalogFilterModal:closeCatalogFilterModal,
+    view:function(){return S.view;},state:function(){return S;}
+  };
+  window.renderSearchResults = renderResults;
+  window.showSearchResults = exportsObj.showSearchResults;
+  window.startSearch = startSearch;
+  return exportsObj;
 })();

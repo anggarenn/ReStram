@@ -2479,6 +2479,7 @@ function switchSource(targetSource){
 function openDrawer(){
   var p = $("drawer-panel");
   if(p) p.classList.remove("hidden");
+  document.body.classList.add("drawer-open");
   // Update status di footer drawer
   var hEl = $("health");
   var dHText = $("drawer-health-text");
@@ -2490,6 +2491,7 @@ function openDrawer(){
 function closeDrawer(){
   var p = $("drawer-panel");
   if(p) p.classList.add("hidden");
+  document.body.classList.remove("drawer-open");
 }
 
 function openUpdateModal(data){
@@ -3298,8 +3300,11 @@ function init(){
   // Listener Drawer Navigation & Update Modal
   var btnDrawer = $("btn-drawer");
   if(btnDrawer) btnDrawer.addEventListener("click", openDrawer);
-  var btnDrawerHead = $("btn-drawer-head");
+  var btnDrawerHead = $("btn-drawer-head") || $("nav-menu-btn") || $("btn-menu");
   if(btnDrawerHead) btnDrawerHead.addEventListener("click", openDrawer);
+  document.querySelectorAll(".nav-menu-btn, #nav-menu-btn, #btn-menu").forEach(function(b){
+    if(b !== btnDrawer && b !== btnDrawerHead) b.addEventListener("click", openDrawer);
+  });
   var btnDrawerClose = $("drawer-close");
   if(btnDrawerClose) btnDrawerClose.addEventListener("click", closeDrawer);
   var drawerBackdrop = $("drawer-backdrop");
@@ -3310,6 +3315,15 @@ function init(){
     b.addEventListener("click", function(){
       var v = b.getAttribute("data-view");
       closeDrawer();
+      if(v === "cari"){
+        var sInp = $("nav-search-input");
+        if(sInp){
+          setTimeout(function(){
+            sInp.focus();
+            sInp.select();
+          }, 60);
+        }
+      }
       if(window.Tui && window.Tui.setView){
         window.Tui.setView(v);
       }
