@@ -23,3 +23,5 @@ local.properties
 *.properties
 !gradle/wrapper/gradle-wrapper.properties
 .vercel
+
+scratch/

@@ -719,51 +719,125 @@
   <footer id="bottom-bar" class="collapsed"></footer>
 </div>
 
-<!-- TITLE / EPISODE MODAL -->
-<div id="title-modal" class="overlay hidden" role="dialog" aria-modal="true">
-  <div class="sheet">
-    <div class="sheet-head">
-      <div>
-        <div class="eyebrow"><span id="tm-eyebrow">DETAIL ANIME</span></div>
-        <h2 id="tm-title">–</h2>
-        <div class="dim small" id="tm-sub">–</div>
-      </div>
-      <div class="sheet-head-actions">
-        <button id="tm-bookmark-btn" class="tm-bookmark-btn" title="Simpan ke Favorit"><svg class="ui-icon"><use href="#icon-star"/></svg> <span id="tm-bookmark-label">+ FAVORIT</span></button>
-        <button class="icon-btn big" id="tm-close" title="Tutup (Esc)"><svg class="ui-icon"><use href="#icon-close"/></svg></button>
-      </div>
+<!-- TITLE / EPISODE MODAL (NetMirror / net27.cc Cinematic Style) -->
+<div id="title-modal" class="overlay hidden title-modal-overlay" role="dialog" aria-modal="true">
+  <div class="sheet title-modal-card">
+    <!-- Sticky top bar with Back & Close -->
+    <div class="title-modal-top-bar">
+      <button id="tm-back-btn" class="tm-top-btn" title="Kembali (Esc)" aria-label="Kembali">
+        <svg class="ui-icon"><use href="#icon-prev"/></svg> <span>Kembali</span>
+      </button>
+      <div id="tm-top-title" class="tm-top-title truncate"></div>
+      <button class="icon-btn big tm-top-close" id="tm-close" title="Tutup (Esc)" aria-label="Tutup">
+        <svg class="ui-icon"><use href="#icon-close"/></svg>
+      </button>
     </div>
-    <div id="tm-detail-meta" class="detail-meta-box hidden">
-      <div class="detail-badges-row">
-        <span id="tm-score" class="badge-score hidden">⭐ <b id="tm-score-val">8.4</b></span>
-        <span id="tm-status" class="badge-status hidden">TAMAT</span>
-        <span id="tm-info-line" class="detail-info-line dim small"></span>
-      </div>
-      <div id="tm-genres" class="detail-genres-row hidden"></div>
-      <div id="tm-synopsis-box" class="tm-synopsis-box hidden">
-        <div class="tm-synopsis-header">
-          <span class="tm-synopsis-label">SINOPSIS</span>
+
+    <!-- Hero Backdrop Banner -->
+    <div class="tm-hero-wrap">
+      <div id="tm-hero-backdrop" class="tm-hero-backdrop"></div>
+      <div class="tm-hero-vignette"></div>
+
+      <!-- Poster + Title Block (overlapping into bottom gradient) -->
+      <div class="tm-hero-info">
+        <div class="tm-hero-info-row">
+          <div class="tm-poster-wrapper">
+            <img id="tm-poster-img" class="tm-poster-img" src="" alt="" loading="lazy">
+          </div>
+          <div class="tm-hero-text">
+            <div class="eyebrow"><span id="tm-eyebrow">DETAIL ANIME</span></div>
+            <h2 id="tm-title" class="tm-title">–</h2>
+            <div id="tm-alt-title" class="tm-alt-title dim small"></div>
+            
+            <div class="tm-meta-pills">
+              <span id="tm-score" class="badge-score hidden">⭐ <b id="tm-score-val">8.4</b></span>
+              <span id="tm-status" class="badge-status hidden">TAMAT</span>
+              <span id="tm-year" class="tm-badge-year hidden"></span>
+              <span id="tm-eps-badge" class="tm-badge-eps hidden"></span>
+              <span class="tm-badge-quality">HD • SUB INDO</span>
+            </div>
+          </div>
         </div>
-        <p id="tm-synopsis" class="tm-synopsis-text clamped"></p>
-        <button id="tm-synopsis-toggle" class="tm-synopsis-toggle">Selengkapnya ▼</button>
       </div>
     </div>
-    <div id="tm-seasons" class="seasons-bar hidden">
-      <span class="seasons-label">SEASON / TERKAIT:</span>
-      <div id="tm-seasons-chips" class="seasons-chips"></div>
-    </div>
-    <div class="sheet-controls">
-      <div class="seg" id="mode-seg">
-        <button data-mode="sub" class="active">SUB</button><button data-mode="dub">DUB</button>
+
+    <!-- Modal Body Content -->
+    <div class="title-modal-body">
+      <!-- Primary Actions (NetMirror style) -->
+      <div class="tm-actions-row">
+        <button id="tm-btn-play-primary" class="tm-btn-play" title="Putar Sekarang">
+          <svg class="ui-icon"><use href="#icon-play"/></svg> <span id="tm-btn-play-label">Putar Sekarang</span>
+        </button>
+        <button id="tm-bookmark-btn" class="tm-bookmark-btn" title="Simpan ke Favorit">
+          <svg class="ui-icon"><use href="#icon-star"/></svg> <span id="tm-bookmark-label">+ DAFTAR TONTONAN</span>
+        </button>
+        <button id="tm-trailer-btn" class="tm-trailer-btn hidden" title="Tonton Trailer Resmi">
+          <svg class="ui-icon"><use href="#icon-film"/></svg> <span>Trailer</span>
+        </button>
       </div>
-      <div class="seg" id="quality-seg">
-        <button data-q="best" class="active">BEST</button><button data-q="1080p">1080p</button><button data-q="720p">720p</button><button data-q="480p">480p</button>
+
+      <!-- 2-Column Info Grid: Synopsis on left, Studio/Season/Genres on right -->
+      <div id="tm-detail-meta" class="tm-details-grid">
+        <div class="tm-synopsis-col">
+          <div class="tm-synopsis-header">
+            <div class="bar-accent"></div>
+            <span class="tm-synopsis-label">SINOPSIS</span>
+            <div class="tm-synopsis-lang-switch">
+              <button id="tm-syn-id-btn" class="tm-syn-btn active" title="Sinopsis Bahasa Indonesia">IND</button>
+              <button id="tm-syn-mal-btn" class="tm-syn-btn" title="Sinopsis MyAnimeList (English)">MAL</button>
+            </div>
+          </div>
+          <p id="tm-synopsis" class="tm-synopsis-text clamped"></p>
+          <button id="tm-synopsis-toggle" class="tm-synopsis-toggle">Selengkapnya ▼</button>
+        </div>
+        
+        <div class="tm-sidebar-col">
+          <div class="tm-meta-item" id="tm-studio-wrap">
+            <span class="tm-meta-label">Studio</span>
+            <span id="tm-studio-val" class="tm-meta-val">–</span>
+          </div>
+          <div class="tm-meta-item" id="tm-season-wrap">
+            <span class="tm-meta-label">Musim / Rilis</span>
+            <span id="tm-season-val" class="tm-meta-val">–</span>
+          </div>
+          <div class="tm-meta-item">
+            <span class="tm-meta-label">Genre</span>
+            <div id="tm-genres" class="detail-genres-row"></div>
+          </div>
+        </div>
       </div>
-      <input id="ep-filter" placeholder="Filter ep… cth: 12" inputmode="numeric">
-      <span id="tm-count" class="dim small"></span>
+
+      <!-- Seasons & Related Anime -->
+      <div id="tm-seasons" class="seasons-bar hidden">
+        <div class="seasons-header">
+          <div class="bar-accent"></div>
+          <span class="seasons-label">SEASON & TERKAIT</span>
+        </div>
+        <div id="tm-seasons-chips" class="seasons-chips"></div>
+      </div>
+
+      <!-- Episode Section -->
+      <div class="tm-episodes-section">
+        <div class="sheet-controls">
+          <div class="tm-episodes-heading">
+            <div class="bar-accent"></div>
+            <span class="tm-episodes-label">DAFTAR EPISODE</span>
+            <span id="tm-count" class="dim small"></span>
+          </div>
+          <div class="tm-episodes-tools">
+            <div class="seg" id="mode-seg">
+              <button data-mode="sub" class="active">SUB</button><button data-mode="dub">DUB</button>
+            </div>
+            <div class="seg" id="quality-seg">
+              <button data-q="best" class="active">BEST</button><button data-q="1080p">1080p</button><button data-q="720p">720p</button><button data-q="480p">480p</button>
+            </div>
+            <input id="ep-filter" placeholder="Cari episode..." inputmode="numeric">
+          </div>
+        </div>
+        <div id="tm-ep-ranges" class="ep-ranges hidden"></div>
+        <div id="tm-eps" class="ep-grid"></div>
+      </div>
     </div>
-    <div id="tm-ep-ranges" class="ep-ranges hidden"></div>
-    <div id="tm-eps" class="ep-grid"></div>
   </div>
 </div>
 

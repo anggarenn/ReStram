@@ -92,9 +92,14 @@ function updateBookmarkBtn(isBookmarked){
   var btn = $("tm-bookmark-btn");
   if(!btn) return;
   btn.classList.toggle("bookmarked", !!isBookmarked);
-  var starSvg = isBookmarked ? '<svg class="ui-icon"><use href="#icon-star-filled"/></svg>' : '<svg class="ui-icon"><use href="#icon-star"/></svg>';
-  btn.innerHTML = starSvg + " " + (isBookmarked ? "TERSIMPAN" : "+ FAVORIT");
-  btn.title = isBookmarked ? "Klik untuk menghapus dari favorit" : "Klik untuk menyimpan ke favorit";
+  var label = $("tm-bookmark-label");
+  if(label){
+    label.textContent = isBookmarked ? "TERSIMPAN" : "+ DAFTAR TONTONAN";
+  } else {
+    var starSvg = isBookmarked ? '<svg class="ui-icon"><use href="#icon-star-filled"/></svg>' : '<svg class="ui-icon"><use href="#icon-star"/></svg>';
+    btn.innerHTML = starSvg + " " + (isBookmarked ? "TERSIMPAN" : "+ DAFTAR TONTONAN");
+  }
+  btn.title = isBookmarked ? "Hapus dari daftar tontonan" : "Tambahkan ke daftar tontonan";
 }
 
 function checkModalBookmark(slug){
@@ -131,6 +136,240 @@ function toggleModalBookmark(){
         window.Tui.setView("favorit");
       }
     });
+  }
+}
+
+function decodeHtmlEntities(str){
+  if(!str) return "";
+  try {
+    var txt = document.createElement("textarea");
+    txt.innerHTML = str;
+    var val = txt.value;
+    val = val.replace(/<[^>]*>/g, " ");
+    val = val.replace(/&nbsp;/g, " ");
+    return val.replace(/\s+/g, " ").trim();
+  } catch(e){
+    return str.replace(/&#8211;/g, "–").replace(/&#8217;/g, "'").replace(/&#8220;/g, '"').replace(/&#8221;/g, '"').replace(/&amp;/g, "&");
+  }
+}
+
+function cleanSynopsis(raw){
+  if(!raw) return "";
+  var s = decodeHtmlEntities(raw);
+  s = s.replace(/^sinopsis\s*:\s*/i, "");
+  s = s.replace(/^synopsis\s*:\s*/i, "");
+  return s.trim();
+}
+
+function cleanAnimeTitle(title){
+  if(!title) return "";
+  var t = title;
+  t = t.replace(/\s*\(?sub\s*indo\)?/gi, "");
+  t = t.replace(/\s*episode\s*\d+/gi, "");
+  t = t.replace(/\s*ep\s*\d+/gi, "");
+  t = t.replace(/\s*batch\b/gi, "");
+  t = t.replace(/\s*bd\b/gi, "");
+  t = t.replace(/\[.*?\]/g, "");
+  return t.trim();
+}
+
+var _anilistMetaCache = {};
+
+function enrichAnimeMetadata(title, slug){
+  if(!title || !slug) return;
+  var cached = _anilistMetaCache[slug];
+  if(!cached){
+    try {
+      var s = sessionStorage.getItem("anilist_" + slug);
+      if(s) cached = JSON.parse(s);
+    } catch(e){}
+  }
+  if(cached){
+    applyEnrichedMetadata(cached, slug);
+    return;
+  }
+
+  var searchTitle = cleanAnimeTitle(title);
+  var gqlQuery = 'query ($search: String) { Media (search: $search, type: ANIME) { id idMal title { romaji english native } bannerImage coverImage { extraLarge large } description(asHtml: false) episodes status seasonYear season averageScore genres studios(isMain: true) { nodes { name } } trailer { id site } } }';
+
+  fetch("https://graphql.anilist.co", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    },
+    body: JSON.stringify({ query: gqlQuery, variables: { search: searchTitle } })
+  })
+  .then(function(res){
+    if(!res.ok) throw new Error("AniList status " + res.status);
+    return res.json();
+  })
+  .then(function(json){
+    var m = json && json.data && json.data.Media;
+    if(!m) return;
+    _anilistMetaCache[slug] = m;
+    try { sessionStorage.setItem("anilist_" + slug, JSON.stringify(m)); } catch(e){}
+    applyEnrichedMetadata(m, slug);
+  })
+  .catch(function(err){});
+}
+
+function applyEnrichedMetadata(m, slug){
+  if(cur.slug !== slug) return;
+
+  // 1. Hero Backdrop
+  var heroBd = $("tm-hero-backdrop");
+  if(heroBd && m.bannerImage){
+    heroBd.style.backgroundImage = 'url("' + m.bannerImage + '")';
+  }
+
+  // 2. Poster Image (upgrade to HD cover if available)
+  var posterImg = $("tm-poster-img");
+  if(posterImg && m.coverImage){
+    var hdCover = m.coverImage.extraLarge || m.coverImage.large;
+    if(hdCover && (!posterImg.src || posterImg.src.indexOf("placeholder") !== -1 || !cur.poster)){
+      posterImg.src = hdCover;
+    }
+  }
+
+  // 3. Alternative Title (Romaji / English / Native)
+  var altTitleEl = $("tm-alt-title");
+  if(altTitleEl && m.title){
+    var alt = m.title.english || m.title.romaji || m.title.native || "";
+    if(alt && alt.toLowerCase() !== cur.title.toLowerCase()){
+      altTitleEl.textContent = alt;
+      altTitleEl.classList.remove("hidden");
+    }
+  }
+
+  // 4. Score
+  if(m.averageScore){
+    var scEl = $("tm-score");
+    var scVal = $("tm-score-val");
+    if(scVal && scEl){
+      scVal.textContent = (m.averageScore / 10).toFixed(1);
+      scEl.classList.remove("hidden");
+    }
+  }
+
+  // 5. Studio
+  var studioWrap = $("tm-studio-wrap");
+  var studioVal = $("tm-studio-val");
+  var studioName = m.studios && m.studios.nodes && m.studios.nodes[0] ? m.studios.nodes[0].name : "";
+  if(studioVal && studioName){
+    studioVal.textContent = studioName;
+    if(studioWrap) studioWrap.classList.remove("hidden");
+  }
+
+  // 6. Season / Year
+  var seasonWrap = $("tm-season-wrap");
+  var seasonVal = $("tm-season-val");
+  var seasonYearText = (m.season ? m.season.charAt(0).toUpperCase() + m.season.slice(1).toLowerCase() + " " : "") + (m.seasonYear || "");
+  if(seasonVal && seasonYearText.trim()){
+    seasonVal.textContent = seasonYearText.trim();
+    if(seasonWrap) seasonWrap.classList.remove("hidden");
+  }
+  var yrBadge = $("tm-year");
+  if(yrBadge && m.seasonYear){
+    yrBadge.textContent = m.seasonYear;
+    yrBadge.classList.remove("hidden");
+  }
+
+  // 7. Episodes Badge
+  var epBadge = $("tm-eps-badge");
+  if(epBadge && m.episodes){
+    epBadge.textContent = m.episodes + " Episode";
+    epBadge.classList.remove("hidden");
+  }
+
+  // 8. MAL Official Description / Synopsis
+  if(m.description){
+    cur.synopsis_mal = cleanSynopsis(m.description);
+    if(!cur.synopsis_id && cur.synopsis_mal){
+      setSynopsisLang("mal");
+    } else if(cur.currentSynLang === "mal"){
+      setSynopsisLang("mal");
+    }
+  }
+
+  // 9. Trailer Button
+  var trBtn = $("tm-trailer-btn");
+  if(trBtn){
+    if(m.trailer && m.trailer.site === "youtube" && m.trailer.id){
+      cur.trailerUrl = "https://www.youtube.com/watch?v=" + m.trailer.id;
+      trBtn.classList.remove("hidden");
+      trBtn.onclick = function(){
+        window.open(cur.trailerUrl, "_blank", "noopener,noreferrer");
+      };
+    }
+  }
+
+  // 10. Refine Genres if empty
+  var genEl = $("tm-genres");
+  if(genEl && (!genEl.children || genEl.children.length === 0) && m.genres && m.genres.length){
+    genEl.innerHTML = "";
+    m.genres.slice(0, 5).forEach(function(g){
+      var span = document.createElement("span");
+      span.className = "genre-pill";
+      span.textContent = g;
+      genEl.appendChild(span);
+    });
+    genEl.classList.remove("hidden");
+  }
+}
+
+function setSynopsisLang(lang){
+  cur.currentSynLang = lang;
+  var synEl = $("tm-synopsis");
+  var btnId = $("tm-syn-id-btn");
+  var btnMal = $("tm-syn-mal-btn");
+  if(!synEl) return;
+  if(btnId) btnId.classList.toggle("active", lang === "id");
+  if(btnMal) btnMal.classList.toggle("active", lang === "mal");
+
+  var text = (lang === "mal") ? (cur.synopsis_mal || "Sinopsis MAL tidak tersedia untuk anime ini.") : (cur.synopsis_id || cur.synopsis_mal || "Belum ada sinopsis untuk anime ini.");
+  synEl.textContent = text;
+  synEl.classList.remove("expanded");
+  synEl.classList.add("clamped");
+
+  var synToggle = $("tm-synopsis-toggle");
+  if(synToggle){
+    synToggle.textContent = "Selengkapnya ▼";
+    synToggle.style.display = text.length > 180 ? "inline-block" : "none";
+  }
+}
+
+function playPrimaryEpisode(){
+  if(!cur.eps || !cur.eps.length){
+    toast("Memuat episode, silakan tunggu...");
+    return;
+  }
+  var targetEp = null;
+  if(cur.lastWatchedEp){
+    for(var i=0; i<cur.eps.length; i++){
+      var epNum = cur.eps[i].ep || cur.eps[i].episode || (i+1);
+      if(parseInt(epNum) === parseInt(cur.lastWatchedEp)){
+        targetEp = cur.eps[i];
+        break;
+      }
+    }
+  }
+  if(!targetEp){
+    targetEp = cur.eps[0];
+  }
+  if(targetEp){
+    openPlayer(targetEp);
+  }
+}
+
+function updatePlayPrimaryButton(){
+  var playBtn = $("tm-btn-play-primary");
+  var playLabel = $("tm-btn-play-label");
+  if(!playBtn || !playLabel) return;
+  if(cur.lastWatchedEp){
+    playLabel.textContent = "Lanjutkan Ep " + cur.lastWatchedEp;
+  } else {
+    playLabel.textContent = "Putar Sekarang";
   }
 }
 
@@ -174,24 +413,45 @@ function renderDetailMeta(meta){
     }
   }
 
-  // Info Line (Studio / Musim / Sumber)
-  var infoEl = $("tm-info-line");
-  if(infoEl){
-    var parts = [];
-    if(meta.studio) parts.push("Studio: " + meta.studio);
-    if(meta.season) parts.push(meta.season);
-    if(meta.source) parts.push("Sumber: " + meta.source);
-    if(parts.length > 0){
-      infoEl.textContent = parts.join(" · ");
-      infoEl.classList.remove("hidden");
+  // Studio & Season Sidebar
+  var studioWrap = $("tm-studio-wrap");
+  var studioVal = $("tm-studio-val");
+  if(studioVal){
+    if(meta.studio){
+      studioVal.textContent = meta.studio;
+      if(studioWrap) studioWrap.classList.remove("hidden");
       hasAny = true;
-    } else {
-      infoEl.textContent = "";
-      infoEl.classList.add("hidden");
+    } else if(!studioVal.textContent || studioVal.textContent === "—"){
+      if(studioWrap) studioWrap.classList.add("hidden");
     }
   }
 
-  // Genres
+  var seasonWrap = $("tm-season-wrap");
+  var seasonVal = $("tm-season-val");
+  if(seasonVal){
+    var sText = meta.season || meta.year || "";
+    if(sText){
+      seasonVal.textContent = sText;
+      if(seasonWrap) seasonWrap.classList.remove("hidden");
+      hasAny = true;
+    } else if(!seasonVal.textContent || seasonVal.textContent === "—"){
+      if(seasonWrap) seasonWrap.classList.add("hidden");
+    }
+  }
+
+  // Year & Episode Badges in Hero
+  var yrBadge = $("tm-year");
+  if(yrBadge && (meta.year || meta.seasonYear)){
+    yrBadge.textContent = meta.year || meta.seasonYear;
+    yrBadge.classList.remove("hidden");
+  }
+  var epBadge = $("tm-eps-badge");
+  if(epBadge && (meta.episodes || meta.eps_counter)){
+    epBadge.textContent = (meta.episodes ? meta.episodes + " Episode" : meta.eps_counter);
+    epBadge.classList.remove("hidden");
+  }
+
+  // Genres (clean & limit to max 5)
   var genEl = $("tm-genres");
   if(genEl){
     genEl.innerHTML = "";
@@ -201,10 +461,14 @@ function renderDetailMeta(meta){
     }
     var validGenres = [];
     if(Array.isArray(gList)){
-      validGenres = gList.map(function(x){ return (x||"").trim(); }).filter(function(x){ return x && x.toLowerCase() !== "hentai"; });
+      validGenres = gList.map(function(x){
+        return decodeHtmlEntities(x || "").trim();
+      }).filter(function(x){
+        return x && x.toLowerCase() !== "hentai";
+      });
     }
     if(validGenres.length > 0){
-      validGenres.forEach(function(g){
+      validGenres.slice(0, 5).forEach(function(g){
         var span = document.createElement("span");
         span.className = "genre-pill";
         span.textContent = g;
@@ -217,34 +481,28 @@ function renderDetailMeta(meta){
     }
   }
 
-  // Synopsis
-  var synBox = $("tm-synopsis-box");
-  var synText = $("tm-synopsis");
-  var synToggle = $("tm-synopsis-toggle");
-  if(synBox && synText && synToggle){
-    var desc = (meta.synopsis || "").trim();
-    if(desc){
-      synText.textContent = desc;
-      synText.classList.remove("expanded");
-      synText.classList.add("clamped");
-      synToggle.textContent = "Selengkapnya ▼";
-      synBox.classList.remove("hidden");
-      hasAny = true;
+  // Synopsis setup
+  if(meta.synopsis){
+    cur.synopsis_id = cleanSynopsis(meta.synopsis);
+  }
+  setSynopsisLang(cur.currentSynLang || "id");
+  if(cur.synopsis_id || cur.synopsis_mal) hasAny = true;
 
-      synToggle.onclick = function(){
-        if(synText.classList.contains("clamped")){
-          synText.classList.remove("clamped");
-          synText.classList.add("expanded");
-          synToggle.textContent = "Tutup Sinopsis ▲";
-        } else {
-          synText.classList.remove("expanded");
-          synText.classList.add("clamped");
-          synToggle.textContent = "Selengkapnya ▼";
-        }
-      };
-    } else {
-      synBox.classList.add("hidden");
-    }
+  // Toggle button setup
+  var synToggle = $("tm-synopsis-toggle");
+  var synText = $("tm-synopsis");
+  if(synToggle && synText){
+    synToggle.onclick = function(){
+      if(synText.classList.contains("clamped")){
+        synText.classList.remove("clamped");
+        synText.classList.add("expanded");
+        synToggle.textContent = "Tutup Sinopsis ▲";
+      } else {
+        synText.classList.remove("expanded");
+        synText.classList.add("clamped");
+        synToggle.textContent = "Selengkapnya ▼";
+      }
+    };
   }
 
   if(hasAny){
@@ -262,22 +520,74 @@ function openTitle(slug,title,poster,type,epsCounter,meta){
   cur.activeEpRange=null;
   cur.meta=meta||null;
   cur.playerServer=null;
+  cur.trailerUrl=null;
+  cur.synopsis_id=meta && meta.synopsis ? cleanSynopsis(meta.synopsis) : "";
+  cur.synopsis_mal="";
+  cur.currentSynLang="id";
   setPlaySpeed(1.0, false);
   renderSourceUI();
+
+  // Top Bar & Hero Elements
+  var topTitle = $("tm-top-title");
+  if(topTitle) topTitle.textContent = title;
   $("tm-title").textContent=title;
-  $("tm-sub").textContent=slug;
+  var altTitle = $("tm-alt-title");
+  if(altTitle){ altTitle.textContent = ""; altTitle.classList.add("hidden"); }
   $("tm-eyebrow").textContent="DETAIL ANIME";
   $("tm-count").textContent="memuat...";
   $("tm-eps").innerHTML="";
   $("ep-filter").value="";
+
+  // Reset Badges
+  var yrBadge = $("tm-year"); if(yrBadge) yrBadge.classList.add("hidden");
+  var epBadge = $("tm-eps-badge"); if(epBadge) epBadge.classList.add("hidden");
+  var trBtn = $("tm-trailer-btn"); if(trBtn) trBtn.classList.add("hidden");
+
+  // Backdrop & Poster
+  var heroBd = $("tm-hero-backdrop");
+  if(heroBd){
+    heroBd.style.backgroundImage = cur.poster ? "url('" + cur.poster + "')" : "none";
+  }
+  var posterImg = $("tm-poster-img");
+  if(posterImg){
+    posterImg.src = cur.poster || "";
+    posterImg.alt = title;
+  }
+
+  // Primary Actions binding
+  var playBtn = $("tm-btn-play-primary");
+  if(playBtn){
+    playBtn.onclick = function(){
+      playPrimaryEpisode();
+    };
+  }
+  updatePlayPrimaryButton();
+
+  var backBtn = $("tm-back-btn");
+  if(backBtn){
+    backBtn.onclick = function(){
+      cur.playToken = ++_playTokenCounter;
+      closeTitle();
+    };
+  }
+
+  // Synopsis Lang Buttons binding
+  var btnId = $("tm-syn-id-btn");
+  if(btnId) btnId.onclick = function(){ setSynopsisLang("id"); };
+  var btnMal = $("tm-syn-mal-btn");
+  if(btnMal) btnMal.onclick = function(){ setSynopsisLang("mal"); };
+
   var sBar=$("tm-seasons");if(sBar)sBar.classList.add("hidden");
   var sChips=$("tm-seasons-chips");if(sChips)sChips.innerHTML="";
   renderDetailMeta(meta);
   updateBookmarkBtn(false);
   checkModalBookmark(slug);
   $("title-modal").classList.remove("hidden");
+
+  // Async loads
   loadEps();
   loadRelations();
+  enrichAnimeMetadata(title, slug);
 }
 function loadRelations(){
   var thisSlug=cur.slug;
@@ -334,6 +644,7 @@ function recordEpisodeWatched(slug, ep){
   if(cur.slug === slug){
     cur.watched[ep] = 1;
     cur.lastWatchedEp = ep;
+    updatePlayPrimaryButton();
   }
 
   try {
@@ -428,7 +739,10 @@ function loadEps(){
       var localWatched = JSON.parse(getAppStorage("watched_" + thisSlug) || "{}");
       cur.watched = Object.assign({}, localWatched);
       var s = getAppStorage("last_ep_" + thisSlug);
-      if(s) cur.lastWatchedEp = parseInt(s);
+      if(s) {
+        cur.lastWatchedEp = parseInt(s);
+        updatePlayPrimaryButton();
+      }
     } catch(e){}
   }
 
@@ -505,6 +819,7 @@ function loadEps(){
           for(var k in cur.watched){ wObj[k] = 1; }
           setAppStorage(wKey, JSON.stringify(wObj));
           setAppStorage("last_ep_" + thisSlug, String(cur.lastWatchedEp));
+          updatePlayPrimaryButton();
         } catch(e){}
       }
       $("tm-count").textContent = countLabel();
@@ -3395,10 +3710,30 @@ function init(){
       b.classList.add("active");cur.quality=b.getAttribute("data-q");
     });
   });
-  $("tm-close").addEventListener("click",function(){
-    cur.playToken = ++_playTokenCounter;
-    closeTitle();
-  });
+  var tmClose = $("tm-close");
+  if(tmClose){
+    tmClose.addEventListener("click",function(){
+      cur.playToken = ++_playTokenCounter;
+      closeTitle();
+    });
+  }
+  var tmBack = $("tm-back-btn");
+  if(tmBack){
+    tmBack.addEventListener("click",function(){
+      cur.playToken = ++_playTokenCounter;
+      closeTitle();
+    });
+  }
+  var tmPlayPri = $("tm-btn-play-primary");
+  if(tmPlayPri){
+    tmPlayPri.addEventListener("click",function(){
+      playPrimaryEpisode();
+    });
+  }
+  var synIdBtn = $("tm-syn-id-btn");
+  if(synIdBtn) synIdBtn.addEventListener("click",function(){ setSynopsisLang("id"); });
+  var synMalBtn = $("tm-syn-mal-btn");
+  if(synMalBtn) synMalBtn.addEventListener("click",function(){ setSynopsisLang("mal"); });
   var tmBmBtn=$("tm-bookmark-btn");
   if(tmBmBtn) tmBmBtn.addEventListener("click",toggleModalBookmark);
   $("title-modal").addEventListener("click",function(e){
