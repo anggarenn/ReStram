@@ -2919,6 +2919,7 @@ var NetMirror = (function(){
       '<div class="rail-card-poster-wrap">' +
         (posterUrl ? '<img class="rail-card-img" src="' + esc(posterUrl) + '" alt="' + esc(a.title) + '" loading="lazy" decoding="async">' : '<div class="rail-card-img no-img" style="background:#151922;display:flex;align-items:center;justify-content:center;color:#64748b;font-size:24px;">▶</div>') +
         '<div class="rail-card-overlay"><div class="card-play-btn"><svg class="ui-icon"><use href="#icon-play"/></svg></div></div>' +
+        '<span class="card-badge-prime"><svg class="ui-icon" style="width:10px;height:10px;margin-right:2px;"><use href="#icon-check"/></svg>prime</span>' +
         '<span class="card-badge-score">' + esc(scoreText) + '</span>' +
         '<span class="' + statusCls + '">' + esc(epText) + '</span>' +
       '</div>' +
@@ -2987,6 +2988,23 @@ var NetMirror = (function(){
           setTimeout(function(){
             App.openPlayer(1);
           }, 150);
+        }
+      };
+    }
+    var btnWatchlist = $("hero-btn-watchlist");
+    if(btnWatchlist){
+      btnWatchlist.onclick = function(e){
+        e.stopPropagation();
+        var api = window.ReStram || window.Tatap;
+        if(api && api.addBookmark){
+          api.addBookmark({
+            slug: a.id || a.slug,
+            title: a.title,
+            poster: a.poster,
+            type: a.type || "TV"
+          }).then(function(){
+            toast("✓ Ditambahkan ke Daftar Tontonan: " + a.title);
+          }).catch(function(){});
         }
       };
     }

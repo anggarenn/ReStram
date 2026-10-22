@@ -1,18 +1,27 @@
 <!DOCTYPE html>
-<html lang="id" style="background:#08090c;color:#d6dae2;">
+<html lang="id" style="background:#0b1118;color:#ffffff;">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#08090c">
-<meta name="application-name" content="ReStram">
-<meta name="apple-mobile-web-app-title" content="ReStram">
-<title>ReStram — nonton santai di lokal</title>
-<link rel="stylesheet" href="./css/style.css?v=20261019_7">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b1118">
+<meta name="application-name" content="ReStram Prime">
+<meta name="apple-mobile-web-app-title" content="ReStram Prime">
+<title>ReStram Prime — Nonton Anime Termasuk dengan Prime</title>
+<link rel="stylesheet" href="./css/style.css?v=20261022_1">
 <link rel="icon" type="image/x-icon" href="./favicon.ico">
 <link rel="icon" type="image/png" sizes="192x192" href="./assets/icon-192.png">
 <link rel="apple-touch-icon" href="./assets/icon-512.png">
 </head>
-<body class="no-crt" style="background:#08090c;color:#d6dae2;">
+<body class="no-crt" style="background:#0b1118;color:#ffffff;">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none" id="restram-icons">
   <defs>
+    <!-- Check: Prime Video verified checkmark -->
+    <symbol id="icon-check" viewBox="0 0 24 24">
+      <polyline points="20 6 9 17 4 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <!-- Plus: Watchlist add -->
+    <symbol id="icon-plus" viewBox="0 0 24 24">
+      <line x1="12" y1="5" x2="12" y2="19" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="5" y1="12" x2="19" y2="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+    </symbol>
     <!-- Menu: 3 sleek horizontal bars -->
     <symbol id="icon-menu" viewBox="0 0 24 24">
       <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
@@ -198,9 +207,9 @@
 <header class="tui-head net-navbar" id="net-navbar">
   <div class="nav-container">
     <div class="nav-main-row">
-      <div class="head-brand" id="nav-brand-logo" role="button" tabindex="0" title="Beranda ReStram">
-        <span class="brand-name net-logo">ReStram</span>
-        <span class="brand-ver" id="brand-ver">v2.9.2</span>
+      <div class="head-brand" id="nav-brand-logo" role="button" tabindex="0" title="Beranda ReStram Prime">
+        <span class="brand-name net-logo prime-logo">ReStram<span class="prime-tag">prime</span></span>
+        <span class="brand-ver prime-ver" id="brand-ver">v2.9.2</span>
       </div>
       
       <!-- Rounded-full search pill in center -->
@@ -218,17 +227,16 @@
       </div>
     </div>
 
-    <!-- Scrollable category filter pills -->
+    <!-- Scrollable storefront navigation (Prime Video Storefront style) -->
     <nav class="nav-pills-bar" id="nav-pills-bar" aria-label="Filter Kategori">
       <button class="nav-pill active" data-view="home"><svg class="ui-icon"><use href="#icon-tv"/></svg> Beranda</button>
+      <button class="nav-pill prime-pill" data-view="musim"><svg class="ui-icon"><use href="#icon-check"/></svg> Termasuk dengan Prime</button>
       <button class="nav-pill" data-view="trending"><svg class="ui-icon"><use href="#icon-fire"/></svg> Trending</button>
-      <button class="nav-pill" data-view="populer"><svg class="ui-icon"><use href="#icon-star"/></svg> Populer</button>
-      <button class="nav-pill" data-view="ongoing"><svg class="ui-icon"><use href="#icon-circle-dot"/></svg> Ongoing</button>
-      <button class="nav-pill" data-view="movies"><svg class="ui-icon"><use href="#icon-film"/></svg> Movies</button>
-      <button class="nav-pill" data-view="musim"><svg class="ui-icon"><use href="#icon-season"/></svg> Musim Ini</button>
-      <button class="nav-pill" data-view="terbaru"><svg class="ui-icon"><use href="#icon-clock"/></svg> Jadwal Rilis</button>
-      <button class="nav-pill" data-view="favorit"><svg class="ui-icon"><use href="#icon-heart"/></svg> Favorit</button>
-
+      <button class="nav-pill" data-view="populer"><svg class="ui-icon"><use href="#icon-star"/></svg> Top 10</button>
+      <button class="nav-pill" data-view="movies"><svg class="ui-icon"><use href="#icon-film"/></svg> Film (Movies)</button>
+      <button class="nav-pill" data-view="ongoing"><svg class="ui-icon"><use href="#icon-circle-dot"/></svg> Serial TV</button>
+      <button class="nav-pill" data-view="terbaru"><svg class="ui-icon"><use href="#icon-clock"/></svg> Baru Ditambahkan</button>
+      <button class="nav-pill" data-view="favorit"><svg class="ui-icon"><use href="#icon-heart"/></svg> Daftar Tontonan</button>
     </nav>
   </div>
 </header>
@@ -246,10 +254,13 @@
       </div>
       <div class="hero-content">
         <div class="hero-badge-wrap">
-          <span class="hero-badge-trending"><svg class="ui-icon"><use href="#icon-fire"/></svg> TRENDING NOW</span>
+          <span class="hero-badge-prime"><svg class="ui-icon"><use href="#icon-check"/></svg> TERMASUK DENGAN PRIME</span>
+          <span class="hero-age-badge">16+</span>
           <span id="hero-score" class="hero-score-badge"><svg class="ui-icon"><use href="#icon-star-filled"/></svg> <b id="hero-score-val">8.9</b></span>
           <span id="hero-type" class="hero-type-badge">TV Series</span>
           <span id="hero-season" class="hero-season-badge dim">Winter 2025</span>
+          <span class="hero-quality-badge">UHD • HDR</span>
+          <span class="hero-sub-badge">Sub Indo</span>
         </div>
         <h1 id="hero-title" class="hero-title">Solo Leveling Season 2: Arise from the Shadow</h1>
         <p id="hero-synopsis" class="hero-synopsis">
@@ -257,10 +268,13 @@
         </p>
         <div class="hero-actions">
           <button id="hero-btn-play" class="hero-btn-play btn-play" title="Tonton sekarang">
-            <svg class="ui-icon"><use href="#icon-play"/></svg> Tonton Sekarang
+            <svg class="ui-icon"><use href="#icon-play"/></svg> Putar Sekarang
           </button>
-          <button id="hero-btn-detail" class="hero-btn-detail btn-info" title="Lihat detail & episode">
-            <svg class="ui-icon"><use href="#icon-tv"/></svg> Detail
+          <button id="hero-btn-watchlist" class="hero-btn-circle" title="Tambahkan ke Daftar Tontonan" aria-label="Watchlist">
+            <svg class="ui-icon"><use href="#icon-plus"/></svg>
+          </button>
+          <button id="hero-btn-detail" class="hero-btn-circle" title="Lihat detail & episode" aria-label="Detail">
+            <svg class="ui-icon"><use href="#icon-tv"/></svg>
           </button>
         </div>
       </div>
@@ -288,11 +302,11 @@
         </div>
       </section>
 
-      <!-- Rail 2: Sedang Hangat (Trending Musim Ini) -->
+      <!-- Rail 2: Termasuk dengan Prime (Anime Populer) -->
       <section id="lane-season-sec" class="net-rail">
         <div class="rail-header">
           <div class="rail-title-wrap">
-            <h2 id="lane-season-title" class="rail-title"><svg class="ui-icon"><use href="#icon-fire"/></svg> Sedang Hangat (Musim Ini)</h2>
+            <h2 id="lane-season-title" class="rail-title"><span class="prime-check-mark"><svg class="ui-icon"><use href="#icon-check"/></svg> prime</span> Termasuk dengan Prime: Anime Populer</h2>
           </div>
           <button class="rail-see-all-btn" data-rail-view="musim">Lihat Semua <svg class="ui-icon"><use href="#icon-next"/></svg></button>
         </div>
@@ -303,11 +317,11 @@
         </div>
       </section>
 
-      <!-- Rail 3: Episode Baru Rilis (Update Hari Ini) -->
+      <!-- Rail 3: 10 Anime Teratas di Indonesia Hari Ini -->
       <section id="lane-latest-sec" class="net-rail">
         <div class="rail-header">
           <div class="rail-title-wrap">
-            <h2 class="rail-title"><svg class="ui-icon"><use href="#icon-clock"/></svg> Episode Baru Rilis</h2>
+            <h2 class="rail-title"><svg class="ui-icon"><use href="#icon-fire"/></svg> 10 Anime Teratas di Indonesia Hari Ini</h2>
           </div>
           <button class="rail-see-all-btn" data-rail-view="terbaru">Jadwal Lengkap <svg class="ui-icon"><use href="#icon-next"/></svg></button>
         </div>
@@ -318,11 +332,11 @@
         </div>
       </section>
 
-      <!-- Rail 4: Rekomendasi Anime Populer -->
+      <!-- Rail 4: Rekomendasi Pilihan untuk Anda -->
       <section id="lane-popular-sec" class="net-rail">
         <div class="rail-header">
           <div class="rail-title-wrap">
-            <h2 class="rail-title"><svg class="ui-icon"><use href="#icon-star"/></svg> Rekomendasi Anime Populer</h2>
+            <h2 class="rail-title"><svg class="ui-icon"><use href="#icon-star"/></svg> Rekomendasi Pilihan untuk Anda</h2>
           </div>
           <button class="rail-see-all-btn" data-rail-view="katalog">Katalog Lengkap <svg class="ui-icon"><use href="#icon-next"/></svg></button>
         </div>
@@ -333,11 +347,11 @@
         </div>
       </section>
 
-      <!-- Rail 5: Masih Tayang (Ongoing) -->
+      <!-- Rail 5: Serial Anime Masih Tayang (Ongoing) -->
       <section id="lane-still-sec" class="net-rail hidden">
         <div class="rail-header">
           <div class="rail-title-wrap">
-            <h2 class="rail-title"><svg class="ui-icon"><use href="#icon-circle-dot"/></svg> Masih Tayang (Lanjut)</h2>
+            <h2 class="rail-title"><svg class="ui-icon"><use href="#icon-circle-dot"/></svg> Serial Anime Masih Tayang (Ongoing)</h2>
           </div>
           <button class="rail-see-all-btn" data-rail-view="lanjutan">Lihat Semua <svg class="ui-icon"><use href="#icon-next"/></svg></button>
         </div>
@@ -348,11 +362,11 @@
         </div>
       </section>
 
-      <!-- Rail 6: Anime Favorit -->
+      <!-- Rail 6: Daftar Tontonan Saya (Watchlist) -->
       <section id="lane-favorites-sec" class="net-rail hidden">
         <div class="rail-header">
           <div class="rail-title-wrap">
-            <h2 class="rail-title"><svg class="ui-icon"><use href="#icon-heart"/></svg> Anime Favorit</h2>
+            <h2 class="rail-title"><svg class="ui-icon"><use href="#icon-heart"/></svg> Daftar Tontonan Saya (Watchlist)</h2>
           </div>
           <button class="rail-see-all-btn" data-rail-view="favorit">Semua Favorit <svg class="ui-icon"><use href="#icon-next"/></svg></button>
         </div>

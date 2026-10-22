@@ -1,19 +1,36 @@
 :root{
-  --bg:#08090c; --panel:#0e1015; --panel2:#0b0d11; --line:#22262e; --line2:#31363f;
-  --txt:#d6dae2; --dim:#8e96a5; --acc:#7dd3fc; --acc2:#a78bfa;
-  --ok:#4ade80; --err:#f87171; --danger:#f87171;
-  --net-red:#E50914; --net-red-hover:#ff1f2d; --net-orange:#FF5722;
+  /* Amazon Prime Video Storefront Theme Tokens */
+  --bg:#0b1118;
+  --bg-deep:#06090e;
+  --panel:#131d2a;
+  --panel2:#192638;
+  --panel-solid:#101826;
+  --line:rgba(255,255,255,0.08);
+  --line2:rgba(0,168,225,0.25);
+  --txt:#ffffff;
+  --dim:#8ba2b5;
+  --acc:#00A8E1;
+  --acc2:#38bdf8;
+  --ok:#4ade80;
+  --err:#f87171;
+  --danger:#f87171;
+  --prime-blue:#00A8E1;
+  --prime-blue-hover:#1ac0f7;
+  --prime-blue-glow:rgba(0,168,225,0.45);
+  --prime-gold:#f59e0b;
+  --net-red:#00A8E1;
+  --net-red-hover:#1ac0f7;
+  --net-orange:#FF9900;
   --net-card-radius:8px;
-  --r:4px;
-  --r-card:6px;
-  --pad-x:clamp(12px,2.2vw,28px);
-  --pad-y:clamp(8px,1vw,12px);
+  --r:6px;
+  --r-card:8px;
+  --pad-x:clamp(14px,2.4vw,36px);
+  --pad-y:clamp(8px,1vw,14px);
   --fs-base:clamp(12px,0.85vw + 0.6rem,14px);
   --fs-head:clamp(11px,0.7vw + 0.55rem,13px);
   --status-h:88px;
-  --font-sans:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Inter",sans-serif;
+  --font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Inter","Amazon Ember",sans-serif;
   --font-mono:ui-monospace,"JetBrains Mono",SFMono-Regular,Menlo,monospace;
-  --panel-solid:rgba(11,13,17,0.96);
 }
 *{box-sizing:border-box}
 * { scrollbar-width: thin; scrollbar-color: var(--line2) transparent; }
@@ -27,42 +44,60 @@ body{background:var(--bg);color:var(--txt);font-family:var(--font-sans);margin:0
 #crt{position:fixed;inset:0;pointer-events:none;z-index:120;background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(0,0,0,.16) 2px 4px)}
 body.no-crt #crt{display:none}
 .ui-icon{display:inline-block;width:1.15em;height:1.15em;vertical-align:-0.18em;flex-shrink:0;pointer-events:none}
-#bg-glow{position:fixed;inset:0;pointer-events:none;z-index:0}
+#bg-glow{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 50% -20%, rgba(0,168,225,0.12) 0%, transparent 70%)}
 
-/* ---- NETFLIX / NETMIRROR FLOATING NAVBAR ---- */
+/* ---- AMAZON PRIME VIDEO STOREFRONT FLOATING NAVBAR ---- */
 .tui-head.net-navbar{
   display:flex;flex-direction:column;padding:0;
-  border-bottom:1px solid rgba(255,255,255,0.07);
-  background:rgba(8,9,12,0.78);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  background:rgba(11,17,24,0.88);
   backdrop-filter:blur(24px);
   -webkit-backdrop-filter:blur(24px);
   position:sticky;top:0;z-index:95;
   transition:background .3s cubic-bezier(0.16,1,0.3,1),box-shadow .3s cubic-bezier(0.16,1,0.3,1),border-color .3s ease;
 }
 .tui-head.net-navbar.scrolled{
-  background:rgba(8,9,12,0.96);
-  border-bottom-color:rgba(255,255,255,0.12);
-  box-shadow:0 8px 30px rgba(0,0,0,0.85),0 1px 0 rgba(255,255,255,0.06);
+  background:rgba(11,17,24,0.98);
+  border-bottom-color:rgba(0,168,225,0.3);
+  box-shadow:0 8px 32px rgba(0,0,0,0.85),0 1px 0 rgba(0,168,225,0.15);
 }
 .nav-container{display:flex;flex-direction:column;width:100%}
 .nav-main-row{
   display:flex;align-items:center;justify-content:space-between;
   gap:clamp(10px,1.5vw,24px);padding:10px var(--pad-x);min-height:56px;
 }
-.net-logo{
-  font-weight:900;letter-spacing:-0.5px;
+.net-logo, .prime-logo{
+  font-weight:900;letter-spacing:-0.4px;
   font-size:clamp(20px,1.3vw + 0.8rem,26px);
-  background:linear-gradient(135deg,#E50914 0%,#FF3D00 65%,#FF8A00 100%);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  text-transform:uppercase;cursor:pointer;user-select:none;
-  text-shadow:0 0 24px rgba(229,9,20,0.35);
+  color:#FFFFFF;
+  text-transform:none;cursor:pointer;user-select:none;
+  display:inline-flex;align-items:baseline;gap:5px;
   transition:opacity .15s ease;
 }
-.net-logo:hover{opacity:.92}
+.net-logo:hover, .prime-logo:hover{opacity:.92}
+.prime-logo .prime-tag{
+  color:var(--prime-blue);
+  font-size:0.85em;
+  font-weight:800;
+  position:relative;
+  letter-spacing:-0.5px;
+}
+.prime-logo .prime-tag::after{
+  content:"";
+  position:absolute;
+  left:-2px;right:-2px;bottom:-3px;height:4px;
+  background:radial-gradient(ellipse at 50% 100%, var(--prime-blue) 0%, transparent 75%);
+  border-bottom:2px solid var(--prime-blue);
+  border-radius:50%;
+}
 .head-brand{display:flex;align-items:center;gap:8px;flex:0 0 auto;cursor:pointer}
 .head-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto}
-.brand-ver{font-size:11px;color:var(--dim);border:1px solid var(--line);padding:2px 7px;border-radius:var(--r);white-space:nowrap}
+.brand-ver, .prime-ver{
+  font-size:10.5px;color:var(--dim);
+  border:1px solid rgba(0,168,225,0.3);
+  background:rgba(0,168,225,0.08);
+  padding:2px 7px;border-radius:4px;white-space:nowrap;
+}
 
 /* Rounded-full Search Pill */
 .nav-search-pill{
@@ -298,13 +333,13 @@ main{width:100%;margin:0;padding:0 0 48px;position:relative;z-index:1;flex:1 0 a
 .net-home-container.hidden{display:none!important}
 
 /* ============================================================
-   NETFLIX / NETMIRROR CINEMATIC HERO SECTION (70-80vh)
+   AMAZON PRIME VIDEO STOREFRONT HERO SECTION (75-80vh)
    ============================================================ */
 .net-hero{
-  position:relative;width:100%;min-height:70vh;height:75vh;max-height:850px;
+  position:relative;width:100%;min-height:72vh;height:78vh;max-height:860px;
   display:flex;align-items:flex-end;
-  overflow:hidden;margin-bottom:32px;
-  background:#0b0b11;
+  overflow:hidden;margin-bottom:28px;
+  background:#0b1118;
 }
 .hero-backdrop-container{
   position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:1;
@@ -316,31 +351,37 @@ main{width:100%;margin:0;padding:0 0 48px;position:relative;z-index:1;flex:1 0 a
 }
 .hero-vignette-bottom{
   position:absolute;inset:0;
-  background:linear-gradient(to top, #0b0b11 10%, rgba(11,11,17,0.4) 50%, rgba(11,11,17,0.8) 100%);
+  background:linear-gradient(to top, #0b1118 12%, rgba(11,17,24,0.45) 55%, rgba(11,17,24,0.85) 100%);
 }
 .hero-vignette-left{
   position:absolute;inset:0;
-  background:linear-gradient(to right, #0b0b11 0%, rgba(11,11,17,0.88) 35%, transparent 75%);
+  background:linear-gradient(to right, #0b1118 0%, rgba(11,17,24,0.92) 38%, transparent 75%);
 }
 .hero-vignette-top{
   position:absolute;inset:0;
-  background:linear-gradient(180deg, rgba(11,11,17,0.7) 0%, transparent 35%);
+  background:linear-gradient(180deg, rgba(11,17,24,0.7) 0%, transparent 35%);
 }
 
 .hero-content{
   position:relative;z-index:3;padding:0 var(--pad-x) 44px;
-  max-width:720px;display:flex;flex-direction:column;gap:12px;
-  animation:heroFadeIn .4s ease-out;
+  max-width:740px;display:flex;flex-direction:column;gap:12px;
+  animation:heroFadeIn .4s cubic-bezier(0.16,1,0.3,1);
 }
 @keyframes heroFadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 
 .hero-badge-wrap{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.hero-badge-trending{
-  background:linear-gradient(135deg, #FF3D00, #E50914);
-  color:#fff;font-weight:800;border-radius:4px;
+.hero-badge-prime{
+  background:rgba(0,168,225,0.18);
+  border:1px solid rgba(0,168,225,0.45);
+  color:var(--prime-blue);font-weight:800;border-radius:4px;
   padding:3px 9px;font-size:11px;letter-spacing:0.5px;
   display:inline-flex;align-items:center;gap:5px;
-  box-shadow:0 0 14px rgba(229,9,20,0.55);
+  box-shadow:0 0 14px rgba(0,168,225,0.35);
+}
+.hero-age-badge{
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.22);
+  color:#fff;font-weight:700;font-size:11px;padding:2px 7px;border-radius:4px;
 }
 .hero-score-badge{
   background:rgba(251,191,36,0.18);border:1px solid rgba(251,191,36,0.45);
@@ -352,6 +393,16 @@ main{width:100%;margin:0;padding:0 0 48px;position:relative;z-index:1;flex:1 0 a
   color:#e2e8f0;font-weight:700;font-size:11px;padding:2px 8px;border-radius:4px;
 }
 .hero-season-badge{font-size:11.5px;color:#94a3b8}
+.hero-quality-badge{
+  font-size:11px;font-weight:700;color:var(--dim);
+  border:1px solid var(--line);padding:2px 7px;border-radius:4px;
+}
+.hero-sub-badge{
+  background:rgba(74,222,128,0.12);
+  border:1px solid rgba(74,222,128,0.35);
+  color:var(--ok);font-size:11px;font-weight:700;
+  padding:2px 7px;border-radius:4px;
+}
 
 .hero-title{
   font-size:clamp(26px,3.8vw,48px);font-weight:900;line-height:1.15;
@@ -365,32 +416,49 @@ main{width:100%;margin:0;padding:0 0 48px;position:relative;z-index:1;flex:1 0 a
   max-width:620px;
 }
 
-.hero-actions{display:flex;align-items:center;gap:12px;margin-top:6px;flex-wrap:wrap}
+.hero-actions{display:flex;align-items:center;gap:12px;margin-top:8px;flex-wrap:wrap}
 .hero-btn-play, .btn-play{
-  background:#FFFFFF;color:#000000;font-weight:700;font-size:14px;
-  padding:10px 24px;border-radius:6px;border:none;cursor:pointer;
-  display:inline-flex;align-items:center;gap:8px;
-  transition:transform .18s ease,background .18s ease,box-shadow .18s ease;
-  box-shadow:0 4px 16px rgba(0,0,0,0.5);line-height:1;
+  background:#FFFFFF;color:#050811;font-weight:800;font-size:14.5px;
+  padding:12px 28px;border-radius:8px;border:none;cursor:pointer;
+  display:inline-flex;align-items:center;gap:10px;
+  transition:transform .2s ease,background .2s ease,box-shadow .2s ease;
+  box-shadow:0 4px 18px rgba(0,0,0,0.6);line-height:1;
 }
 .hero-btn-play:hover, .btn-play:hover{
-  background:#f1f5f9;transform:scale(1.05);
-  box-shadow:0 6px 20px rgba(255,255,255,0.3);
+  background:#e2f4ff;transform:scale(1.04);
+  box-shadow:0 6px 24px rgba(0,168,225,0.45);color:#000;
 }
 .hero-btn-play:active, .btn-play:active{
   transform:scale(0.96);
   transition:transform 0.08s ease;
 }
+.hero-btn-circle{
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(25,38,56,0.75);
+  border:1px solid rgba(255,255,255,0.25);
+  color:#fff;display:inline-flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:16px;
+  transition:all .2s cubic-bezier(0.16,1,0.3,1);
+  box-shadow:0 4px 12px rgba(0,0,0,0.5);
+}
+.hero-btn-circle:hover{
+  background:rgba(0,168,225,0.2);
+  border-color:var(--prime-blue);
+  color:var(--prime-blue);
+  transform:scale(1.08);
+  box-shadow:0 0 16px rgba(0,168,225,0.4);
+}
+.hero-btn-circle:active{transform:scale(0.94)}
 .hero-btn-detail, .btn-info{
-  background:rgba(255,255,255,0.2);backdrop-filter:blur(12px);
+  background:rgba(255,255,255,0.18);backdrop-filter:blur(12px);
   -webkit-backdrop-filter:blur(12px);color:#FFFFFF;font-weight:700;
-  font-size:14px;padding:10px 24px;border-radius:6px;
+  font-size:14px;padding:12px 24px;border-radius:8px;
   border:1px solid rgba(255,255,255,0.25);cursor:pointer;
   display:inline-flex;align-items:center;gap:8px;
   transition:transform .18s ease,background .18s ease,border-color .18s ease;line-height:1;
 }
 .hero-btn-detail:hover, .btn-info:hover{
-  background:rgba(255,255,255,0.32);transform:scale(1.05);
+  background:rgba(255,255,255,0.28);transform:scale(1.04);
   border-color:rgba(255,255,255,0.5);
 }
 .hero-btn-detail:active, .btn-info:active{
@@ -410,8 +478,8 @@ main{width:100%;margin:0;padding:0 0 48px;position:relative;z-index:1;flex:1 0 a
   cursor:pointer;transition:all .18s ease;padding:0;outline:none;
 }
 .hero-arrow-btn:hover{
-  background:var(--net-red);border-color:var(--net-red);
-  transform:scale(1.1);box-shadow:0 0 14px rgba(229,9,20,0.6);
+  background:var(--prime-blue);border-color:var(--prime-blue);
+  transform:scale(1.1);box-shadow:0 0 14px rgba(0,168,225,0.6);
 }
 .hero-dots{display:flex;align-items:center;gap:6px}
 .hero-dot{
@@ -419,8 +487,8 @@ main{width:100%;margin:0;padding:0 0 48px;position:relative;z-index:1;flex:1 0 a
   border:none;cursor:pointer;padding:0;transition:all .25s ease;
 }
 .hero-dot.active{
-  width:22px;border-radius:4px;background:var(--net-red);
-  box-shadow:0 0 10px rgba(229,9,20,0.6);
+  width:22px;border-radius:4px;background:var(--prime-blue);
+  box-shadow:0 0 10px rgba(0,168,225,0.6);
 }
 
 /* ============================================================
@@ -524,28 +592,47 @@ main{width:100%;margin:0;padding:0 0 48px;position:relative;z-index:1;flex:1 0 a
 .rail-card:hover .card-play-btn{transform:scale(1)}
 .card-play-btn:active{transform:scale(0.92);background:#ff1e27}
 
-/* Card badges */
+/* Card badges (Amazon Prime Video style) */
+.card-badge-prime{
+  position:absolute;top:8px;left:8px;
+  background:rgba(11,17,24,0.92);
+  border:1px solid rgba(0,168,225,0.55);
+  color:var(--prime-blue);font-size:10.5px;font-weight:800;
+  padding:2px 7px;border-radius:4px;
+  display:inline-flex;align-items:center;gap:3px;z-index:3;
+  letter-spacing:0.3px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.8);
+  line-height:1.2;
+}
 .card-badge-score{
-  position:absolute;top:8px;left:8px;background:rgba(8,9,12,0.85);
+  position:absolute;top:8px;right:8px;background:rgba(8,9,12,0.85);
   backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   color:#fbbf24;font-size:11px;font-weight:700;
   padding:3px 7px;border-radius:4px;border:1px solid rgba(251,191,36,0.35);
   display:inline-flex;align-items:center;gap:3px;z-index:2;
 }
 .card-badge-status{
-  position:absolute;top:8px;right:8px;background:rgba(8,9,12,0.85);
+  position:absolute;bottom:8px;right:8px;background:rgba(8,9,12,0.85);
   backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   color:#38bdf8;font-size:10px;font-weight:700;
   padding:2px 6px;border-radius:4px;border:1px solid rgba(56,189,248,0.3);z-index:2;
 }
 .card-badge-status.finished{color:#4ade80;border-color:rgba(74,222,128,0.3)}
+.prime-check-mark{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(0,168,225,0.16);
+  border:1px solid rgba(0,168,225,0.45);
+  color:var(--prime-blue);
+  padding:3px 9px;border-radius:4px;font-size:12px;font-weight:800;
+  letter-spacing:0.4px;
+}
 
 /* Progress bar on Continue Watching card */
 .card-progress-bar{
   position:absolute;bottom:0;left:0;right:0;height:4px;
   background:rgba(255,255,255,0.18);z-index:2;
 }
-.card-progress-fill{height:100%;background:var(--net-red);box-shadow:0 0 8px rgba(229,9,20,0.6)}
+.card-progress-fill{height:100%;background:var(--prime-blue);box-shadow:0 0 8px rgba(0,168,225,0.65)}
 
 /* Card info text (Judul di bawah poster) */
 .rail-card-info{
