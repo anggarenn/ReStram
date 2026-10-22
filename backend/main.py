@@ -1777,11 +1777,12 @@ async def proxy_sub(url: str = Query(""),
 
 
 async def _llm_enabled():
-    """Tier aktif kalau ada API key, atau endpoint LLM lokal (Ollama di localhost)."""
+    """Tier aktif kalau ada API key, endpoint LLM lokal, atau Bilibili Index-Translate online (free)."""
     from api.translate import is_local_llm
     apikey = await get_setting("translate_apikey", "")
     apiurl = await get_setting("translate_apiurl", "")
-    return bool(apikey) or is_local_llm(apiurl)
+    # Default aktif dengan Index-Translate bila belum ada key
+    return bool(apikey) or is_local_llm(apiurl) or not apiurl or "index-translate" in apiurl or "bilibili" in apiurl
 
 
 async def _translate_sub_job(url, referer, src, lang, key_llm, key_gtxplus, fetcher, key_gtx=None, requested_mode="gtx"):
@@ -1841,11 +1842,11 @@ async def _translate_with_fallback(cues, src, tgt, requested_mode="gtx"):
     last_err = ""
 
     if requested_mode == "ai":
-        # 1. Coba AI Fansub jika ada API key atau LLM lokal
+        # 1. Coba AI Fansub jika ada API key, LLM lokal, atau Bilibili Index-Translate
         if await _llm_enabled():
             apikey = await get_setting("translate_apikey", "")
-            model = await get_setting("translate_model", "gemini-2.0-flash")
-            apiurl = await get_setting("translate_apiurl", "https://generativelanguage.googleapis.com/v1beta/openai")
+            model = await get_setting("translate_model", "Index-Translate-35B-A3B")
+            apiurl = await get_setting("translate_apiurl", "https://index-translate.bilibili.com/v1")
             try:
                 translated, stats = await call_openai_translate(cues, src, tgt, apikey, model, apiurl)
                 return {"cues": translated, "level": "tier3", "engine": "ai", **stats}
@@ -2196,8 +2197,8 @@ async def get_set():
         # Translate API (opsional). User isi via settings panel. Fallback ke
         # MyMemory kalau kosong. translate_apikey tidak pernah di-log.
         "translate_apikey": await get_setting("translate_apikey", ""),
-        "translate_model": await get_setting("translate_model", "gemini-2.0-flash"),
-        "translate_apiurl": await get_setting("translate_apiurl", "https://generativelanguage.googleapis.com/v1beta/openai"),
+        "translate_model": await get_setting("translate_model", "Index-Translate-35B-A3B"),
+        "translate_apiurl": await get_setting("translate_apiurl", "https://index-translate.bilibili.com/v1"),
     })
 
 @app.post("/api/settings")

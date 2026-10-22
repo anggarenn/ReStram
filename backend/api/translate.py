@@ -193,6 +193,7 @@ _DEFAULT_MODEL = {
     "groq": "llama-3.3-70b-versatile",
     "openrouter": "google/gemini-2.0-flash-exp:free",
     "openai": "gpt-4o-mini",
+    "index_translate": "Index-Translate-35B-A3B",
     "custom": "gpt-4o-mini",
 }
 
@@ -204,12 +205,13 @@ _PROVIDER_CFG = {
     "groq": {"batch": 40, "conc": 2},
     "openrouter": {"batch": 40, "conc": 2},
     "openai": {"batch": 60, "conc": 3},
+    "index_translate": {"batch": 40, "conc": 2},
     "custom": {"batch": 40, "conc": 2},
 }
 
 _PROVIDER_LABEL = {
     "google": "Google AI Studio", "ollama": "Ollama Cloud", "ollama_local": "Ollama Lokal",
-    "groq": "Groq", "openrouter": "OpenRouter", "openai": "OpenAI", "custom": "OpenAI-compatible",
+    "groq": "Groq", "openrouter": "OpenRouter", "openai": "OpenAI", "index_translate": "Bilibili Index-Translate (Free 35B)", "custom": "OpenAI-compatible",
 }
 
 
@@ -233,6 +235,8 @@ def detect_provider(apiurl: str) -> str:
         return "openrouter"
     if "openai.com" in u:
         return "openai"
+    if "index-translate" in u or "bilibili" in u:
+        return "index_translate"
     return "custom"
 
 
@@ -263,6 +267,8 @@ def _model_chain(prov: str, model: str):
         chain += ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash"]
     elif prov == "groq":
         chain.append("llama-3.3-70b-versatile")
+    elif prov == "index_translate":
+        chain += ["Index-Translate-35B-A3B", "Index-Translate-9B"]
     seen, out = set(), []
     for m in chain:
         if m and m not in seen:
@@ -1489,6 +1495,9 @@ async def call_openai_translate(cues, src, tgt, apikey, model, apiurl, timeout=1
     headers = {"Content-Type": "application/json"}
     if apikey:
         headers["Authorization"] = "Bearer " + apikey
+    elif prov == "index_translate":
+        headers["Authorization"] = "Bearer index"
+        headers["User-Agent"] = "Index-Translate-Client/1.0"
     if prov == "google":
         headers["x-goog-api-key"] = apikey
     if prov == "openrouter":
@@ -1509,6 +1518,24 @@ async def call_openai_translate(cues, src, tgt, apikey, model, apiurl, timeout=1
     )
 
     def _payload(cur_model, ids, lo):
+        if prov == "index_translate":
+            tgt_zh = "印尼语" if tgt in ("id", "indonesian") else tgt_name
+            cues_block = "\n".join(f"{i}|{src_lines[lo + i - 1]}" for i in ids)
+            canonical_prompt = (
+                f"请将以下文本翻译为{tgt_zh}，并且严格遵循所有约束要求。\n\n"
+                f"【源文】\n{cues_block}\n\n"
+                f"【约束要求】\n"
+                f"1. 【硬性要求】保持每行 'ID|译文' 的格式不变，不要增删任何行\n"
+                f"2. 【硬性要求】适用于动漫字幕风格，自然生动\n\n"
+                f"只输出译文，不要有任何额外说明。"
+            )
+            return {
+                "model": cur_model,
+                "messages": [{"role": "user", "content": canonical_prompt}],
+                "temperature": 0.0,
+                "max_tokens": min(8192, len(ids) * 65 + 250),
+                "chat_template_kwargs": {"enable_thinking": False}
+            }
         ctx = [src_lines[j] for j in range(max(0, lo - 4), lo)]
         parts = []
         if ctx:
