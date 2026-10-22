@@ -1,7 +1,7 @@
 import sys, os, re, time, html
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import asyncio, subprocess, tempfile
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, Query, HTTPException, Request
 from fastapi.responses import JSONResponse, FileResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
@@ -21,7 +21,7 @@ async def lifespan(app: FastAPI):
     yield
 
 from version import __version__ as CURRENT_VERSION
-app = FastAPI(title="Tatap", version=CURRENT_VERSION, lifespan=lifespan)
+app = FastAPI(title="ReStram", version=CURRENT_VERSION, lifespan=lifespan)
 
 def ok(data):
     return {"success": True, "data": data}
@@ -41,17 +41,17 @@ async def get_version():
 
 @app.get("/api/update/check")
 async def check_update():
-    """Pemeriksaan pembaruan versi Tatap secara on-demand via GitHub Releases API.
+    """Pemeriksaan pembaruan versi ReStram secara on-demand via GitHub Releases API.
     Memfilter 4 berkas resmi sesuai aturan paten agent.md:
-    1. tatap-release-v<VER>.apk (Official Signed Mobile APK)
-    2. tatap-tv-release-v<VER>.apk (Official Signed Android/Google TV APK)
-    3. tatap-windows-x64-portable.zip (Windows Portable)
-    4. Tatap-x86_64.AppImage (Linux AppImage)
+    1. restram-release-v<VER>.apk (Official Signed Mobile APK)
+    2. restram-tv-release-v<VER>.apk (Official Signed Android/Google TV APK)
+    3. restram-windows-x64-portable.zip (Windows Portable)
+    4. ReStram-x86_64.AppImage (Linux AppImage)
     """
     try:
-        url = "https://api.github.com/repos/asfaraguest/tatap/releases/latest"
+        url = "https://api.github.com/repos/anggarenn/ReStram/releases/latest"
         headers = {
-            "User-Agent": f"Tatap-App/{CURRENT_VERSION} (https://github.com/asfaraguest/tatap)",
+            "User-Agent": f"ReStram-App/{CURRENT_VERSION} (https://github.com/anggarenn/ReStram)",
             "Accept": "application/vnd.github.v3+json"
         }
         async with httpx.AsyncClient(timeout=8.0, follow_redirects=True) as client:
@@ -87,9 +87,9 @@ async def check_update():
         for a in raw_assets:
             fname = (a.get("name") or "").lower()
             dl_url = a.get("browser_download_url") or ""
-            if "tatap-tv-release-" in fname and fname.endswith(".apk") and not fname.endswith(".idsig"):
+            if ("restram-tv-release-" in fname or "tatap-tv-release-" in fname) and fname.endswith(".apk") and not fname.endswith(".idsig"):
                 assets_out["android_tv"] = dl_url
-            elif "tatap-release-" in fname and fname.endswith(".apk") and not fname.endswith(".idsig"):
+            elif ("restram-release-" in fname or "tatap-release-" in fname) and fname.endswith(".apk") and not fname.endswith(".idsig"):
                 assets_out["android"] = dl_url
             elif "windows" in fname and fname.endswith(".zip"):
                 assets_out["windows"] = dl_url
@@ -104,7 +104,7 @@ async def check_update():
             "release_name": rel_data.get("name") or tag_name,
             "body": rel_data.get("body") or "",
             "published_at": rel_data.get("published_at") or "",
-            "release_url": rel_data.get("html_url") or "https://github.com/asfaraguest/tatap/releases/latest",
+            "release_url": rel_data.get("html_url") or "https://github.com/anggarenn/ReStram/releases/latest",
             "assets": assets_out
         })
     except Exception as e:
@@ -196,6 +196,119 @@ async def genres():
         filtered = [g for g in out if (g.get("slug") or "").lower() != "hentai" and "hentai" not in (g.get("title") or "").lower()]
         await set_browse_cache(key, {"list": filtered})
         return ok({"list": filtered, "cached": False})
+    except Exception as e:
+        return fail(str(e))
+
+# =====================================================================
+# Synchronized Provider Endpoints (/api/hianime, /api/otakudesu, /api/anilist)
+# =====================================================================
+
+@app.get("/api/hianime/search")
+async def api_hianime_search(q: str = Query(""), limit: int = 15):
+    q = (q or "").strip()
+    if not q:
+        return fail("missing q")
+    loop = asyncio.get_running_loop()
+    try:
+        res = await loop.run_in_executor(None, lambda: hi.hianime_search(q, limit))
+        return ok({"results": res, "cached": False})
+    except Exception as e:
+        return fail(str(e))
+
+@app.get("/api/hianime/catalog")
+async def api_hianime_catalog(page: int = Query(1, ge=1, le=100)):
+    loop = asyncio.get_running_loop()
+    try:
+        res = await loop.run_in_executor(None, lambda: hi.browse({}, page))
+        return ok(res)
+    except Exception as e:
+        return fail(str(e))
+
+@app.get("/api/hianime/browse")
+async def api_hianime_browse(request: Request, page: int = Query(1, ge=1, le=100)):
+    filters = dict(request.query_params)
+    filters.pop("page", None)
+    loop = asyncio.get_running_loop()
+    try:
+        res = await loop.run_in_executor(None, lambda: hi.browse(filters, page))
+        return ok(res)
+    except Exception as e:
+        return fail(str(e))
+
+@app.get("/api/hianime/detail/{slug:path}")
+async def api_hianime_detail(slug: str):
+    loop = asyncio.get_running_loop()
+    try:
+        res = await loop.run_in_executor(None, lambda: hi.hianime_details(slug))
+        return ok(res)
+    except Exception as e:
+        return fail(str(e))
+
+@app.get("/api/hianime/episodes/{slug:path}")
+async def api_hianime_episodes(slug: str):
+    loop = asyncio.get_running_loop()
+    try:
+        eps = await loop.run_in_executor(None, lambda: hi.hianime_episodes(slug))
+        return ok({"episodes": eps})
+    except Exception as e:
+        return fail(str(e))
+
+@app.get("/api/otakudesu/search")
+async def api_otakudesu_search(q: str = Query(""), limit: int = 15):
+    q = (q or "").strip()
+    if not q:
+        return fail("missing q")
+    loop = asyncio.get_running_loop()
+    try:
+        from api import otakudesu as ot
+        res = await loop.run_in_executor(None, lambda: ot.search(q, limit))
+        return ok({"results": res, "cached": False})
+    except Exception as e:
+        return fail(str(e))
+
+@app.get("/api/otakudesu/episodes/{slug:path}")
+async def api_otakudesu_episodes(slug: str):
+    loop = asyncio.get_running_loop()
+    try:
+        from api import otakudesu as ot
+        clean_slug = slug[len("otakudesu:"):] if slug.startswith("otakudesu:") else slug
+        eps = await loop.run_in_executor(None, lambda: ot.episodes(clean_slug))
+        return ok({"episodes": eps})
+    except Exception as e:
+        return fail(str(e))
+
+@app.get("/api/anilist/seasonal")
+async def api_anilist_seasonal(page: int = Query(1, ge=1, le=50), per_page: int = 20):
+    loop = asyncio.get_running_loop()
+    try:
+        res = await loop.run_in_executor(None, lambda: al.seasonal_page(None, None, page, per_page))
+        return ok(res)
+    except Exception as e:
+        return fail(str(e))
+
+@app.get("/api/anilist/schedule")
+async def api_anilist_schedule(days: int = Query(7, ge=1, le=14)):
+    loop = asyncio.get_running_loop()
+    try:
+        res = await loop.run_in_executor(None, lambda: al.upcoming_episodes_days(days))
+        return ok(res)
+    except Exception as e:
+        return fail(str(e))
+
+@app.get("/api/net27/rails")
+async def api_net27_rails():
+    """Endpoint rails dan spotlight hero untuk layout net27.cc."""
+    try:
+        loop = asyncio.get_running_loop()
+        cat = await loop.run_in_executor(None, lambda: hi.browse({}, 1))
+        items = (cat or {}).get("items") or []
+        hero = items[:5]
+        rails = [
+            {"id": "trending", "title": "🔥 Sedang Tren Minggu Ini", "items": items[:8]},
+            {"id": "popular", "title": "⭐ Anime Populer", "items": items[8:16] if len(items) >= 16 else items},
+            {"id": "action", "title": "⚔️ Action & Petualangan", "items": [x for x in items if any(g in (x.get("genres") or []) for g in ["Action", "Adventure"])][:8]}
+        ]
+        return ok({"hero": hero, "rails": rails, "items": items})
     except Exception as e:
         return fail(str(e))
 
@@ -674,8 +787,8 @@ ID_TO_EN = {
 @app.get("/api/schedule")
 async def anime_schedule(day: str = Query("today")):
     """Jadwal rilis anime 7 hari mingguan (Senin - Minggu) waktu WIB.
-    HANYA menampilkan anime yang tersedia di aplikasi Tatap (memiliki slug valid).
-    Anime yang tidak ada di aplikasi Tatap otomatis di-remove."""
+    HANYA menampilkan anime yang tersedia di aplikasi ReStram (memiliki slug valid).
+    Anime yang tidak ada di aplikasi ReStram otomatis di-remove."""
     try:
         import datetime as _dt
         loop = asyncio.get_running_loop()
@@ -725,7 +838,7 @@ async def anime_schedule(day: str = Query("today")):
 
             for s, title, _ in pending:
                 slug = slug_by_title.get(title)
-                # FILTER KETAT: Yang tidak ada di dalam app Tatap di-REMOVE dari jadwal
+                # FILTER KETAT: Yang tidak ada di dalam app ReStram di-REMOVE dari jadwal
                 if not slug:
                     continue
 
@@ -1072,7 +1185,7 @@ async def resolve(slug: str = Query(""), ep: int = Query(1), mode: str = Query("
         async def _check_and_prewarm(ep_data):
             try:
                 sub_lang = (await get_setting("sub_lang", "Indonesian")).strip().lower()
-                auto_tr = await get_setting("tatap_translate", "1")
+                auto_tr = await get_setting("restram_translate", await get_setting("tatap_translate", "1"))
                 # Jika preferensi pengguna adalah Indonesia atau auto-translate aktif
                 if sub_lang in ("indonesian", "id") or auto_tr in ("1", "true"):
                     subs = ep_data.get("subtitles") or []
@@ -1232,7 +1345,7 @@ def _is_m3u8_url(url: str, ctype: str = "") -> bool:
 
 
 @app.get("/api/player/video")
-async def proxy_video(url: str = Query(""), referer: str = Query("")):
+async def proxy_video(request: Request, url: str = Query(""), referer: str = Query("")):
     # Proxy cepat: koneksi dipakai ulang, segmen di-stream (tanpa buffer penuh),
     # Range diteruskan supaya seek tidak unduh ulang dari awal.
     from fastapi import Request
@@ -1270,15 +1383,22 @@ async def proxy_video(url: str = Query(""), referer: str = Query("")):
         elif any(h in url for h in ("phantomharbor", "nexabloom", "silverorbit", "megaplay", "vidtube", "vidplay")):
             referer = "https://megaplay.buzz/"
 
+    range_header = request.headers.get("range") if request else None
+    resp_headers = {
+        "Access-Control-Allow-Origin": "*",
+        "Accept-Ranges": "bytes"
+    }
+
     # Jika host terdeteksi diblokir DPI ISP, gunakan TLS desync murni (aman dari Sangfor)
     from api.hianime import _host_from, _BLOCKED_DPI_HOSTS
     host = _host_from(url)
     if host in _BLOCKED_DPI_HOSTS:
         return _SR(_pipe_desync_video(url, referer), media_type=media_type,
-                   headers={"Access-Control-Allow-Origin": "*"})
+                   headers=resp_headers)
 
-    return _SR(_pipe_video(url, referer), media_type=media_type,
-               headers={"Access-Control-Allow-Origin": "*"})
+    status_code = 206 if (range_header and not is_m3u8) else 200
+    return _SR(_pipe_video(url, referer, range_header), status_code=status_code, media_type=media_type,
+               headers=resp_headers)
 
 
 def _rewrite_m3u8_content(txt: str, base_url: str, referer: str) -> str:
@@ -1324,7 +1444,7 @@ async def _pipe_desync_video(url: str, referer: str):
     headers = {"Referer": referer} if referer else {}
     loop = asyncio.get_running_loop()
     
-    # Playlist m3u8: baca penuh dan rewrite URL agar segmen tetap lewat proxy Tatap
+    # Playlist m3u8: baca penuh dan rewrite URL agar segmen tetap lewat proxy ReStram
     if _is_m3u8_url(url):
         body = await loop.run_in_executor(None, lambda: tls_desync_request(url, headers=headers))
         try:
@@ -1349,7 +1469,7 @@ def _get_video_client(url: str):
     global _direct_client
     import httpx as _hx
     if _direct_client is None:
-        if os.environ.get("TATAP_IS_TV") == "1":
+        if os.environ.get("RESTRAM_IS_TV") == "1" or os.environ.get("TATAP_IS_TV") == "1":
             limits = _hx.Limits(max_connections=30, max_keepalive_connections=20, keepalive_expiry=90.0)
         else:
             limits = _hx.Limits(max_connections=60, max_keepalive_connections=30, keepalive_expiry=90.0)
@@ -1362,7 +1482,7 @@ def _get_video_client(url: str):
     return _direct_client
 
 
-async def _pipe_video(url: str, referer: str):
+async def _pipe_video(url: str, referer: str, range_header: str = None):
     import urllib.parse as _up
     import asyncio as _asyncio
     from api.hianime import STRIP_BYTES as _SB, STRIP_RE as _SR2
@@ -1371,6 +1491,8 @@ async def _pipe_video(url: str, referer: str):
     headers = {"User-Agent": HI_UA}
     if referer:
         headers["Referer"] = referer
+    if range_header:
+        headers["Range"] = range_header
 
     for attempt in range(2):
         try:
@@ -2070,7 +2192,7 @@ async def get_set():
         # sumber (Megaplay, ZokoAnime) punya English sebagai track default. Kalau
         # user pernah pilih bahasa lain, disimpan di sini dan dipakai frontend
         # untuk auto-select track di episode berikutnya.
-        "sub_lang": await get_setting("sub_lang", "English"),
+        "sub_lang": await get_setting("sub_lang", "Indonesian (GTX+)"),
         # Translate API (opsional). User isi via settings panel. Fallback ke
         # MyMemory kalau kosong. translate_apikey tidak pernah di-log.
         "translate_apikey": await get_setting("translate_apikey", ""),
@@ -2113,13 +2235,23 @@ if os.path.isdir(os.path.join(frontend_dir, "css")):
     app.mount("/css", StaticFiles(directory=os.path.join(frontend_dir, "css")), name="css")
 if os.path.isdir(os.path.join(frontend_dir, "assets")):
     app.mount("/assets", StaticFiles(directory=os.path.join(frontend_dir, "assets")), name="assets")
+if os.path.isdir(os.path.join(frontend_dir, "data")):
+    app.mount("/data", StaticFiles(directory=os.path.join(frontend_dir, "data")), name="data")
+
+@app.get("/favicon.ico")
+async def favicon():
+    fav_path = os.path.join(frontend_dir, "favicon.ico")
+    if os.path.isfile(fav_path):
+        return FileResponse(fav_path)
+    return Response(status_code=404)
 
 @app.get("/")
 async def root():
     idx_path = os.path.join(frontend_dir, "index.html")
     if os.path.isfile(idx_path):
         return FileResponse(idx_path)
-    return ok({"status": "running", "app": "Tatap Native Android Backend"})
+    return ok({"status": "running", "app": "ReStram Native Android Backend"})
+
 
 if __name__ == "__main__":
     import uvicorn

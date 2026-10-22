@@ -786,6 +786,27 @@ function openPlayer(ep, resumeTime){
   (window.ReStram||window.Tatap).resolve(cur.slug,ep,cur.mode,cur.quality,src).then(function(r){
     if(cur.playToken !== token || cur.slug !== reqSlug || $("player-modal").classList.contains("hidden")) return;
     if(!r || !r.success){
+      var item = (window.NET27_DATA && window.NET27_DATA.getItem(cur.slug)) || cur.meta || cur.item;
+      if(!item && window.NET27_DATA && window.NET27_DATA.items && cur.title){
+        var cleanTitle = (cur.title || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+        item = window.NET27_DATA.items.find(function(it){
+          return (it.title || "").toLowerCase().replace(/[^a-z0-9]/g, "") === cleanTitle;
+        });
+      }
+      var srvMap = extractEpisodeServers(item, ep);
+      if(srvMap && (srvMap.blogger || srvMap.mega || srvMap.native)){
+        cur.episodeServers = srvMap;
+        var fbUrl = srvMap.blogger || srvMap.mega;
+        if(fbUrl){
+          cur.embedUrl = fbUrl;
+          cur.source = "anime-json";
+          $("pm-meta").innerHTML = "ep " + ep + " · " + cur.mode.toUpperCase() + " · SERVER ALTERNATIF";
+          applyEmbedPlayer(fbUrl, srvMap.blogger ? "blogger" : "mega");
+          toast("Server online sibuk, beralih ke Server Cadangan...");
+          (window.ReStram||window.Tatap).saveHist({slug:cur.slug,title:cur.title,episode:ep,mode:cur.mode,progress:resumeTime||0}).then(function(){renderContinue();});
+          return;
+        }
+      }
       $("pm-spinner").classList.add("hidden");
       $("pm-status").textContent="ERROR: "+(r && r.error ? r.error : "gagal resolve stream");
       toast("Gagal resolve stream: "+(r && r.error ? r.error : "unknown"));
@@ -854,6 +875,18 @@ function openPlayer(ep, resumeTime){
     (window.ReStram||window.Tatap).saveHist({slug:cur.slug,title:cur.title,episode:ep,mode:cur.mode,progress:resumeTime||0}).then(function(){renderContinue();});
   }).catch(function(err){
     if(cur.playToken !== token || cur.slug !== reqSlug || $("player-modal").classList.contains("hidden")) return;
+    var item = (window.NET27_DATA && window.NET27_DATA.getItem(cur.slug)) || cur.meta || cur.item;
+    var srvMap = extractEpisodeServers(item, ep);
+    if(srvMap && (srvMap.blogger || srvMap.mega)){
+      cur.episodeServers = srvMap;
+      var fb = srvMap.blogger || srvMap.mega;
+      cur.embedUrl = fb;
+      cur.source = "anime-json";
+      $("pm-meta").innerHTML = "ep " + ep + " · " + cur.mode.toUpperCase() + " · SERVER ALTERNATIF";
+      applyEmbedPlayer(fb, srvMap.blogger ? "blogger" : "mega");
+      toast("Koneksi gagal, beralih ke Server Cadangan...");
+      return;
+    }
     $("pm-spinner").classList.add("hidden");
     $("pm-status").textContent="KONEKSI GAGAL: "+(err&&err.message||err);
     toast("Koneksi gagal saat resolve: "+(err&&err.message||err));
@@ -956,9 +989,15 @@ function applyEmbedPlayer(url, serverName){
   } else {
     cur.playerServer = "blogger";
   }
+  if(window._hls){
+    try{ window._hls.destroy(); window._hls = null; }catch(e){}
+  }
   var v = $("vid");
   if(v){
+    v.onerror = null;
     try{ v.pause(); }catch(e){}
+    v.removeAttribute("src");
+    try{ v.load(); }catch(e){}
     v.classList.add("hidden");
     v.style.display = "none";
   }
@@ -1056,6 +1095,50 @@ function switchPlayerServer(serverType){
       toast("Stream HLS native tidak tersedia");
     }
   }
+}
+
+function fallbackFromNative(reason){
+  var item = (window.NET27_DATA && window.NET27_DATA.getItem(cur.slug)) || cur.meta || cur.item;
+  if(!item && window.NET27_DATA && window.NET27_DATA.items && cur.title){
+    var cleanTitle = (cur.title || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    item = window.NET27_DATA.items.find(function(it){
+      return (it.title || "").toLowerCase().replace(/[^a-z0-9]/g, "") === cleanTitle;
+    });
+  }
+  var srvMap = cur.episodeServers || extractEpisodeServers(item, cur.ep || 1);
+  cur.episodeServers = srvMap;
+
+  var targetUrl = "";
+  var targetType = "";
+  var targetLabel = "";
+
+  if(srvMap && srvMap.blogger){
+    targetUrl = srvMap.blogger;
+    targetType = "blogger";
+    targetLabel = "Server 1 (Blogger/Drive)";
+  } else if(srvMap && srvMap.mega){
+    targetUrl = srvMap.mega;
+    targetType = "mega";
+    targetLabel = "Server 2 (Mega)";
+  } else if(cur.embedUrl){
+    targetUrl = cur.embedUrl;
+    targetType = "blogger";
+    targetLabel = "Server Alternatif";
+  } else {
+    var anilistId = (cur.res && cur.res.anilist_id) || (cur.item && cur.item.anilist_id) || (item && item.anilist_id);
+    if(anilistId){
+      targetUrl = "https://vidlink.pro/anime/" + anilistId + "/" + (cur.ep || 1) + "/" + (cur.mode === "dub" ? "dub" : "sub");
+      targetType = "blogger";
+      targetLabel = "Server Alternatif (VidLink)";
+    }
+  }
+
+  if(targetUrl){
+    toast("Stream terputus (" + (reason || "gangguan koneksi") + "). Otomatis beralih ke " + targetLabel + "...");
+    applyEmbedPlayer(targetUrl, targetType);
+    return true;
+  }
+  return false;
 }
 
 
@@ -1985,9 +2068,13 @@ function playUrl(url,referrer,sub,subRef,resumeTime,token){
     window._hls=h;
     h._networkRetryCount = 0;
     h._mediaRetryCount = 0;
+    h._stallCount = 0;
+    h._fragErrorCount = 0;
     h.on(Hls.Events.FRAG_LOADED, function(){
       h._networkRetryCount = 0;
       h._mediaRetryCount = 0;
+      h._stallCount = 0;
+      h._fragErrorCount = 0;
     });
     h.on(Hls.Events.AUDIO_TRACKS_UPDATED,function(ev,data){
       if(data&&data.audioTracks&&data.audioTracks.length){
@@ -2091,6 +2178,10 @@ function playUrl(url,referrer,sub,subRef,resumeTime,token){
     h.on(Hls.Events.ERROR,function(ev,d){
       if(!d)return;
       if(d.details === Hls.ErrorDetails.BUFFER_STALLED_ERROR || d.details === "bufferStalledError"){
+        h._stallCount = (h._stallCount || 0) + 1;
+        if(h._stallCount > 3){
+          if(fallbackFromNative("buffer stream macet")) return;
+        }
         try{
           if(!v.paused && v.readyState >= 2){
             v.currentTime += 0.08;
@@ -2102,41 +2193,33 @@ function playUrl(url,referrer,sub,subRef,resumeTime,token){
       if(d.fatal){
         if(d.type===Hls.ErrorTypes.NETWORK_ERROR){
           h._networkRetryCount = (h._networkRetryCount || 0) + 1;
-          if(h._networkRetryCount <= 3){
-            $("pm-status").textContent="mencoba memulihkan koneksi stream ("+h._networkRetryCount+"/3)...";
+          if(h._networkRetryCount <= 2){
+            $("pm-status").textContent="mencoba memulihkan koneksi stream ("+h._networkRetryCount+"/2)...";
             setTimeout(function(){ try{h.startLoad();}catch(_){} }, 600);
             return;
           }
-          if(cur.episodeServers && cur.episodeServers.blogger){
-            toast("Koneksi HLS terganggu, beralih ke Server 1 (Blogger/Drive)...");
-            applyEmbedPlayer(cur.episodeServers.blogger, "blogger");
-            return;
-          } else if(cur.episodeServers && cur.episodeServers.mega){
-            toast("Koneksi HLS terganggu, beralih ke Server 2 (Mega)...");
-            applyEmbedPlayer(cur.episodeServers.mega, "mega");
-            return;
-          } else if(cur.embedUrl){
-            toast("Koneksi HLS terganggu, beralih ke server alternatif...");
-            applyEmbedPlayer(cur.embedUrl, "blogger");
-            return;
-          }
+          if(fallbackFromNative("koneksi HLS terputus")) return;
         }else if(d.type===Hls.ErrorTypes.MEDIA_ERROR){
           h._mediaRetryCount = (h._mediaRetryCount || 0) + 1;
-          if(h._mediaRetryCount <= 3){
-            $("pm-status").textContent="mencoba memulihkan codec media ("+h._mediaRetryCount+"/3)...";
+          if(h._mediaRetryCount <= 1){
+            $("pm-status").textContent="mencoba memulihkan codec media...";
             setTimeout(function(){ try{h.recoverMediaError();}catch(_){} }, 500);
             return;
           }
+          if(fallbackFromNative("kesalahan dekode media")) return;
+        }else{
+          if(fallbackFromNative(d.details || "error pemutaran")) return;
         }
         $("pm-status").textContent="player error: "+(d.type||"fatal")+" — "+(d.details||"");
         try{h.destroy();}catch(_){}
         return;
       }
-      // Non-fatal: fragLoadError / manifestLoadError / networkError — kalau host
-      // mati (dramahot.top RST), proxy return 502; HLS.js fire ini. Beri pesan
-      // jelas di spinner & stop setelah beberapa retry agar user tidak hang.
-      var n=(h.config&&h.config.fragLoadingMaxRetry)||4;
+      // Non-fatal: fragLoadError / manifestLoadError / networkError
       if(d.details==="fragLoadError"||d.details==="manifestLoadError"||d.details==="networkError"){
+        h._fragErrorCount = (h._fragErrorCount || 0) + 1;
+        if(h._fragErrorCount >= 4){
+          if(fallbackFromNative("gagal memuat fragmen")) return;
+        }
         $("pm-status").textContent="gagal load: "+(d.details||"network");
       }
     });
@@ -2148,6 +2231,11 @@ function playUrl(url,referrer,sub,subRef,resumeTime,token){
     if(v){try{v.pause();v.removeAttribute("src");v.load();}catch(e){}}
     return;
   }
+  v.onerror = function(){
+    if(cur.playerServer === "native" || !cur.playerServer){
+      fallbackFromNative("video error");
+    }
+  };
   v.play().catch(function(err){
     $("pm-spinner").classList.add("hidden");
     if(err && err.name === "NotAllowedError"){
@@ -2219,6 +2307,7 @@ function closePlayer(){
   var v=$("vid");
   try{recordWatchProgress(true);}catch(e){}
   if(v){
+    v.onerror = null;
     try{v.pause();}catch(e){}
     v.removeAttribute("src");
     try{v.load();}catch(e){}

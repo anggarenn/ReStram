@@ -473,6 +473,19 @@ def hianime_episodes(slug: str):
         return cached[1]
 
     numeric = slug.rsplit("-", 1)[-1]
+    if not numeric.isdigit():
+        try:
+            q_title = slug.replace("-", " ").strip()
+            s_res = hianime_search(q_title)
+            if s_res and s_res[0].get("id"):
+                real_slug = s_res[0]["id"]
+                cached_real = _EPISODES_MEM_CACHE.get(real_slug)
+                if cached_real and (now - cached_real[0] < _EPISODES_MEM_TTL):
+                    _EPISODES_MEM_CACHE[slug] = cached_real
+                    return cached_real[1]
+                numeric = real_slug.rsplit("-", 1)[-1]
+        except Exception:
+            pass
     raw_page = _fetch(EPISODES_API.format(numeric))
     page = raw_page
     if not page.startswith("{") and "{" in page:

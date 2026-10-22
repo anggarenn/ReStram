@@ -1345,7 +1345,7 @@ def _is_m3u8_url(url: str, ctype: str = "") -> bool:
 
 
 @app.get("/api/player/video")
-async def proxy_video(url: str = Query(""), referer: str = Query("")):
+async def proxy_video(request: Request, url: str = Query(""), referer: str = Query("")):
     # Proxy cepat: koneksi dipakai ulang, segmen di-stream (tanpa buffer penuh),
     # Range diteruskan supaya seek tidak unduh ulang dari awal.
     from fastapi import Request
@@ -1383,15 +1383,22 @@ async def proxy_video(url: str = Query(""), referer: str = Query("")):
         elif any(h in url for h in ("phantomharbor", "nexabloom", "silverorbit", "megaplay", "vidtube", "vidplay")):
             referer = "https://megaplay.buzz/"
 
+    range_header = request.headers.get("range") if request else None
+    resp_headers = {
+        "Access-Control-Allow-Origin": "*",
+        "Accept-Ranges": "bytes"
+    }
+
     # Jika host terdeteksi diblokir DPI ISP, gunakan TLS desync murni (aman dari Sangfor)
     from api.hianime import _host_from, _BLOCKED_DPI_HOSTS
     host = _host_from(url)
     if host in _BLOCKED_DPI_HOSTS:
         return _SR(_pipe_desync_video(url, referer), media_type=media_type,
-                   headers={"Access-Control-Allow-Origin": "*"})
+                   headers=resp_headers)
 
-    return _SR(_pipe_video(url, referer), media_type=media_type,
-               headers={"Access-Control-Allow-Origin": "*"})
+    status_code = 206 if (range_header and not is_m3u8) else 200
+    return _SR(_pipe_video(url, referer, range_header), status_code=status_code, media_type=media_type,
+               headers=resp_headers)
 
 
 def _rewrite_m3u8_content(txt: str, base_url: str, referer: str) -> str:
@@ -1475,7 +1482,7 @@ def _get_video_client(url: str):
     return _direct_client
 
 
-async def _pipe_video(url: str, referer: str):
+async def _pipe_video(url: str, referer: str, range_header: str = None):
     import urllib.parse as _up
     import asyncio as _asyncio
     from api.hianime import STRIP_BYTES as _SB, STRIP_RE as _SR2
@@ -1484,6 +1491,8 @@ async def _pipe_video(url: str, referer: str):
     headers = {"User-Agent": HI_UA}
     if referer:
         headers["Referer"] = referer
+    if range_header:
+        headers["Range"] = range_header
 
     for attempt in range(2):
         try:
