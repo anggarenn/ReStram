@@ -819,14 +819,7 @@ function openPlayer(ep, resumeTime){
     cur.source=r.data.source||"hianime";
     var picked=r.data.picked||(r.data.variants&&r.data.variants[0])||{q:"HD",url:r.data.master||""};
     var srvText=r.data.server||"";
-    $("pm-meta").innerHTML="ep "+ep+" · "+cur.mode.toUpperCase()+" · "+picked.q+" · <button id='pm-source-btn' class='server-badge' title='Klik untuk switch sumber' style='background:none;border:1px solid rgba(255,255,255,0.25);color:var(--cyan,#00dbeb);cursor:pointer;border-radius:4px;padding:1px 6px;font:inherit;'>"+esc(srvText)+" ⇄</button>"+(r.data.cached?" · cached":" · "+(Date.now()-t0)+"ms");
-    var srvBtn=$("pm-source-btn");
-    if(srvBtn){
-      srvBtn.onclick=function(){
-        if(window.Tui&&window.Tui.switchSource){window.Tui.switchSource();}
-        else{App.switchSource();}
-      };
-    }
+    $("pm-meta").innerHTML = "EP " + ep + " · " + cur.mode.toUpperCase() + " · " + picked.q + (r.data.cached ? " · CACHED" : "");
     renderVariants();
     cur.activeSub = pickSubtitleUrl(r.data.subtitles || [], cur.subLang);
     renderSubtitles(r.data.subtitles || [], cur.activeSub);

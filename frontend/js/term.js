@@ -31,7 +31,20 @@ var Tui = (function () {
   function saveCmdHist(h){try{setTermStorage("hist",JSON.stringify(h.slice(0,50)));}catch(e){}}
 
   function cmdUsage(){
-    return "perintah:\n  cari <judul> | :musim | :lanjutan | :favorit | :katalog\n  :terbaru | :season <winter|spring|summer|fall> <tahun>\n  :switch [hianime|otaku] (ganti sumber video HiAnime / Otakudesu)\n  :filter [key=val...] | :filter reset\n  :genre <slug|title> | :genre | :genre --list | :genre reset\n  :update (cek versi rilis terbaru secara on-demand)\n  :apikey <key> | :ollama <key> | :groq <key> | :gemini <key> | :model <nama> | :apiurl <url>\n  :logs | :crt on|off|toggle | :ambient on|off|toggle\n  :riwayat | :favorit | :status | :bantuan | :q";
+    return "Pintasan Keyboard (Shortcuts):\n" +
+           "  /          : Fokus ke kolom pencarian (Search)\n" +
+           "  Tab        : Ganti kategori navigasi (Beranda, Trending, Populer, dll)\n" +
+           "  ↑ / ↓      : Pilih anime di daftar hasil\n" +
+           "  Enter      : Buka anime yang dipilih\n" +
+           "  [ / ]      : Halaman sebelumnya / berikutnya\n" +
+           "  Esc        : Tutup modal atau bersihkan pencarian\n\n" +
+           "Kontrol Pemutar Video:\n" +
+           "  Space / k  : Putar / Jeda (Play/Pause)\n" +
+           "  ← / →      : Mundur / Maju 5 detik\n" +
+           "  f          : Layar Penuh (Fullscreen)\n" +
+           "  m          : Senyap (Mute/Unmute)\n" +
+           "  [ / ]      : Kurangi / Tambah kecepatan putar\n" +
+           "  n / p      : Episode Berikutnya / Sebelumnya";
   }
 
   function applyFilter(){
@@ -1120,9 +1133,14 @@ var Tui = (function () {
   }
 
   function focusPrompt(){
-    S.promptFoc=true;
-    if(window.toggleCli) window.toggleCli(true);
-    var inp=$("cmd");if(inp) inp.focus();
+    var navInp = $("nav-search-input");
+    if(navInp){
+      navInp.focus();
+      navInp.select();
+      return;
+    }
+    var inp = $("cmd");
+    if(inp) inp.focus();
   }
   function submitPrompt(){
     var inp=$("cmd");var raw=inp.value.trim();inp.value="";

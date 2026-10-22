@@ -206,15 +206,12 @@
       <!-- Rounded-full search pill in center -->
       <div class="nav-search-pill" id="nav-search-wrap">
         <span class="search-pill-icon"><svg class="ui-icon"><use href="#icon-search"/></svg></span>
-        <input id="nav-search-input" type="search" placeholder="Cari anime, genre, judul, atau :perintah..." autocomplete="off" spellcheck="false" autocapitalize="off" aria-label="Cari anime">
+        <input id="nav-search-input" type="search" placeholder="Cari anime, genre, atau judul..." autocomplete="off" spellcheck="false" autocapitalize="off" aria-label="Cari anime">
         <button id="nav-search-clear" class="search-pill-clear hidden" title="Hapus pencarian" aria-label="Hapus pencarian"><svg class="ui-icon"><use href="#icon-close"/></svg></button>
       </div>
       
       <div class="head-actions">
-        <button id="nav-source-btn" class="nav-source-badge" title="Klik untuk beralih sumber stream (HiAnime / Otakudesu)">
-          <span id="nav-source-label">SRC: HIANIME</span>
-          <svg class="ui-icon"><use href="#icon-switch"/></svg>
-        </button>
+
         <button id="btn-drawer-head" class="icon-btn header-drawer-btn nav-menu-btn" title="Buka Menu & Navigasi (☰)" aria-label="Menu">
           <span class="drawer-btn-icon"><svg class="ui-icon"><use href="#icon-menu"/></svg></span>
         </button>
@@ -231,8 +228,7 @@
       <button class="nav-pill" data-view="musim"><svg class="ui-icon"><use href="#icon-season"/></svg> Musim Ini</button>
       <button class="nav-pill" data-view="terbaru"><svg class="ui-icon"><use href="#icon-clock"/></svg> Jadwal Rilis</button>
       <button class="nav-pill" data-view="favorit"><svg class="ui-icon"><use href="#icon-heart"/></svg> Favorit</button>
-      <button class="nav-pill pill-source" data-source="hianime" id="pill-src-hianime">HiAnime</button>
-      <button class="nav-pill pill-source" data-source="otakudesu" id="pill-src-otakudesu">Otakudesu</button>
+
     </nav>
   </div>
 </header>
@@ -460,15 +456,10 @@
           <span class="drawer-item-label">Filter Genre</span>
           <span class="drawer-item-badge">:genre</span>
         </button>
-        <button class="drawer-item" id="drawer-switch-source">
-          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-switch"/></svg></span>
-          <span class="drawer-item-label">Sumber Video Stream</span>
-          <span class="drawer-item-badge" id="drawer-src-badge">HiAnime</span>
-        </button>
         <button class="drawer-item" id="drawer-help">
           <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-help"/></svg></span>
-          <span class="drawer-item-label">Daftar Perintah Terminal</span>
-          <span class="drawer-item-badge">:bantuan</span>
+          <span class="drawer-item-label">Pintasan Keyboard</span>
+          <span class="drawer-item-badge">Bantuan</span>
         </button>
       </div>
 
@@ -695,49 +686,24 @@
   </div>
 </div>
 
-<footer class="bottom-bar collapsed" id="bottom-bar">
-  <div class="bottom-search-row">
-    <div class="search-input-wrap">
-      <span class="prompt-ps1">restram$</span>
-      <input id="cmd" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="cari judul, atau :perintah (cth: :update, :musim, :bantuan)">
-      <span class="caret" aria-hidden="true"></span>
-    </div>
-    <div class="bottom-actions">
-      <span id="health" class="health" title="Status koneksi scraper backend">…</span>
-      <button id="btn-cli-close" class="icon-btn" title="Tutup Terminal CLI (Esc)" aria-label="Tutup Terminal"><svg class="ui-icon"><use href="#icon-close"/></svg></button>
-      <button id="btn-drawer" class="icon-btn header-drawer-btn" title="Buka Menu & Navigasi (☰)" aria-label="Menu">
-        <span class="drawer-btn-icon"><svg class="ui-icon"><use href="#icon-menu"/></svg></span>
-      </button>
-    </div>
-  </div>
-  <div class="statusbar">
-    <div class="sb-shortcuts">
-      <span><b>↑↓</b> pilih</span>
-      <span><b>enter</b> buka</span>
-      <span><b>tab</b> ganti tampilan</span>
-      <span><b>[ ]</b> halaman</span>
-      <span><b>esc</b> sembunyikan</span>
-      <span><b>:update</b> cek rilis</span>
-    </div>
-    <div class="sb-meta">
-      <button id="sb-source" class="sb-source" title="Sumber streaming aktif. Klik atau ketik :switch untuk beralih">src: hianime <svg class="ui-icon" style="margin-left:3px;"><use href="#icon-switch"/></svg></button>
-      <span id="sb-view" class="sb-view"></span>
-    </div>
-  </div>
-</footer>
-
-<!-- Floating CLI widget toggle at bottom-right corner -->
-<button id="btn-cli-toggle" class="btn-cli-toggle" title="Buka / Tutup Terminal CLI (:perintah)" aria-label="Terminal CLI">
-  <svg class="ui-icon"><use href="#icon-help"/></svg>
-  <span>CLI</span>
-</button>
+<!-- Hidden compatibility layer for legacy script bindings -->
+<div id="hidden-compat" style="display:none!important;" aria-hidden="true">
+  <input id="cmd" autocomplete="off" spellcheck="false" autocapitalize="off">
+  <span id="health" class="health"></span>
+  <span id="sb-source" class="sb-source"></span>
+  <span id="sb-view" class="sb-view"></span>
+  <span id="nav-source-label"></span>
+  <button id="btn-cli-toggle"></button>
+  <button id="btn-cli-close"></button>
+  <footer id="bottom-bar" class="collapsed"></footer>
+</div>
 
 <!-- TITLE / EPISODE MODAL -->
 <div id="title-modal" class="overlay hidden" role="dialog" aria-modal="true">
   <div class="sheet">
     <div class="sheet-head">
       <div>
-        <div class="eyebrow"><span id="tm-eyebrow">DETAIL ANIME</span> <button id="tm-source-btn" class="tm-source-badge" title="Klik untuk beralih sumber stream">SRC: HIANIME <svg class="ui-icon" style="margin-left:3px;"><use href="#icon-switch"/></svg></button></div>
+        <div class="eyebrow"><span id="tm-eyebrow">DETAIL ANIME</span></div>
         <h2 id="tm-title">–</h2>
         <div class="dim small" id="tm-sub">–</div>
       </div>
