@@ -205,7 +205,7 @@ _PROVIDER_CFG = {
     "groq": {"batch": 40, "conc": 2},
     "openrouter": {"batch": 40, "conc": 2},
     "openai": {"batch": 60, "conc": 3},
-    "index_translate": {"batch": 40, "conc": 2},
+    "index_translate": {"batch": 40, "conc": 4},
     "custom": {"batch": 40, "conc": 2},
 }
 
