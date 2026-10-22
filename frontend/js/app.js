@@ -2665,83 +2665,130 @@ function checkForUpdate(manualTrigger){
 // =========================================================================
 // NETMIRROR CONTROLLER (Netflix-style Hero Carousel & Content Rails)
 // =========================================================================
-var NET_FALLBACK_ANIME = (function(){
-  if(typeof window !== "undefined" && window.NET27_DATA && window.NET27_DATA.items && window.NET27_DATA.items.length){
-    return window.NET27_DATA.items;
+var HERO_SHOWCASE = [
+  {
+    id: "solo-leveling-season-2-arise-from-the-shadows-19413",
+    slug: "solo-leveling-season-2-arise-from-the-shadows-19413",
+    title: "Solo Leveling Season 2 -Arise from the Shadow-",
+    poster: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx176496-9BDMjAZGEbq4.png",
+    backdrop: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/176496-5oY4k2NRqlYs.jpg",
+    banner: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/176496-5oY4k2NRqlYs.jpg",
+    score: 8.9,
+    type: "TV",
+    season: "Winter 2025",
+    badge: "TRENDING SEKARANG",
+    eps_counter: "13/13",
+    synopsis: "Sung Jinwoo melanjutkan perjalanannya sebagai Shadow Monarch yang mengendalikan pasukan bayangan tak terkalahkan. Ancaman Dungeon misterius semakin dekat ke dunia manusia dan perang antar Monarch tak terhindarkan.",
+    genres: ["Action", "Adventure", "Fantasy"]
+  },
+  {
+    id: "frieren-beyond-journeys-end-18418",
+    slug: "frieren-beyond-journeys-end-18418",
+    title: "Frieren: Beyond Journey’s End",
+    poster: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx154587-qQTzQnEJJ3oB.jpg",
+    backdrop: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/154587-ivXNJ23SM1xB.jpg",
+    banner: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/154587-ivXNJ23SM1xB.jpg",
+    score: 9.3,
+    type: "TV",
+    season: "Fall 2023",
+    badge: "TOP RATED",
+    eps_counter: "28/28",
+    synopsis: "Setelah mengalahkan Raja Iblis bersama pahlawan Himmel dan kawan-kawan, penyihir elf Frieren memulai perjalanan baru melintasi benua untuk memahami perasaan manusia dan makna waktu.",
+    genres: ["Adventure", "Drama", "Fantasy"]
+  },
+  {
+    id: "dandadan-19343",
+    slug: "dandadan-19343",
+    title: "DAN DA DAN",
+    poster: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx171018-60q1B6GK2Ghb.jpg",
+    backdrop: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/171018-SpwPNAduszXl.jpg",
+    banner: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/171018-SpwPNAduszXl.jpg",
+    score: 8.7,
+    type: "TV",
+    season: "Fall 2024",
+    badge: "POPULER",
+    eps_counter: "12/12",
+    synopsis: "Momo Ayase yang percaya hantu dan Ken Takakura (Okarun) yang percaya alien bertaruh di tempat angker, terjerumus ke dalam perang misterius antara arwah dan invasi alien.",
+    genres: ["Action", "Comedy", "Supernatural"]
+  },
+  {
+    id: "jujutsu-kaisen-2nd-season-18413",
+    slug: "jujutsu-kaisen-2nd-season-18413",
+    title: "JUJUTSU KAISEN Season 2",
+    poster: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx145064-hSNRJM03pvv1.jpg",
+    backdrop: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/145064-esDtAY2He7sk.jpg",
+    banner: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/145064-esDtAY2He7sk.jpg",
+    score: 8.8,
+    type: "TV",
+    season: "Summer 2023",
+    badge: "HOT ACTION",
+    eps_counter: "23/23",
+    synopsis: "Tragedi besar Shibuya pecah pada malam Halloween. Gojo Satoru terperangkap dalam Prison Realm, sementara Yuji Itadori harus bertarung mati-matian melawan roh kutukan khusus.",
+    genres: ["Action", "Fantasy", "Supernatural"]
+  },
+  {
+    id: "demon-slayer-kimetsu-no-yaiba-47",
+    slug: "demon-slayer-kimetsu-no-yaiba-47",
+    title: "Demon Slayer: Kimetsu no Yaiba",
+    poster: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101922-WBsBl0ClmgYL.jpg",
+    backdrop: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/101922-33MtJGsUSxga.jpg",
+    banner: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/101922-33MtJGsUSxga.jpg",
+    score: 8.6,
+    type: "TV",
+    season: "Spring 2019",
+    badge: "BEST ANIMATION",
+    eps_counter: "26/26",
+    synopsis: "Tanjiro dan korps pembasmi iblis menjalani latihan fisik dan teknik pernapasan intensif sebagai persiapan menghadapi pertempuran akhir melawan Muzan Kibutsuji.",
+    genres: ["Action", "Fantasy", "Historical"]
+  },
+  {
+    id: "one-piece",
+    slug: "one-piece",
+    title: "One Piece",
+    poster: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21-Y2ncsENluTMA.png",
+    backdrop: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21-wf37VakJSpdH.jpg",
+    banner: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21-wf37VakJSpdH.jpg",
+    score: 8.8,
+    type: "TV",
+    season: "Egghead Arc",
+    badge: "LEGENDARY",
+    eps_counter: "1122+",
+    synopsis: "Monkey D. Luffy dan Bajak Laut Topi Jerami tiba di Pulau Masa Depan Egghead, markas ilmuwan jenius Dr. Vegapunk, memicu konfrontasi dahsyat melawan World Government dan Gorosei.",
+    genres: ["Action", "Adventure", "Fantasy"]
+  },
+  {
+    id: "naruto-shippuden",
+    slug: "naruto-shippuden",
+    title: "Naruto: Shippuuden",
+    poster: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx1735-F5nnmxkBNUye.png",
+    backdrop: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/1735-e6hP4jXbhYlT.jpg",
+    banner: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/1735-e6hP4jXbhYlT.jpg",
+    score: 8.6,
+    type: "TV",
+    season: "Classic Shounen",
+    badge: "MASTERPIECE",
+    eps_counter: "500/500",
+    synopsis: "Setelah dua setengah tahun berlatih dengan Jiraiya, Naruto Uzumaki kembali ke Konoha untuk menyelamatkan sahabatnya Sasuke dan melindungi dunia shinobi dari ancaman Akatsuki.",
+    genres: ["Action", "Adventure", "Martial Arts"]
+  },
+  {
+    id: "bleach",
+    slug: "bleach",
+    title: "Bleach: Thousand-Year Blood War",
+    poster: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx159322-wK1n3kO42o6g.jpg",
+    backdrop: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/159322-y4n5FqFh3941.jpg",
+    banner: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/159322-y4n5FqFh3941.jpg",
+    score: 8.9,
+    type: "TV",
+    season: "Fall 2022",
+    badge: "EPIC BATTLE",
+    eps_counter: "39/39",
+    synopsis: "Soul Society diserang oleh Wandenreich, pasukan Quincy di bawah kepemimpinan Yhwach. Ichigo Kurosaki kembali mengangkat Zangetsu untuk menghadapi takdir terdalam para Shinigami.",
+    genres: ["Action", "Supernatural"]
   }
-  return [
-    {
-      id: "solo-leveling-season-2-arise-from-the-shadows-19413",
-      slug: "solo-leveling-season-2-arise-from-the-shadows-19413",
-      title: "Solo Leveling Season 2 -Arise from the Shadow-",
-      poster: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx176496-9BDMjAZGEbq4.png",
-      backdrop: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/176496-5oY4k2NRqlYs.jpg",
-      score: 8.9,
-      type: "TV",
-      season: "Winter 2025",
-      badge: "TRENDING NOW",
-      eps_counter: "13/13",
-      synopsis: "Sung Jinwoo melanjutkan perjalanannya sebagai Shadow Monarch yang mengendalikan pasukan bayangan tak terkalahkan. Ancaman Dungeon misterius semakin dekat ke dunia manusia dan perang antar Monarch tak terhindarkan.",
-      genres: ["Action", "Adventure", "Fantasy"]
-    },
-    {
-      id: "frieren-beyond-journeys-end-18418",
-      slug: "frieren-beyond-journeys-end-18418",
-      title: "Frieren: Beyond Journey’s End",
-      poster: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx154587-qQTzQnEJJ3oB.jpg",
-      backdrop: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/154587-ivXNJ23SM1xB.jpg",
-      score: 9.3,
-      type: "TV",
-      season: "Fall 2023",
-      badge: "TOP RATED",
-      eps_counter: "28/28",
-      synopsis: "Setelah mengalahkan Raja Iblis bersama pahlawan Himmel dan kawan-kawan, penyihir elf Frieren memulai perjalanan baru melintasi benua untuk memahami perasaan manusia dan makna waktu.",
-      genres: ["Adventure", "Drama", "Fantasy"]
-    },
-    {
-      id: "dandadan-19343",
-      slug: "dandadan-19343",
-      title: "DAN DA DAN",
-      poster: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx171018-60q1B6GK2Ghb.jpg",
-      backdrop: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/171018-SpwPNAduszXl.jpg",
-      score: 8.6,
-      type: "TV",
-      season: "Fall 2024",
-      badge: "POPULER",
-      eps_counter: "12/12",
-      synopsis: "Momo Ayase yang percaya hantu dan Ken Takakura (Okarun) yang percaya alien bertaruh di tempat angker, terjerumus ke dalam perang misterius antara arwah dan invasi alien.",
-      genres: ["Action", "Comedy", "Supernatural"]
-    },
-    {
-      id: "jujutsu-kaisen-2nd-season-18413",
-      slug: "jujutsu-kaisen-2nd-season-18413",
-      title: "JUJUTSU KAISEN Season 2",
-      poster: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx145064-hSNRJM03pvv1.jpg",
-      backdrop: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/145064-esDtAY2He7sk.jpg",
-      score: 8.8,
-      type: "TV",
-      season: "Summer 2023",
-      badge: "HOT ACTION",
-      eps_counter: "23/23",
-      synopsis: "Tragedi besar Shibuya pecah pada malam Halloween. Gojo Satoru terperangkap dalam Prison Realm, sementara Yuji Itadori harus bertarung mati-matian melawan roh kutukan khusus.",
-      genres: ["Action", "Fantasy", "Supernatural"]
-    },
-    {
-      id: "demon-slayer-kimetsu-no-yaiba-47",
-      slug: "demon-slayer-kimetsu-no-yaiba-47",
-      title: "Demon Slayer: Kimetsu no Yaiba",
-      poster: "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101922-WBsBl0ClmgYL.jpg",
-      backdrop: "https://s4.anilist.co/file/anilistcdn/media/anime/banner/101922-33MtJGsUSxga.jpg",
-      score: 8.5,
-      type: "TV",
-      season: "Spring 2019",
-      badge: "ONGOING",
-      eps_counter: "26/26",
-      synopsis: "Tanjiro dan korps pembasmi iblis menjalani latihan fisik dan teknik pedang intensif sebagai persiapan menghadapi pertempuran akhir melawan Muzan Kibutsuji.",
-      genres: ["Action", "Fantasy", "Historical"]
-    }
-  ];
-})();
+];
+
+var NET_FALLBACK_ANIME = HERO_SHOWCASE;
 
 function loadAnimeDatabase(){
   return fetch("./data/anime.json")
@@ -2780,7 +2827,7 @@ function loadAnimeDatabase(){
 
       if(typeof window !== "undefined" && window.NET27_DATA){
         window.NET27_DATA.items = normalized;
-        window.NET27_DATA.hero = normalized.slice(0, 6);
+        window.NET27_DATA.hero = HERO_SHOWCASE;
 
         var itemMap = {};
         normalized.forEach(function(it){
@@ -2890,13 +2937,7 @@ window.loadAnimeDatabase = loadAnimeDatabase;
 
 var NetMirror = (function(){
   function getHeroData(){
-    if(window.ANIME_DB && window.ANIME_DB.length){
-      return window.ANIME_DB.slice(0, 6);
-    }
-    if(typeof window !== "undefined" && window.NET27_DATA && window.NET27_DATA.hero && window.NET27_DATA.hero.length){
-      return window.NET27_DATA.hero;
-    }
-    return NET_FALLBACK_ANIME.slice(0, 5);
+    return HERO_SHOWCASE;
   }
 
   var heroIndex = 0;
@@ -2919,7 +2960,7 @@ var NetMirror = (function(){
       '<div class="rail-card-poster-wrap">' +
         (posterUrl ? '<img class="rail-card-img" src="' + esc(posterUrl) + '" alt="' + esc(a.title) + '" loading="lazy" decoding="async">' : '<div class="rail-card-img no-img" style="background:#151922;display:flex;align-items:center;justify-content:center;color:#64748b;font-size:24px;">▶</div>') +
         '<div class="rail-card-overlay"><div class="card-play-btn"><svg class="ui-icon"><use href="#icon-play"/></svg></div></div>' +
-        '<span class="card-badge-prime"><svg class="ui-icon" style="width:10px;height:10px;margin-right:2px;"><use href="#icon-check"/></svg>prime</span>' +
+        '<span class="card-badge-hd">HD</span>' +
         '<span class="card-badge-score">' + esc(scoreText) + '</span>' +
         '<span class="' + statusCls + '">' + esc(epText) + '</span>' +
       '</div>' +
@@ -2958,8 +2999,18 @@ var NetMirror = (function(){
 
     var bg = $("hero-backdrop");
     if(bg){
-      var bgImg = a.backdrop || a.banner || a.poster || a.thumbnail || "https://s4.anilist.co/file/anilistcdn/media/anime/banner/176496-5oY4k2NRqlYs.jpg";
-      bg.style.backgroundImage = "url('" + bgImg + "')";
+      var bgImg = a.backdrop || a.banner || "https://s4.anilist.co/file/anilistcdn/media/anime/banner/176496-5oY4k2NRqlYs.jpg";
+      var pre = new Image();
+      pre.onload = function(){
+        bg.style.backgroundImage = "url('" + bgImg + "')";
+        bg.style.opacity = "1";
+      };
+      pre.onerror = function(){
+        bg.style.backgroundImage = "url('" + bgImg + "')";
+        bg.style.opacity = "1";
+      };
+      bg.style.opacity = "0.45";
+      pre.src = bgImg;
     }
 
     var tEl = $("hero-title");

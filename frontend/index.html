@@ -2,9 +2,9 @@
 <html lang="id" style="background:#0b1118;color:#ffffff;">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b1118">
-<meta name="application-name" content="ReStram Prime">
-<meta name="apple-mobile-web-app-title" content="ReStram Prime">
-<title>ReStram Prime — Nonton Anime Termasuk dengan Prime</title>
+<meta name="application-name" content="ReStram">
+<meta name="apple-mobile-web-app-title" content="ReStram">
+<title>ReStram — Nonton Anime Subtitle Indonesia</title>
 <link rel="stylesheet" href="./css/style.css?v=20261022_1">
 <link rel="icon" type="image/x-icon" href="./favicon.ico">
 <link rel="icon" type="image/png" sizes="192x192" href="./assets/icon-192.png">
@@ -207,9 +207,9 @@
 <header class="tui-head net-navbar" id="net-navbar">
   <div class="nav-container">
     <div class="nav-main-row">
-      <div class="head-brand" id="nav-brand-logo" role="button" tabindex="0" title="Beranda ReStram Prime">
-        <span class="brand-name net-logo prime-logo">ReStram<span class="prime-tag">prime</span></span>
-        <span class="brand-ver prime-ver" id="brand-ver">v2.9.2</span>
+      <div class="head-brand" id="nav-brand-logo" role="button" tabindex="0" title="Beranda ReStram">
+        <span class="brand-name net-logo">ReStram</span>
+        <span class="brand-ver" id="brand-ver">v3.0</span>
       </div>
       
       <!-- Rounded-full search pill in center -->
@@ -220,23 +220,24 @@
       </div>
       
       <div class="head-actions">
-
-        <button id="btn-drawer-head" class="icon-btn header-drawer-btn nav-menu-btn" title="Buka Menu & Navigasi (☰)" aria-label="Menu">
+        <button id="btn-drawer-head" class="icon-btn header-drawer-btn nav-menu-btn" title="Buka Menu & Navigasi" aria-label="Menu">
           <span class="drawer-btn-icon"><svg class="ui-icon"><use href="#icon-menu"/></svg></span>
+          <span class="header-menu-label">Menu</span>
         </button>
       </div>
     </div>
 
-    <!-- Scrollable storefront navigation (Prime Video Storefront style) -->
+    <!-- Scrollable storefront navigation -->
     <nav class="nav-pills-bar" id="nav-pills-bar" aria-label="Filter Kategori">
       <button class="nav-pill active" data-view="home"><svg class="ui-icon"><use href="#icon-tv"/></svg> Beranda</button>
-      <button class="nav-pill prime-pill" data-view="musim"><svg class="ui-icon"><use href="#icon-check"/></svg> Termasuk dengan Prime</button>
+      <button class="nav-pill" data-view="musim"><svg class="ui-icon"><use href="#icon-season"/></svg> Musim Ini</button>
       <button class="nav-pill" data-view="trending"><svg class="ui-icon"><use href="#icon-fire"/></svg> Trending</button>
       <button class="nav-pill" data-view="populer"><svg class="ui-icon"><use href="#icon-star"/></svg> Top 10</button>
-      <button class="nav-pill" data-view="movies"><svg class="ui-icon"><use href="#icon-film"/></svg> Film (Movies)</button>
+      <button class="nav-pill" data-view="movies"><svg class="ui-icon"><use href="#icon-film"/></svg> Film</button>
       <button class="nav-pill" data-view="ongoing"><svg class="ui-icon"><use href="#icon-circle-dot"/></svg> Serial TV</button>
-      <button class="nav-pill" data-view="terbaru"><svg class="ui-icon"><use href="#icon-clock"/></svg> Baru Ditambahkan</button>
+      <button class="nav-pill" data-view="terbaru"><svg class="ui-icon"><use href="#icon-clock"/></svg> Jadwal Rilis</button>
       <button class="nav-pill" data-view="favorit"><svg class="ui-icon"><use href="#icon-heart"/></svg> Daftar Tontonan</button>
+      <button class="nav-pill" data-view="katalog"><svg class="ui-icon"><use href="#icon-catalog"/></svg> Semua Anime</button>
     </nav>
   </div>
 </header>
@@ -254,7 +255,7 @@
       </div>
       <div class="hero-content">
         <div class="hero-badge-wrap">
-          <span class="hero-badge-prime"><svg class="ui-icon"><use href="#icon-check"/></svg> TERMASUK DENGAN PRIME</span>
+          <span class="hero-badge-top"><svg class="ui-icon"><use href="#icon-star-filled"/></svg> PILIHAN UTAMA</span>
           <span class="hero-age-badge">16+</span>
           <span id="hero-score" class="hero-score-badge"><svg class="ui-icon"><use href="#icon-star-filled"/></svg> <b id="hero-score-val">8.9</b></span>
           <span id="hero-type" class="hero-type-badge">TV Series</span>
@@ -302,11 +303,11 @@
         </div>
       </section>
 
-      <!-- Rail 2: Termasuk dengan Prime (Anime Populer) -->
+      <!-- Rail 2: Populer Musim Ini -->
       <section id="lane-season-sec" class="net-rail">
         <div class="rail-header">
           <div class="rail-title-wrap">
-            <h2 id="lane-season-title" class="rail-title"><span class="prime-check-mark"><svg class="ui-icon"><use href="#icon-check"/></svg> prime</span> Termasuk dengan Prime: Anime Populer</h2>
+            <h2 id="lane-season-title" class="rail-title"><svg class="ui-icon"><use href="#icon-fire"/></svg> Populer Musim Ini</h2>
           </div>
           <button class="rail-see-all-btn" data-rail-view="musim">Lihat Semua <svg class="ui-icon"><use href="#icon-next"/></svg></button>
         </div>
@@ -417,44 +418,54 @@
   <aside class="drawer-content">
     <div class="drawer-head">
       <div class="drawer-title">
-        <span class="brand-name net-logo" style="font-size:20px;">ReStram</span>
-        <span class="brand-ver" id="drawer-ver">v2.9.2</span>
+        <span class="brand-name net-logo" style="font-size:22px;">ReStram</span>
+        <span class="brand-ver" id="drawer-ver">v3.0</span>
       </div>
       <button class="icon-btn drawer-close-btn" id="drawer-close" title="Tutup Menu (Esc)" aria-label="Tutup Menu"><svg class="ui-icon"><use href="#icon-close"/></svg></button>
     </div>
 
     <div class="drawer-body">
       <div class="drawer-group">
-        <div class="drawer-group-label">NAVIGASI TAMPILAN</div>
+        <div class="drawer-group-label">NAVIGASI UTAMA</div>
+        <button class="drawer-item" data-view="home">
+          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-tv"/></svg></span>
+          <span class="drawer-item-label">Beranda Utama</span>
+        </button>
         <button class="drawer-item" data-view="cari">
           <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-search"/></svg></span>
           <span class="drawer-item-label">Cari Anime</span>
-          <span class="drawer-item-badge">:cari</span>
         </button>
         <button class="drawer-item" data-view="musim">
           <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-season"/></svg></span>
           <span class="drawer-item-label">Tayang Musim Ini</span>
-          <span class="drawer-item-badge">:musim</span>
+        </button>
+        <button class="drawer-item" data-view="trending">
+          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-fire"/></svg></span>
+          <span class="drawer-item-label">Trending Sekarang</span>
+        </button>
+        <button class="drawer-item" data-view="populer">
+          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-star"/></svg></span>
+          <span class="drawer-item-label">Top 10 Populer</span>
+        </button>
+        <button class="drawer-item" data-view="movies">
+          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-film"/></svg></span>
+          <span class="drawer-item-label">Film & Movies</span>
+        </button>
+        <button class="drawer-item" data-view="ongoing">
+          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-circle-dot"/></svg></span>
+          <span class="drawer-item-label">Serial TV (Ongoing)</span>
         </button>
         <button class="drawer-item" data-view="terbaru">
           <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-clock"/></svg></span>
-          <span class="drawer-item-label">Sedang Rilis / Terbaru</span>
-          <span class="drawer-item-badge">:terbaru</span>
-        </button>
-        <button class="drawer-item" data-view="lanjutan">
-          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-tv"/></svg></span>
-          <span class="drawer-item-label">Masih Tayang (Lanjut)</span>
-          <span class="drawer-item-badge">:lanjutan</span>
+          <span class="drawer-item-label">Jadwal Rilis & Terbaru</span>
         </button>
         <button class="drawer-item" data-view="favorit">
-          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-star"/></svg></span>
-          <span class="drawer-item-label">Anime Favorit</span>
-          <span class="drawer-item-badge">:favorit</span>
+          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-heart"/></svg></span>
+          <span class="drawer-item-label">Daftar Tontonan</span>
         </button>
         <button class="drawer-item" data-view="katalog">
           <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-catalog"/></svg></span>
-          <span class="drawer-item-label">Katalog Lengkap</span>
-          <span class="drawer-item-badge">:katalog</span>
+          <span class="drawer-item-label">Katalog Semua Anime</span>
         </button>
       </div>
 
@@ -462,37 +473,33 @@
         <div class="drawer-group-label">KONTROL & FILTER</div>
         <button class="drawer-item" id="drawer-catalog-filter">
           <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-filter"/></svg></span>
-          <span class="drawer-item-label">Filter Katalog (Urutan+Tahun+Bulan)</span>
-          <span class="drawer-item-badge">:filter</span>
+          <span class="drawer-item-label">Filter Katalog (Tahun/Bulan/Tipe)</span>
         </button>
         <button class="drawer-item" id="drawer-genre">
           <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-tag"/></svg></span>
           <span class="drawer-item-label">Filter Genre</span>
-          <span class="drawer-item-badge">:genre</span>
         </button>
         <button class="drawer-item" id="drawer-help">
           <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-help"/></svg></span>
           <span class="drawer-item-label">Pintasan Keyboard</span>
-          <span class="drawer-item-badge">Bantuan</span>
         </button>
       </div>
 
       <div class="drawer-group">
-        <div class="drawer-group-label">SISTEM & PEMBARUAN</div>
+        <div class="drawer-group-label">SISTEM</div>
         <button class="drawer-item highlight" id="drawer-update">
           <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-update"/></svg></span>
           <span class="drawer-item-label">Periksa Pembaruan</span>
-          <span class="drawer-item-badge">:update</span>
         </button>
       </div>
     </div>
 
     <div class="drawer-foot">
       <div class="drawer-foot-row">
-        <span>Status Scraper:</span>
-        <span id="drawer-health-text" class="dim">Memeriksa…</span>
+        <span>Status Layanan:</span>
+        <span id="drawer-health-text" class="dim">Online</span>
       </div>
-      <div class="dim small" style="margin-top:4px;">Zero-bloat & standalone anime stream aggregator</div>
+      <div class="dim small" style="margin-top:4px;">ReStram • Streaming Modern Bebas Iklan</div>
     </div>
   </aside>
 </div>

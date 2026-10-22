@@ -66,7 +66,7 @@ body.no-crt #crt{display:none}
   display:flex;align-items:center;justify-content:space-between;
   gap:clamp(10px,1.5vw,24px);padding:10px var(--pad-x);min-height:56px;
 }
-.net-logo, .prime-logo{
+.net-logo{
   font-weight:900;letter-spacing:-0.4px;
   font-size:clamp(20px,1.3vw + 0.8rem,26px);
   color:#FFFFFF;
@@ -74,25 +74,10 @@ body.no-crt #crt{display:none}
   display:inline-flex;align-items:baseline;gap:5px;
   transition:opacity .15s ease;
 }
-.net-logo:hover, .prime-logo:hover{opacity:.92}
-.prime-logo .prime-tag{
-  color:var(--prime-blue);
-  font-size:0.85em;
-  font-weight:800;
-  position:relative;
-  letter-spacing:-0.5px;
-}
-.prime-logo .prime-tag::after{
-  content:"";
-  position:absolute;
-  left:-2px;right:-2px;bottom:-3px;height:4px;
-  background:radial-gradient(ellipse at 50% 100%, var(--prime-blue) 0%, transparent 75%);
-  border-bottom:2px solid var(--prime-blue);
-  border-radius:50%;
-}
+.net-logo:hover{opacity:.92}
 .head-brand{display:flex;align-items:center;gap:8px;flex:0 0 auto;cursor:pointer}
 .head-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto}
-.brand-ver, .prime-ver{
+.brand-ver{
   font-size:10.5px;color:var(--dim);
   border:1px solid rgba(0,168,225,0.3);
   background:rgba(0,168,225,0.08);
@@ -177,11 +162,11 @@ body.no-crt #crt{display:none}
 body.drawer-open{overflow:hidden!important;touch-action:none}
 
 .header-drawer-btn{
-  display:inline-flex;align-items:center;justify-content:center;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
   background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);
-  color:#f1f5f9;padding:6px 11px;border-radius:var(--r);
-  cursor:pointer;font-size:15px;transition:all .18s ease;line-height:1;
-  min-height:36px;min-width:36px;
+  color:#f1f5f9;padding:6px 12px;border-radius:8px;
+  cursor:pointer;font-size:13px;font-weight:600;transition:all .18s ease;line-height:1;
+  min-height:36px;
 }
 .header-drawer-btn:hover{
   border-color:var(--net-red);color:#fff;
@@ -189,29 +174,34 @@ body.drawer-open{overflow:hidden!important;touch-action:none}
   box-shadow:0 0 12px rgba(229,9,20,0.35);
 }
 .header-drawer-btn:active{
-  transform:scale(0.93);
+  transform:scale(0.94);
   transition:transform 0.08s ease;
 }
+.header-menu-label{
+  font-size:12px;font-weight:700;letter-spacing:0.3px;display:inline-block;
+}
+@media (max-width: 480px){
+  .header-menu-label{display:none;}
+}
 
-/* ---- DRAWER SLIDE-OVER NAVIGATION PANEL (NETFLIX MODERN GLASS) ---- */
-.drawer-overlay{position:fixed;inset:0;z-index:200;display:flex;justify-content:flex-end}
+/* ---- DRAWER SLIDE-OVER NAVIGATION PANEL (MODERN SLEEK GLASS) ---- */
+.drawer-overlay{position:fixed;inset:0;z-index:9999;display:flex;justify-content:flex-end}
 .drawer-overlay.hidden{display:none}
 .drawer-backdrop{
   position:fixed;inset:0;
-  background:rgba(4,5,8,0.72);
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
-  animation:fadeIn .25s ease-out;
+  background:rgba(4,5,8,0.78);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  animation:fadeIn .2s ease-out;
 }
 .drawer-content{
-  position:relative;z-index:201;
-  width:min(360px,88vw);height:100dvh;max-height:100dvh;
-  background:rgba(12,14,20,0.96);
-  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  position:relative;z-index:10000;
+  width:min(340px,85vw);height:100dvh;max-height:100dvh;
+  background:rgba(13,17,23,0.98);
   border-left:1px solid rgba(255,255,255,0.12);
   display:flex;flex-direction:column;
-  animation:slideLeft .28s cubic-bezier(0.16,1,0.3,1);
-  box-shadow:-12px 0 40px rgba(0,0,0,0.85);
+  animation:slideLeft .24s cubic-bezier(0.16,1,0.3,1);
+  box-shadow:-12px 0 40px rgba(0,0,0,0.9);
   box-sizing:border-box;
   padding-top:max(6px,env(safe-area-inset-top));
   padding-bottom:max(8px,env(safe-area-inset-bottom));
@@ -345,21 +335,23 @@ main{width:100%;margin:0;padding:0 0 48px;position:relative;z-index:1;flex:1 0 a
   position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:1;
 }
 .hero-backdrop{
-  position:absolute;inset:0;background-size:cover;background-position:center 20%;
-  transition:opacity .6s ease, transform .6s cubic-bezier(0.2,0.8,0.2,1);
-  filter:brightness(0.92);will-change:opacity,transform;
+  position:absolute;inset:0;background-size:cover;background-position:center 25%;
+  image-rendering:-webkit-optimize-contrast;image-rendering:crisp-edges;
+  filter:contrast(1.05) brightness(0.96);
+  transition:opacity .5s ease, transform .6s cubic-bezier(0.2,0.8,0.2,1);
+  will-change:opacity,transform;
 }
 .hero-vignette-bottom{
   position:absolute;inset:0;
-  background:linear-gradient(to top, #0b1118 12%, rgba(11,17,24,0.45) 55%, rgba(11,17,24,0.85) 100%);
+  background:linear-gradient(to top, #0b1118 6%, rgba(11,17,24,0.7) 28%, transparent 65%);
 }
 .hero-vignette-left{
   position:absolute;inset:0;
-  background:linear-gradient(to right, #0b1118 0%, rgba(11,17,24,0.92) 38%, transparent 75%);
+  background:linear-gradient(to right, #0b1118 0%, rgba(11,17,24,0.85) 32%, transparent 72%);
 }
 .hero-vignette-top{
   position:absolute;inset:0;
-  background:linear-gradient(180deg, rgba(11,17,24,0.7) 0%, transparent 35%);
+  background:linear-gradient(180deg, rgba(11,17,24,0.45) 0%, transparent 25%);
 }
 
 .hero-content{
@@ -370,13 +362,13 @@ main{width:100%;margin:0;padding:0 0 48px;position:relative;z-index:1;flex:1 0 a
 @keyframes heroFadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 
 .hero-badge-wrap{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.hero-badge-prime{
+.hero-badge-top, .hero-badge-prime{
   background:rgba(0,168,225,0.18);
   border:1px solid rgba(0,168,225,0.45);
   color:var(--prime-blue);font-weight:800;border-radius:4px;
   padding:3px 9px;font-size:11px;letter-spacing:0.5px;
   display:inline-flex;align-items:center;gap:5px;
-  box-shadow:0 0 14px rgba(0,168,225,0.35);
+  box-shadow:0 0 14px rgba(0,168,225,0.25);
 }
 .hero-age-badge{
   background:rgba(255,255,255,0.08);
@@ -592,15 +584,15 @@ main{width:100%;margin:0;padding:0 0 48px;position:relative;z-index:1;flex:1 0 a
 .rail-card:hover .card-play-btn{transform:scale(1)}
 .card-play-btn:active{transform:scale(0.92);background:#ff1e27}
 
-/* Card badges (Amazon Prime Video style) */
-.card-badge-prime{
+/* Card badges */
+.card-badge-hd{
   position:absolute;top:8px;left:8px;
-  background:rgba(11,17,24,0.92);
-  border:1px solid rgba(0,168,225,0.55);
-  color:var(--prime-blue);font-size:10.5px;font-weight:800;
-  padding:2px 7px;border-radius:4px;
-  display:inline-flex;align-items:center;gap:3px;z-index:3;
-  letter-spacing:0.3px;
+  background:rgba(11,17,24,0.88);
+  border:1px solid rgba(255,255,255,0.22);
+  color:#f1f5f9;font-size:10px;font-weight:800;
+  padding:2px 6px;border-radius:4px;
+  display:inline-flex;align-items:center;z-index:3;
+  letter-spacing:0.5px;
   box-shadow:0 2px 8px rgba(0,0,0,0.8);
   line-height:1.2;
 }
@@ -618,14 +610,6 @@ main{width:100%;margin:0;padding:0 0 48px;position:relative;z-index:1;flex:1 0 a
   padding:2px 6px;border-radius:4px;border:1px solid rgba(56,189,248,0.3);z-index:2;
 }
 .card-badge-status.finished{color:#4ade80;border-color:rgba(74,222,128,0.3)}
-.prime-check-mark{
-  display:inline-flex;align-items:center;gap:4px;
-  background:rgba(0,168,225,0.16);
-  border:1px solid rgba(0,168,225,0.45);
-  color:var(--prime-blue);
-  padding:3px 9px;border-radius:4px;font-size:12px;font-weight:800;
-  letter-spacing:0.4px;
-}
 
 /* Progress bar on Continue Watching card */
 .card-progress-bar{

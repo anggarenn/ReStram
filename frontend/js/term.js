@@ -73,19 +73,9 @@ var Tui = (function () {
   }
 
   function syncNavPills(activeKey){
-    var keyMap = {
-      "musim": "trending",
-      "katalog": "populer",
-      "lanjutan": "ongoing",
-      "home": "home",
-      "beranda": "home",
-      "terbaru": "terbaru",
-      "favorit": "favorit"
-    };
-    var targetPill = keyMap[activeKey] || activeKey;
     document.querySelectorAll("#nav-pills-bar .nav-pill[data-view]").forEach(function(pill){
       var v = pill.getAttribute("data-view");
-      pill.classList.toggle("active", v === targetPill);
+      pill.classList.toggle("active", v === activeKey);
     });
   }
 
@@ -98,8 +88,11 @@ var Tui = (function () {
       if(homeSec) homeSec.classList.remove("hidden");
       var searchSec = $("search-sec");
       if(searchSec) searchSec.classList.add("hidden");
+      var sBar = $("schedule-days-bar");
+      if(sBar) sBar.classList.add("hidden");
       $("sb-view").textContent="view: beranda";
       syncNavPills("home");
+      try{window.scrollTo({top:0,behavior:"smooth"});}catch(_){}
       if(window.NetMirror && window.NetMirror.refreshHomeRails){
         window.NetMirror.refreshHomeRails();
       }
@@ -113,8 +106,9 @@ var Tui = (function () {
     if(searchSec) searchSec.classList.remove("hidden");
 
     syncNavPills(v);
+    try{window.scrollTo({top:0,behavior:"smooth"});}catch(_){}
     $("empty-state").style.display="none";
-    $("results").innerHTML="";$("results-title").textContent="memuat...";$("results-meta").textContent="";
+    $("results").innerHTML="";$("results-title").textContent="Memuat...";$("results-meta").textContent="";
     $("pager").classList.add("hidden");
     var sBar = $("schedule-days-bar");
     if(sBar) sBar.classList.toggle("hidden", v !== "terbaru");
@@ -122,14 +116,18 @@ var Tui = (function () {
     var cfBtn = $("btn-catalog-filter");
     if(cfBtn) cfBtn.classList.toggle("hidden", v !== "katalog");
     switch(v){
-      case "cari":$("results-title").textContent="cari judul";$("empty-state").style.display="";break;
-      case "musim":$("results-title").textContent="Tayang musim ini";break;
-      case "lanjutan":$("results-title").textContent="Masih tayang (lanjut)";break;
-      case "favorit":$("results-title").textContent="Anime Favorit";break;
+      case "cari":$("results-title").textContent="Cari Anime";$("empty-state").style.display="";break;
+      case "musim":$("results-title").textContent="Tayang Musim Ini";break;
+      case "trending":$("results-title").textContent="Trending Sekarang";break;
+      case "populer":$("results-title").textContent="Top 10 Populer";break;
+      case "movies":$("results-title").textContent="Film & Movies";break;
+      case "ongoing":
+      case "lanjutan":$("results-title").textContent="Serial TV (Masih Tayang)";break;
+      case "favorit":$("results-title").textContent="Daftar Tontonan";break;
       case "katalog":$("results-title").textContent=getCatalogFilterTitle();break;
       case "terbaru":{
         var lblDay = SCHEDULE_LABELS[S.scheduleDay] || S.scheduleDay || "Hari Ini";
-        $("results-title").textContent="Jadwal rilis (" + lblDay + ")";
+        $("results-title").textContent="Jadwal Rilis (" + lblDay + ")";
         break;
       }
       case "season-custom":{
@@ -137,6 +135,7 @@ var Tui = (function () {
         $("results-title").textContent="Season: "+(sf.season||"?")+" "+sf.year;
         break;
       }
+      default:$("results-title").textContent="Koleksi Anime";break;
     }
     $("sb-view").textContent="view: "+v;
     loadView();
@@ -183,6 +182,10 @@ var Tui = (function () {
     var api = window.ReStram || window.Tatap;
     switch(name){
       case "musim":return api.seasonNow(S.page);
+      case "trending":return api.browse({ sort: "trending" }, S.page);
+      case "populer":return api.catalog(S.page);
+      case "movies":return api.browse({ type: "movie" }, S.page);
+      case "ongoing":
       case "lanjutan":return api.stillAiring(S.page);
       case "favorit":return api.bookmarks();
       case "katalog":{
@@ -200,7 +203,7 @@ var Tui = (function () {
       }
       case "cari":return null;
     }
-    return null;
+    return api.catalog(S.page);
   }
 
   async function loadView(){
@@ -1435,19 +1438,7 @@ var Tui = (function () {
           return;
         }
         if(!targetView) return;
-        if(targetView === "trending"){
-          setView("musim");
-        } else if(targetView === "populer"){
-          S.catalogFilter = {sort: "popularity", year: "", season: "", month: "", type: "", status: "", genre: ""};
-          setView("katalog");
-        } else if(targetView === "ongoing"){
-          setView("lanjutan");
-        } else if(targetView === "movies"){
-          S.catalogFilter = {sort: "popularity", year: "", season: "", month: "", type: "movie", status: "", genre: ""};
-          setView("katalog");
-        } else {
-          setView(targetView);
-        }
+        setView(targetView);
       });
     });
 
