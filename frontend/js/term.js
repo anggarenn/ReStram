@@ -120,9 +120,9 @@ var Tui = (function () {
       case "musim":$("results-title").textContent="Tayang Musim Ini";break;
       case "trending":$("results-title").textContent="Trending Sekarang";break;
       case "populer":$("results-title").textContent="Top 10 Populer";break;
-      case "movies":$("results-title").textContent="Film & Movies";break;
+      case "movies":$("results-title").textContent="Film Barat & Hollywood";break;
       case "ongoing":
-      case "lanjutan":$("results-title").textContent="Serial TV (Masih Tayang)";break;
+      case "lanjutan":$("results-title").textContent="Serial TV Populer";break;
       case "favorit":$("results-title").textContent="Daftar Tontonan";break;
       case "katalog":$("results-title").textContent=getCatalogFilterTitle();break;
       case "terbaru":{
@@ -184,9 +184,9 @@ var Tui = (function () {
       case "musim":return api.seasonNow(S.page);
       case "trending":return api.browse({ sort: "trending" }, S.page);
       case "populer":return api.catalog(S.page);
-      case "movies":return api.browse({ type: "movie" }, S.page);
+      case "movies":return api.movies ? api.movies(S.page) : api.browse({ type: "movie" }, S.page);
       case "ongoing":
-      case "lanjutan":return api.stillAiring(S.page);
+      case "lanjutan":return api.series ? api.series(S.page) : api.stillAiring(S.page);
       case "favorit":return api.bookmarks();
       case "katalog":{
         var f = S.catalogFilter || {};

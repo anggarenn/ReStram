@@ -527,6 +527,24 @@ function openTitle(slug,title,poster,type,epsCounter,meta){
   setPlaySpeed(1.0, false);
   renderSourceUI();
 
+  // Check if TMDB item
+  var isTmdb = (meta && meta.tmdbId) || (slug && slug.indexOf("tmdb-") === 0);
+  if(isTmdb){
+    cur.isTmdb = true;
+    cur.tmdbId = (meta && meta.tmdbId) || parseInt(slug.replace(/tmdb-(movie|tv)-/, ""));
+    cur.mediaType = (meta && (meta.media_type || meta.type)) || (slug.indexOf("tmdb-tv") !== -1 ? "tv" : "movie");
+    $("tm-eyebrow").textContent = (cur.mediaType === "tv") ? "SERIAL TV" : "FILM & MOVIE";
+    if(meta && meta.backdrop){
+      var heroBd = $("tm-hero-backdrop");
+      if(heroBd) heroBd.style.backgroundImage = 'url("' + meta.backdrop + '")';
+    }
+  } else {
+    cur.isTmdb = false;
+    cur.tmdbId = null;
+    cur.mediaType = null;
+    $("tm-eyebrow").textContent = "DETAIL ANIME";
+  }
+
   // Top Bar & Hero Elements
   var topTitle = $("tm-top-title");
   if(topTitle) topTitle.textContent = title;
@@ -731,6 +749,49 @@ function renderEpRanges(){
 
 function loadEps(){
   cur.activeEpRange = null;
+  if(cur.isTmdb){
+    var thisSlug = cur.slug;
+    if(cur.mediaType === "movie"){
+      cur.eps = [{
+        ep: 1,
+        episode: 1,
+        title: cur.title + " (Full Movie)",
+        id: cur.slug,
+        date: (cur.meta && cur.meta.year) || "",
+        tmdbId: cur.tmdbId,
+        mediaType: "movie"
+      }];
+      $("tm-count").textContent = "1 Film Lengkap • HD";
+      renderEpGrid();
+      return;
+    } else {
+      $("tm-count").textContent = "Memuat episode...";
+      (window.ReStram||window.Tatap).tmdbSeason(cur.tmdbId, 1).then(function(r){
+        if(thisSlug !== cur.slug) return;
+        var epsData = (r && r.success && r.data && r.data.episodes) || [];
+        cur.eps = epsData.map(function(e){
+          return {
+            ep: e.episode,
+            episode: e.episode,
+            title: e.name ? ("Ep " + e.episode + ": " + e.name) : ("Episode " + e.episode),
+            id: "tmdb-tv-" + cur.tmdbId + "-s1-e" + e.episode,
+            date: e.airDate || "",
+            thumbnail: e.still || "",
+            overview: e.overview || "",
+            tmdbId: cur.tmdbId,
+            mediaType: "tv",
+            se: 1
+          };
+        });
+        $("tm-count").textContent = cur.eps.length + " Episode • Musim 1";
+        renderEpGrid();
+      }).catch(function(){
+        if(thisSlug !== cur.slug) return;
+        $("tm-count").textContent = "Gagal memuat episode series";
+      });
+      return;
+    }
+  }
   cur.lastWatchedEp = null;
   cur.watched = {};
   var thisSlug = cur.slug;
@@ -1091,6 +1152,43 @@ function openPlayer(ep, resumeTime){
   closeTitle();
   closeResumeModal();
   $("player-modal").classList.remove("hidden");
+
+  // TMDB Movie/Series Stream Resolver
+  if(cur.isTmdb || (cur.slug && cur.slug.indexOf("tmdb-") === 0)){
+    var tmdbId = cur.tmdbId || parseInt(cur.slug.replace(/tmdb-(movie|tv)-/, ""));
+    var mType = cur.mediaType || (cur.slug.indexOf("tmdb-tv") !== -1 ? "tv" : "movie");
+    var epNum = (typeof ep === "object") ? (ep.ep || ep.episode || 1) : (parseInt(ep) || 1);
+    var seNum = (typeof ep === "object" && ep.se) ? ep.se : 1;
+
+    $("pm-title").textContent = cur.title;
+    $("pm-meta").textContent = (mType === "movie" ? "FULL MOVIE" : ("S" + seNum + " E" + epNum)) + " · HD";
+    $("pm-spinner").classList.remove("hidden");
+    $("pm-status").textContent = "Menghubungkan stream...";
+
+    (window.ReStram||window.Tatap).tmdbResolve(tmdbId, mType, seNum, epNum).then(function(r){
+      if(cur.playToken !== token) return;
+      $("pm-spinner").classList.add("hidden");
+      if(!r || !r.success || !r.data || !r.data.servers || !r.data.servers.length){
+        $("pm-status").textContent = "Gagal memuat stream film";
+        toast("Stream tidak tersedia untuk judul ini");
+        return;
+      }
+      var srvs = r.data.servers;
+      cur.tmdbServers = srvs;
+      var pick = srvs[0];
+      if(pick.type === "mp4" && pick.url){
+        applyNativePlayer();
+        playUrl(pick.url, "", null, "", resumeTime || 0, token);
+      } else {
+        applyEmbedPlayer(pick.url, "peachify");
+      }
+      toast("Memutar: " + (mType === "movie" ? cur.title : ("S" + seNum + " E" + epNum)));
+    }).catch(function(err){
+      $("pm-spinner").classList.add("hidden");
+      $("pm-status").textContent = "Error memuat stream";
+    });
+    return;
+  }
   $("pm-title").textContent=cur.title;
   $("pm-meta").textContent="ep "+ep+" · "+cur.mode.toUpperCase();
   $("pm-spinner").classList.remove("hidden");

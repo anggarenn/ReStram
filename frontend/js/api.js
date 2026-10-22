@@ -240,6 +240,13 @@ window.ReStram = window.Tatap = {
   // net27.cc layout direct helpers
   getHeroItems: function(){ return (window.NET27_DATA && window.NET27_DATA.hero) || []; },
   getCatalogRails: function(){ return (window.NET27_DATA && window.NET27_DATA.rails) || []; },
-  getFallbackData: function(){ return window.NET27_DATA || null; }
+  getFallbackData: function(){ return window.NET27_DATA || null; },
+  // TMDB Movies & TV Series
+  movies: function(p){ return jget("/api/tmdb/movies?page="+(p||1)); },
+  series: function(p){ return jget("/api/tmdb/tv?page="+(p||1)); },
+  tmdbTrending: function(){ return jget("/api/tmdb/trending?window=day"); },
+  tmdbTitle: function(t, id){ return jget("/api/tmdb/title/"+encodeURIComponent(t)+"/"+encodeURIComponent(id)); },
+  tmdbSeason: function(id, se){ return jget("/api/tmdb/season/"+encodeURIComponent(id)+"/"+encodeURIComponent(se||1)); },
+  tmdbResolve: function(id, t, se, ep){ return jget("/api/tmdb/resolve?tmdb_id="+encodeURIComponent(id)+"&media_type="+(t||"movie")+"&se="+(se||1)+"&ep="+(ep||1)); }
 };
 

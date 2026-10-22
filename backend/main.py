@@ -312,6 +312,170 @@ async def api_net27_rails():
     except Exception as e:
         return fail(str(e))
 
+# ==================== TMDB & MOVIEBOX MULTI-CONTENT ====================
+TMDB_MIRROR_BASE = "https://net79.cc"
+
+@app.get("/api/tmdb/trending")
+async def tmdb_trending(window: str = "day"):
+    url = f"{TMDB_MIRROR_BASE}/api/catalog/trending?window={window}"
+    try:
+        async with httpx.AsyncClient(timeout=10.0, follow_redirects=True) as client:
+            r = await client.get(url, headers={"User-Agent": "Mozilla/5.0"})
+            if r.status_code == 200:
+                data = r.json()
+                items = data.get("items", [])
+                norm = []
+                for it in items:
+                    t_type = it.get("type", "movie")
+                    tid = it.get("tmdbId")
+                    norm.append({
+                        "id": f"tmdb-{t_type}-{tid}",
+                        "tmdbId": tid,
+                        "title": it.get("title"),
+                        "year": it.get("year"),
+                        "poster": it.get("poster"),
+                        "backdrop": it.get("backdrop"),
+                        "score": it.get("rating"),
+                        "type": t_type,
+                        "synopsis": it.get("overview", ""),
+                        "eps_counter": "HD" if t_type == "movie" else "Series",
+                        "media_type": t_type
+                    })
+                return ok({"items": norm, "total_pages": 1, "page": 1})
+    except Exception as e:
+        pass
+    return fail("Gagal memuat trending TMDB")
+
+@app.get("/api/tmdb/movies")
+async def tmdb_movies(page: int = 1, sort: str = "popularity"):
+    url = f"{TMDB_MIRROR_BASE}/api/catalog/discover?type=movie&sort={sort}&page={page}"
+    try:
+        async with httpx.AsyncClient(timeout=10.0, follow_redirects=True) as client:
+            r = await client.get(url, headers={"User-Agent": "Mozilla/5.0"})
+            if r.status_code == 200:
+                data = r.json()
+                items = data.get("items", [])
+                norm = []
+                for it in items:
+                    tid = it.get("tmdbId")
+                    norm.append({
+                        "id": f"tmdb-movie-{tid}",
+                        "tmdbId": tid,
+                        "title": it.get("title"),
+                        "year": it.get("year"),
+                        "poster": it.get("poster"),
+                        "backdrop": it.get("backdrop"),
+                        "score": it.get("rating"),
+                        "type": "movie",
+                        "synopsis": it.get("overview", ""),
+                        "eps_counter": "Film",
+                        "media_type": "movie"
+                    })
+                return ok({"items": norm, "total_pages": data.get("totalPages", 10), "page": page})
+    except Exception as e:
+        pass
+    return fail("Gagal memuat daftar film")
+
+@app.get("/api/tmdb/tv")
+async def tmdb_tv(page: int = 1, sort: str = "popularity"):
+    url = f"{TMDB_MIRROR_BASE}/api/catalog/discover?type=tv&sort={sort}&page={page}"
+    try:
+        async with httpx.AsyncClient(timeout=10.0, follow_redirects=True) as client:
+            r = await client.get(url, headers={"User-Agent": "Mozilla/5.0"})
+            if r.status_code == 200:
+                data = r.json()
+                items = data.get("items", [])
+                norm = []
+                for it in items:
+                    tid = it.get("tmdbId")
+                    norm.append({
+                        "id": f"tmdb-tv-{tid}",
+                        "tmdbId": tid,
+                        "title": it.get("title"),
+                        "year": it.get("year"),
+                        "poster": it.get("poster"),
+                        "backdrop": it.get("backdrop"),
+                        "score": it.get("rating"),
+                        "type": "tv",
+                        "synopsis": it.get("overview", ""),
+                        "eps_counter": "Serial TV",
+                        "media_type": "tv"
+                    })
+                return ok({"items": norm, "total_pages": data.get("totalPages", 10), "page": page})
+    except Exception as e:
+        pass
+    return fail("Gagal memuat serial TV")
+
+@app.get("/api/tmdb/title/{media_type}/{tmdb_id}")
+async def tmdb_title_detail(media_type: str, tmdb_id: int):
+    url = f"{TMDB_MIRROR_BASE}/api/catalog/title/{media_type}/{tmdb_id}"
+    try:
+        async with httpx.AsyncClient(timeout=10.0, follow_redirects=True) as client:
+            r = await client.get(url, headers={"User-Agent": "Mozilla/5.0"})
+            if r.status_code == 200:
+                return ok(r.json())
+    except Exception as e:
+        pass
+    return fail("Gagal memuat detail judul TMDB")
+
+@app.get("/api/tmdb/season/{tmdb_id}/{season}")
+async def tmdb_season_episodes(tmdb_id: int, season: int):
+    url = f"{TMDB_MIRROR_BASE}/api/catalog/season/{tmdb_id}/{season}"
+    try:
+        async with httpx.AsyncClient(timeout=10.0, follow_redirects=True) as client:
+            r = await client.get(url, headers={"User-Agent": "Mozilla/5.0"})
+            if r.status_code == 200:
+                return ok(r.json())
+    except Exception as e:
+        pass
+    return fail("Gagal memuat season TMDB")
+
+@app.get("/api/tmdb/resolve")
+async def tmdb_resolve(tmdb_id: int = Query(...), media_type: str = Query("movie"), se: int = Query(1), ep: int = Query(1)):
+    if media_type == "tv":
+        peachify_url = f"https://peachify.top/embed/tv/{tmdb_id}/{se}/{ep}"
+        vidsrc_url = f"https://vidsrc.to/embed/tv/{tmdb_id}/{se}/{ep}"
+        twoembed_url = f"https://www.2embed.cc/embedtv/{tmdb_id}&s={se}&e={ep}"
+    else:
+        peachify_url = f"https://peachify.top/embed/movie/{tmdb_id}"
+        vidsrc_url = f"https://vidsrc.to/embed/movie/{tmdb_id}"
+        twoembed_url = f"https://www.2embed.cc/embed/{tmdb_id}"
+
+    servers = [
+        {"name": "Server 1: Peachify HD", "type": "embed", "url": peachify_url},
+        {"name": "Server 2: VidSrc Multi", "type": "embed", "url": vidsrc_url},
+        {"name": "Server 3: 2Embed VIP", "type": "embed", "url": twoembed_url}
+    ]
+
+    mb_url = f"{TMDB_MIRROR_BASE}/api/embed-tmdb/{tmdb_id}?type={media_type}&se={se}&ep={ep}"
+    try:
+        async with httpx.AsyncClient(timeout=6.0, follow_redirects=True) as client:
+            r = await client.get(mb_url, headers={"User-Agent": "Mozilla/5.0"})
+            if r.status_code == 200:
+                mb = r.json()
+                if mb.get("ok") and mb.get("mp4"):
+                    servers.insert(0, {
+                        "name": "Server 0: MovieBox Direct MP4",
+                        "type": "mp4",
+                        "url": mb.get("mp4"),
+                        "streams": mb.get("streams", []),
+                        "captions": mb.get("captions", [])
+                    })
+    except Exception:
+        pass
+
+    primary = servers[0]
+    return ok({
+        "tmdb_id": tmdb_id,
+        "type": media_type,
+        "se": se,
+        "ep": ep,
+        "stream_url": primary["url"],
+        "stream_type": primary["type"],
+        "servers": servers,
+        "title": f"S{se} E{ep}" if media_type == "tv" else "Full Movie"
+    })
+
 def _is_long_running(title: str, episodes: int = 0, start_year: int = 0, sub_count: int = 0, slug: str = "") -> bool:
     """Klasifikasi apakah anime tergolong serial panjang kontinu (non-musiman)."""
     t = (title or "").lower()
