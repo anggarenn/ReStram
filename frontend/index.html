@@ -230,14 +230,11 @@
     <!-- Scrollable storefront navigation -->
     <nav class="nav-pills-bar" id="nav-pills-bar" aria-label="Filter Kategori">
       <button class="nav-pill active" data-view="home"><svg class="ui-icon"><use href="#icon-tv"/></svg> Beranda</button>
-      <button class="nav-pill" data-view="musim"><svg class="ui-icon"><use href="#icon-season"/></svg> Musim Ini</button>
-      <button class="nav-pill" data-view="trending"><svg class="ui-icon"><use href="#icon-fire"/></svg> Trending</button>
-      <button class="nav-pill" data-view="populer"><svg class="ui-icon"><use href="#icon-star"/></svg> Top 10</button>
       <button class="nav-pill" data-view="movies"><svg class="ui-icon"><use href="#icon-film"/></svg> Film</button>
+      <button class="nav-pill" data-view="katalog"><svg class="ui-icon"><use href="#icon-catalog"/></svg> Anime</button>
       <button class="nav-pill" data-view="ongoing"><svg class="ui-icon"><use href="#icon-circle-dot"/></svg> Serial TV</button>
-      <button class="nav-pill" data-view="terbaru"><svg class="ui-icon"><use href="#icon-clock"/></svg> Jadwal Rilis</button>
+      <button class="nav-pill" data-view="trending"><svg class="ui-icon"><use href="#icon-fire"/></svg> Trending</button>
       <button class="nav-pill" data-view="favorit"><svg class="ui-icon"><use href="#icon-heart"/></svg> Daftar Tontonan</button>
-      <button class="nav-pill" data-view="katalog"><svg class="ui-icon"><use href="#icon-catalog"/></svg> Semua Anime</button>
     </nav>
   </div>
 </header>
@@ -303,13 +300,13 @@
         </div>
       </section>
 
-      <!-- Rail 2: Populer Musim Ini -->
+      <!-- Rail 2: Film Box Office & Hollywood -->
       <section id="lane-season-sec" class="net-rail">
         <div class="rail-header">
           <div class="rail-title-wrap">
-            <h2 id="lane-season-title" class="rail-title"><svg class="ui-icon"><use href="#icon-fire"/></svg> Populer Musim Ini</h2>
+            <h2 id="lane-season-title" class="rail-title"><svg class="ui-icon"><use href="#icon-film"/></svg> Film Box Office & Hollywood</h2>
           </div>
-          <button class="rail-see-all-btn" data-rail-view="musim">Lihat Semua <svg class="ui-icon"><use href="#icon-next"/></svg></button>
+          <button class="rail-see-all-btn" data-rail-view="movies">Lihat Semua Film <svg class="ui-icon"><use href="#icon-next"/></svg></button>
         </div>
         <div class="rail-slider-wrapper">
           <button class="rail-nav-btn prev" aria-label="Scroll ke kiri"><svg class="ui-icon"><use href="#icon-prev"/></svg></button>
@@ -318,13 +315,13 @@
         </div>
       </section>
 
-      <!-- Rail 3: 10 Anime Teratas di Indonesia Hari Ini -->
+      <!-- Rail 3: Serial TV Terpopuler -->
       <section id="lane-latest-sec" class="net-rail">
         <div class="rail-header">
           <div class="rail-title-wrap">
-            <h2 class="rail-title"><svg class="ui-icon"><use href="#icon-fire"/></svg> 10 Anime Teratas di Indonesia Hari Ini</h2>
+            <h2 class="rail-title"><svg class="ui-icon"><use href="#icon-circle-dot"/></svg> Serial TV Terpopuler</h2>
           </div>
-          <button class="rail-see-all-btn" data-rail-view="terbaru">Jadwal Lengkap <svg class="ui-icon"><use href="#icon-next"/></svg></button>
+          <button class="rail-see-all-btn" data-rail-view="ongoing">Semua Serial <svg class="ui-icon"><use href="#icon-next"/></svg></button>
         </div>
         <div class="rail-slider-wrapper">
           <button class="rail-nav-btn prev" aria-label="Scroll ke kiri"><svg class="ui-icon"><use href="#icon-prev"/></svg></button>
@@ -333,13 +330,13 @@
         </div>
       </section>
 
-      <!-- Rail 4: Rekomendasi Pilihan untuk Anda -->
+      <!-- Rail 4: Anime Populer Pilihan -->
       <section id="lane-popular-sec" class="net-rail">
         <div class="rail-header">
           <div class="rail-title-wrap">
-            <h2 class="rail-title"><svg class="ui-icon"><use href="#icon-star"/></svg> Rekomendasi Pilihan untuk Anda</h2>
+            <h2 class="rail-title"><svg class="ui-icon"><use href="#icon-star"/></svg> Anime Populer Pilihan</h2>
           </div>
-          <button class="rail-see-all-btn" data-rail-view="katalog">Katalog Lengkap <svg class="ui-icon"><use href="#icon-next"/></svg></button>
+          <button class="rail-see-all-btn" data-rail-view="katalog">Katalog Anime <svg class="ui-icon"><use href="#icon-next"/></svg></button>
         </div>
         <div class="rail-slider-wrapper">
           <button class="rail-nav-btn prev" aria-label="Scroll ke kiri"><svg class="ui-icon"><use href="#icon-prev"/></svg></button>
@@ -431,41 +428,25 @@
           <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-tv"/></svg></span>
           <span class="drawer-item-label">Beranda Utama</span>
         </button>
-        <button class="drawer-item" data-view="cari">
-          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-search"/></svg></span>
-          <span class="drawer-item-label">Cari Anime</span>
+        <button class="drawer-item" data-view="movies">
+          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-film"/></svg></span>
+          <span class="drawer-item-label">Film (Hollywood & Barat)</span>
         </button>
-        <button class="drawer-item" data-view="musim">
-          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-season"/></svg></span>
-          <span class="drawer-item-label">Tayang Musim Ini</span>
+        <button class="drawer-item" data-view="katalog">
+          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-catalog"/></svg></span>
+          <span class="drawer-item-label">Anime</span>
+        </button>
+        <button class="drawer-item" data-view="ongoing">
+          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-circle-dot"/></svg></span>
+          <span class="drawer-item-label">Serial TV</span>
         </button>
         <button class="drawer-item" data-view="trending">
           <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-fire"/></svg></span>
           <span class="drawer-item-label">Trending Sekarang</span>
         </button>
-        <button class="drawer-item" data-view="populer">
-          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-star"/></svg></span>
-          <span class="drawer-item-label">Top 10 Populer</span>
-        </button>
-        <button class="drawer-item" data-view="movies">
-          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-film"/></svg></span>
-          <span class="drawer-item-label">Film & Movies</span>
-        </button>
-        <button class="drawer-item" data-view="ongoing">
-          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-circle-dot"/></svg></span>
-          <span class="drawer-item-label">Serial TV (Ongoing)</span>
-        </button>
-        <button class="drawer-item" data-view="terbaru">
-          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-clock"/></svg></span>
-          <span class="drawer-item-label">Jadwal Rilis & Terbaru</span>
-        </button>
         <button class="drawer-item" data-view="favorit">
           <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-heart"/></svg></span>
           <span class="drawer-item-label">Daftar Tontonan</span>
-        </button>
-        <button class="drawer-item" data-view="katalog">
-          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-catalog"/></svg></span>
-          <span class="drawer-item-label">Katalog Semua Anime</span>
         </button>
       </div>
 

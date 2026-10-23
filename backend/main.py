@@ -433,36 +433,25 @@ async def tmdb_season_episodes(tmdb_id: int, season: int):
 @app.get("/api/tmdb/resolve")
 async def tmdb_resolve(tmdb_id: int = Query(...), media_type: str = Query("movie"), se: int = Query(1), ep: int = Query(1)):
     if media_type == "tv":
-        peachify_url = f"https://peachify.top/embed/tv/{tmdb_id}/{se}/{ep}"
-        vidsrc_url = f"https://vidsrc.to/embed/tv/{tmdb_id}/{se}/{ep}"
-        twoembed_url = f"https://www.2embed.cc/embedtv/{tmdb_id}&s={se}&e={ep}"
+        vidlink_url = f"https://vidlink.pro/tv/{tmdb_id}/{se}/{ep}"
+        vidsrc_me = f"https://vidsrc.me/embed/tv?tmdb={tmdb_id}&season={se}&episode={ep}"
+        vidsrc_to = f"https://vidsrc.to/embed/tv/{tmdb_id}/{se}/{ep}"
+        multiembed = f"https://multiembed.mov/?video_id={tmdb_id}&tmdb=1&s={se}&e={ep}"
+        twoembed = f"https://www.2embed.cc/embedtv/{tmdb_id}&s={se}&e={ep}"
     else:
-        peachify_url = f"https://peachify.top/embed/movie/{tmdb_id}"
-        vidsrc_url = f"https://vidsrc.to/embed/movie/{tmdb_id}"
-        twoembed_url = f"https://www.2embed.cc/embed/{tmdb_id}"
+        vidlink_url = f"https://vidlink.pro/movie/{tmdb_id}"
+        vidsrc_me = f"https://vidsrc.me/embed/movie?tmdb={tmdb_id}"
+        vidsrc_to = f"https://vidsrc.to/embed/movie/{tmdb_id}"
+        multiembed = f"https://multiembed.mov/?video_id={tmdb_id}&tmdb=1"
+        twoembed = f"https://www.2embed.cc/embed/{tmdb_id}"
 
     servers = [
-        {"name": "Server 1: Peachify HD", "type": "embed", "url": peachify_url},
-        {"name": "Server 2: VidSrc Multi", "type": "embed", "url": vidsrc_url},
-        {"name": "Server 3: 2Embed VIP", "type": "embed", "url": twoembed_url}
+        {"name": "Server 1: VidLink Pro", "type": "embed", "url": vidlink_url},
+        {"name": "Server 2: VidSrc Pro", "type": "embed", "url": vidsrc_me},
+        {"name": "Server 3: VidSrc TO", "type": "embed", "url": vidsrc_to},
+        {"name": "Server 4: MultiEmbed VIP", "type": "embed", "url": multiembed},
+        {"name": "Server 5: 2Embed CC", "type": "embed", "url": twoembed}
     ]
-
-    mb_url = f"{TMDB_MIRROR_BASE}/api/embed-tmdb/{tmdb_id}?type={media_type}&se={se}&ep={ep}"
-    try:
-        async with httpx.AsyncClient(timeout=6.0, follow_redirects=True) as client:
-            r = await client.get(mb_url, headers={"User-Agent": "Mozilla/5.0"})
-            if r.status_code == 200:
-                mb = r.json()
-                if mb.get("ok") and mb.get("mp4"):
-                    servers.insert(0, {
-                        "name": "Server 0: MovieBox Direct MP4",
-                        "type": "mp4",
-                        "url": mb.get("mp4"),
-                        "streams": mb.get("streams", []),
-                        "captions": mb.get("captions", [])
-                    })
-    except Exception:
-        pass
 
     primary = servers[0]
     return ok({

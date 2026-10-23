@@ -1175,17 +1175,13 @@ function openPlayer(ep, resumeTime){
       }
       var srvs = r.data.servers;
       cur.tmdbServers = srvs;
+      renderTmdbServerButtons(srvs, 0);
       var pick = srvs[0];
-      if(pick.type === "mp4" && pick.url){
-        applyNativePlayer();
-        playUrl(pick.url, "", null, "", resumeTime || 0, token);
-      } else {
-        applyEmbedPlayer(pick.url, "peachify");
-      }
-      toast("Memutar: " + (mType === "movie" ? cur.title : ("S" + seNum + " E" + epNum)));
+      applyEmbedPlayer(pick.url, "vidlink");
+      toast("Memutar Server 1 (VidLink): " + (mType === "movie" ? cur.title : ("S" + seNum + " E" + epNum)));
     }).catch(function(err){
       $("pm-spinner").classList.add("hidden");
-      $("pm-status").textContent = "Error memuat stream";
+      $("pm-status").textContent = "Error memuat stream film";
     });
     return;
   }
@@ -1389,6 +1385,27 @@ function extractEpisodeServers(item, epNum){
   };
 }
 
+
+function renderTmdbServerButtons(servers, activeIdx){
+  var seg = $("pm-server-seg");
+  if(!seg) return;
+  seg.innerHTML = "";
+  (servers || []).forEach(function(s, idx){
+    var b = document.createElement("button");
+    b.className = (idx === (activeIdx || 0)) ? "active" : "";
+    b.title = s.name;
+    var cleanName = s.name.replace(/^Server \d+:\s*/, "");
+    b.innerHTML = '<span class="srv-num">Server ' + (idx + 1) + '</span><span class="srv-name">: ' + cleanName + '</span>';
+    b.onclick = function(){
+      seg.querySelectorAll("button").forEach(function(btn){ btn.classList.remove("active"); });
+      b.classList.add("active");
+      applyEmbedPlayer(s.url, "tmdb-" + idx);
+      toast("Beralih ke Server " + (idx + 1) + " (" + cleanName + ")");
+    };
+    seg.appendChild(b);
+  });
+}
+
 function applyEmbedPlayer(url, serverName){
   if(serverName === "mega"){
     cur.playerServer = "mega";
@@ -1410,6 +1427,7 @@ function applyEmbedPlayer(url, serverName){
   var frame = $("pm-embed-frame");
   if(frame){
     frame.setAttribute("allow", "autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope");
+    frame.setAttribute("referrerpolicy", "no-referrer");
     frame.setAttribute("allowfullscreen", "true");
     frame.setAttribute("webkitallowfullscreen", "true");
     frame.setAttribute("mozallowfullscreen", "true");
@@ -3080,6 +3098,57 @@ function checkForUpdate(manualTrigger){
 // =========================================================================
 var HERO_SHOWCASE = [
   {
+    id: "tmdb-movie-969681",
+    slug: "tmdb-movie-969681",
+    tmdbId: 969681,
+    title: "Spider-Man: Brand New Day",
+    poster: "https://image.tmdb.org/t/p/w780/bjiS5ipwxb9JFy3XRRN4OAilSeX.jpg",
+    backdrop: "https://image.tmdb.org/t/p/original/r08LxMJCbf1SiJIWeyH9aJmdqwC.jpg",
+    banner: "https://image.tmdb.org/t/p/original/r08LxMJCbf1SiJIWeyH9aJmdqwC.jpg",
+    score: 8.5,
+    type: "movie",
+    media_type: "movie",
+    season: "2026",
+    badge: "FILM TERPOPULER",
+    eps_counter: "Full Movie",
+    synopsis: "Peter Parker berjuang sebagai Spider-Man di dunia yang tidak lagi mengingatnya. Menghadapi ancaman baru yang membahayakan kota dan orang-orang yang dicintainya, sebuah transformasi besar mengubah segalanya.",
+    genres: ["Action", "Sci-Fi", "Adventure"]
+  },
+  {
+    id: "tmdb-movie-687163",
+    slug: "tmdb-movie-687163",
+    tmdbId: 687163,
+    title: "Project Hail Mary",
+    poster: "https://image.tmdb.org/t/p/w780/iOb2fjXLbpJgyQXe46n1WtGCnaa.jpg",
+    backdrop: "https://image.tmdb.org/t/p/original/8Tfys3mDZVp4tNoH2ktm06a0Tau.jpg",
+    banner: "https://image.tmdb.org/t/p/original/8Tfys3mDZVp4tNoH2ktm06a0Tau.jpg",
+    score: 8.7,
+    type: "movie",
+    media_type: "movie",
+    season: "2026",
+    badge: "HOLLYWOOD PREMIERE",
+    eps_counter: "Full Movie",
+    synopsis: "Guru sains Ryland Grace terbangun sendirian di pesawat luar angkasa bertahun-tahun cahaya dari Bumi tanpa ingatan. Ia harus memecahkan misteri zat kepunahan bintang demi menyelamatkan umat manusia.",
+    genres: ["Sci-Fi", "Adventure", "Drama"]
+  },
+  {
+    id: "tmdb-movie-299534",
+    slug: "tmdb-movie-299534",
+    tmdbId: 299534,
+    title: "Avengers: Endgame",
+    poster: "https://image.tmdb.org/t/p/w780/or06FN3Dka5tukK1e9sl16pB3iy.jpg",
+    backdrop: "https://image.tmdb.org/t/p/original/7RyHsO4yDXtBv1zUU3mTpHeQ0d5.jpg",
+    banner: "https://image.tmdb.org/t/p/original/7RyHsO4yDXtBv1zUU3mTpHeQ0d5.jpg",
+    score: 9.1,
+    type: "movie",
+    media_type: "movie",
+    season: "2019",
+    badge: "BOX OFFICE MASTERPIECE",
+    eps_counter: "Full Movie",
+    synopsis: "Setelah peristiwa dahsyat Infinity War, para Avengers yang tersisa harus bersatu kembali untuk membalikkan tindakan Thanos dan memulihkan keseimbangan alam semesta.",
+    genres: ["Action", "Adventure", "Sci-Fi"]
+  },
+  {
     id: "solo-leveling-season-2-arise-from-the-shadows-19413",
     slug: "solo-leveling-season-2-arise-from-the-shadows-19413",
     title: "Solo Leveling Season 2 -Arise from the Shadow-",
@@ -3569,32 +3638,23 @@ var NetMirror = (function(){
     });
   }
 
-  function loadTrendingRail(){
+  function loadMovieRail(){
     var track = $("lane-season");
     var api = window.ReStram || window.Tatap;
-    if(!api || !api.seasonNow) return;
-    api.seasonNow(1).then(function(r){
-      if(r && r.success && r.data && Array.isArray(r.data.items) && r.data.items.length){
-        renderRailItems(track, r.data.items);
-        if(r.data.items.length >= 3){
-          heroSlides = r.data.items.slice(0, 5);
-          initHero();
-        }
-      }
+    if(!api || !api.movies) return;
+    api.movies(1).then(function(r){
+      var items = (r && r.success && r.data && r.data.items) || [];
+      if(items.length) renderRailItems(track, items.slice(0, 15));
     }).catch(function(){});
   }
 
-  function loadLatestRail(){
+  function loadSeriesRail(){
     var track = $("lane-latest");
     var api = window.ReStram || window.Tatap;
-    if(!api || !api.schedule) return;
-    api.schedule("today").then(function(r){
-      if(r && r.success && r.data){
-        var items = r.data.items || (Array.isArray(r.data) ? r.data : []);
-        if(items.length){
-          renderRailItems(track, items);
-        }
-      }
+    if(!api || !api.series) return;
+    api.series(1).then(function(r){
+      var items = (r && r.success && r.data && r.data.items) || [];
+      if(items.length) renderRailItems(track, items.slice(0, 15));
     }).catch(function(){});
   }
 
@@ -3633,15 +3693,18 @@ var NetMirror = (function(){
     var allItems = (window.ANIME_DB && window.ANIME_DB.length) ? window.ANIME_DB : 
                    ((typeof window !== "undefined" && window.NET27_DATA && window.NET27_DATA.items && window.NET27_DATA.items.length) ? window.NET27_DATA.items : NET_FALLBACK_ANIME);
 
-    renderRailItems($("lane-season"), allItems.slice(0, 15));
-    renderRailItems($("lane-latest"), allItems.slice(15, 30));
-    var sorted = allItems.slice().sort(function(a,b){ return (b.score||0) - (a.score||0); });
-    renderRailItems($("lane-popular"), sorted.slice(0, 15));
+    // Rail 3 immediately populated with top anime
+    var sortedAnime = allItems.slice().sort(function(a,b){ return (b.score||0) - (a.score||0); });
+    renderRailItems($("lane-popular"), sortedAnime.slice(0, 15));
+
+    // Rail 1: Movies (Hollywood & Box Office)
+    loadMovieRail();
+
+    // Rail 2: Series (Serial TV Terpopuler)
+    loadSeriesRail();
 
     // 2. Fetch live updates if server API is reachable and local DB not loaded
     if(!window.ANIME_DB || !window.ANIME_DB.length){
-      loadTrendingRail();
-      loadLatestRail();
       loadPopularRail();
     }
     loadFavoritesRail();
