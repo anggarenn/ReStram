@@ -4030,8 +4030,14 @@ function init(){
   var btnCliClose = $("btn-cli-close");
   if(btnCliClose) btnCliClose.addEventListener("click", function(){ toggleCli(false); });
 
-  window.addEventListener("beforeunload", function(){
+  window.addEventListener("beforeunload", function(e){
     recordWatchProgress(true);
+    var pm = $("player-modal");
+    if(pm && !pm.classList.contains("hidden") && cur && cur.isTmdb){
+      // Prevent top navigation hijack by third-party embed ad networks
+      e.preventDefault();
+      return (e.returnValue = "Tetap di ReStram?");
+    }
   });
 
   loadAnimeDatabase();
