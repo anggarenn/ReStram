@@ -88,7 +88,11 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
+            if (signingConfigs.release.storeFile != null && signingConfigs.release.storeFile.exists()) {
+                signingConfig signingConfigs.release
+            } else {
+                signingConfig signingConfigs.debug
+            }
         }
     }
 
@@ -96,9 +100,15 @@ android {
         variant.outputs.all { output ->
             if (variant.buildType.name == "release") {
                 if (variant.flavorName == "mobile") {
-                    outputFileName = "tatap-release-v${defaultConfig.versionName}.apk"
+                    outputFileName = "restram-release-v${defaultConfig.versionName}.apk"
                 } else if (variant.flavorName == "tv") {
-                    outputFileName = "tatap-tv-release-v${defaultConfig.versionName}.apk"
+                    outputFileName = "restram-tv-release-v${defaultConfig.versionName}.apk"
+                }
+            } else if (variant.buildType.name == "debug") {
+                if (variant.flavorName == "mobile") {
+                    outputFileName = "restram-debug.apk"
+                } else if (variant.flavorName == "tv") {
+                    outputFileName = "restram-tv-debug.apk"
                 }
             }
         }
