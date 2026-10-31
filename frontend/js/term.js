@@ -330,7 +330,6 @@ var Tui = (function () {
       bgTag.textContent=bText;
       d.appendChild(bgTag);
     }
-    if(isUnavail){var bad=document.createElement("span");bad.className="pc-bad";bad.textContent="?";bad.title="Tidak ada di hianime";d.appendChild(bad);}
     if(a.poster){var im=document.createElement("img");im.loading="lazy";im.decoding="async";im.alt=a.title||"";im.src=a.poster;im.onerror=function(){this.style.display="none";};d.appendChild(im);}
     var body=document.createElement("div");body.className="poster-body";
     var b=document.createElement("b");b.textContent=a.title||"";body.appendChild(b);
@@ -705,8 +704,7 @@ var Tui = (function () {
             bgTag.textContent=bText;
             d.appendChild(bgTag);
           }
-          if(isUnavail){var bad=document.createElement("span");bad.className="pc-bad";bad.textContent="?";bad.title="Tidak ada di hianime";d.appendChild(bad);}
-          if(a.poster){var im=document.createElement("img");im.loading="lazy";im.decoding="async";im.alt=a.title;im.src=a.poster;im.onerror=function(){this.style.display="none";};d.appendChild(im);}
+                if(a.poster){var im=document.createElement("img");im.loading="lazy";im.decoding="async";im.alt=a.title;im.src=a.poster;im.onerror=function(){this.style.display="none";};d.appendChild(im);}
           var body=document.createElement("div");body.className="poster-body";
           var b=document.createElement("b");b.textContent=a.title;body.appendChild(b);
           var meta=document.createElement("div");meta.className="poster-meta";
@@ -724,9 +722,7 @@ var Tui = (function () {
           meta.textContent=m.join(" · ");
           body.appendChild(meta);
           d.appendChild(body);
-          if(!isUnavail){
-            d.addEventListener("click",function(){App.openTitle(a.id,a.title,a.poster,a.type,a.eps_counter,a);});
-          }
+          d.addEventListener("click",function(){App.openTitle(a.id || a.slug,a.title,a.poster,a.type,a.eps_counter,a);});
           grid.appendChild(d);
         })(S.items[j],j);
       }
