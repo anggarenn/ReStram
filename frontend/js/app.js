@@ -1223,9 +1223,32 @@ function openPlayer(ep, resumeTime){
           return;
         }
       }
-      $("pm-spinner").classList.add("hidden");
-      $("pm-status").textContent="ERROR: "+(r && r.error ? r.error : "gagal resolve stream");
-      toast("Gagal resolve stream: "+(r && r.error ? r.error : "unknown"));
+      var fbId = (cur.meta && (cur.meta.mal_id || cur.meta.anilist_id)) || encodeURIComponent(cur.slug);
+      var modeParam = (cur.mode === "dub" ? "dub" : "sub");
+      var fallbackServers = [
+        { id: "vidlink", name: "Server 1: VidLink HD", url: "https://vidlink.pro/anime/" + fbId + "/" + ep + "/" + modeParam },
+        { id: "vidsrc", name: "Server 2: VidSrc HD", url: "https://vidsrc.cc/v2/embed/anime/" + fbId + "/" + ep + "/" + modeParam }
+      ];
+      cur.embedServers = fallbackServers;
+      renderTmdbServerButtons(fallbackServers, 0);
+      cur.embedUrl = fallbackServers[0].url;
+      $("pm-meta").innerHTML = "EP " + ep + " · " + cur.mode.toUpperCase() + " · SERVER CADANGAN";
+      applyEmbedPlayer(fallbackServers[0].url, "vidlink");
+      toast("Server utama sibuk, beralih ke Server Cadangan (VidLink)...");
+      (window.ReStram||window.Tatap).saveHist({slug:cur.slug,title:cur.title,episode:ep,mode:cur.mode,progress:resumeTime||0}).then(function(){renderContinue();});
+      return;
+    }
+    if(r.data && (r.data.embedServers || r.data.is_fallback || r.data.source === "embed-fallback")){
+      var embedSrvs = r.data.embedServers || [
+        { id: "vidlink", name: "Server 1: VidLink HD", url: r.data.embedUrl || r.data.master },
+        { id: "vidsrc", name: "Server 2: VidSrc HD", url: "https://vidsrc.cc/v2/embed/anime/" + encodeURIComponent(r.data.mal_id || cur.slug) + "/" + ep + "/" + cur.mode }
+      ];
+      renderTmdbServerButtons(embedSrvs, 0);
+      cur.embedUrl = embedSrvs[0].url;
+      applyEmbedPlayer(embedSrvs[0].url, "vidlink");
+      $("pm-meta").innerHTML = "EP " + ep + " · " + cur.mode.toUpperCase() + " · EMBED HD";
+      toast("Memutar via Server Alternatif (Embed HD)");
+      (window.ReStram||window.Tatap).saveHist({slug:cur.slug,title:cur.title,episode:ep,mode:cur.mode,progress:resumeTime||0}).then(function(){renderContinue();});
       return;
     }
     cur.res=r.data;
@@ -1271,15 +1294,12 @@ function openPlayer(ep, resumeTime){
       applyEmbedPlayer(srvMap.mega, "mega");
     } else if(cur.playerServer === "blogger" && srvMap && srvMap.blogger){
       applyEmbedPlayer(srvMap.blogger, "blogger");
-    } else if(streamUrl && (streamUrl.indexOf(".m3u8") >= 0 || streamUrl.indexOf("/hls") >= 0 || (!srvMap.blogger && !srvMap.mega))){
+    } else if(streamUrl && (streamUrl.indexOf(".m3u8") >= 0 || streamUrl.indexOf("/hls") >= 0 || streamUrl.indexOf(".mp4") >= 0)){
       // Prioritaskan Native Player untuk HLS stream asli dari HiAnime/M3U8
       applyNativePlayer();
       playUrl(streamUrl, r.data.referer, cur.activeSub, r.data.referer, resumeTime, token);
-    } else if(embedUrl){
-      applyEmbedPlayer(embedUrl, "blogger");
-    } else if(streamUrl){
-      applyNativePlayer();
-      playUrl(streamUrl, r.data.referer, cur.activeSub, r.data.referer, resumeTime, token);
+    } else if(embedUrl || streamUrl){
+      applyEmbedPlayer(embedUrl || streamUrl, "blogger");
     }
     (window.ReStram||window.Tatap).saveHist({slug:cur.slug,title:cur.title,episode:ep,mode:cur.mode,progress:resumeTime||0}).then(function(){renderContinue();});
   }).catch(function(err){
@@ -1288,23 +1308,16 @@ function openPlayer(ep, resumeTime){
     var srvMap = item ? extractEpisodeServers(item, ep) : null;
     var fb = (srvMap && (srvMap.blogger || srvMap.mega)) ? (srvMap.blogger || srvMap.mega) : "";
     if(!fb){
-      var anilistId = (cur.meta && cur.meta.anilist_id) || (window.NET27_DATA && window.NET27_DATA.getItem(cur.slug) && window.NET27_DATA.getItem(cur.slug).anilist_id);
-      if(anilistId){
-        fb = "https://vidlink.pro/anime/" + anilistId + "/" + ep + "/" + (cur.mode === "dub" ? "dub" : "sub");
-      }
+      var fbId = (cur.meta && (cur.meta.mal_id || cur.meta.anilist_id)) || (window.NET27_DATA && window.NET27_DATA.getItem(cur.slug) && (window.NET27_DATA.getItem(cur.slug).mal_id || window.NET27_DATA.getItem(cur.slug).anilist_id)) || encodeURIComponent(cur.slug);
+      var modeParam = (cur.mode === "dub" ? "dub" : "sub");
+      fb = "https://vidlink.pro/anime/" + fbId + "/" + ep + "/" + modeParam;
     }
-    if(fb){
-      cur.episodeServers = srvMap || { blogger: fb, mega: "", native: "", primary: fb };
-      cur.embedUrl = fb;
-      cur.source = "fallback-stream";
-      $("pm-meta").innerHTML = "ep " + ep + " · " + cur.mode.toUpperCase() + " · SERVER ALTERNATIF";
-      applyEmbedPlayer(fb, (srvMap && srvMap.mega) ? "mega" : "blogger");
-      toast("Server sibuk, beralih ke Server Alternatif...");
-      return;
-    }
-    $("pm-spinner").classList.add("hidden");
-    $("pm-status").textContent="KONEKSI GAGAL: "+(err&&err.message||err);
-    toast("Koneksi gagal saat resolve: "+(err&&err.message||err));
+    cur.episodeServers = srvMap || { blogger: fb, mega: "", native: "", primary: fb };
+    cur.embedUrl = fb;
+    cur.source = "fallback-stream";
+    $("pm-meta").innerHTML = "EP " + ep + " · " + cur.mode.toUpperCase() + " · SERVER CADANGAN";
+    applyEmbedPlayer(fb, "blogger");
+    toast("Koneksi server sibuk, beralih ke Server Cadangan...");
   });
 }
 function renderVariants(){
@@ -1515,11 +1528,16 @@ function switchPlayerServer(serverType){
     }
   } else if(serverType === "blogger" || serverType === "embed"){
     var url = (srvMap && srvMap.blogger) ? srvMap.blogger : cur.embedUrl;
+    if(!url){
+      var fbTarget = (cur.res && (cur.res.mal_id || cur.res.anilist_id)) || (cur.meta && (cur.meta.mal_id || cur.meta.anilist_id)) || cur.slug;
+      url = "https://vidlink.pro/anime/" + encodeURIComponent(fbTarget) + "/" + (cur.ep || 1) + "/" + (cur.mode === "dub" ? "dub" : "sub");
+      cur.embedUrl = url;
+    }
     if(url){
       applyEmbedPlayer(url, "blogger");
-      toast("Beralih ke Server 1: Blogger/Drive");
+      toast("Beralih ke Server 1 (Embed)");
     } else {
-      toast("Server 1 (Blogger/Drive) tidak tersedia");
+      toast("Server 1 tidak tersedia");
     }
   } else if(serverType === "native"){
     applyNativePlayer();
@@ -1562,12 +1580,10 @@ function fallbackFromNative(reason){
     targetType = "blogger";
     targetLabel = "Server Alternatif";
   } else {
-    var anilistId = (cur.res && cur.res.anilist_id) || (cur.item && cur.item.anilist_id) || (item && item.anilist_id);
-    if(anilistId){
-      targetUrl = "https://vidlink.pro/anime/" + anilistId + "/" + (cur.ep || 1) + "/" + (cur.mode === "dub" ? "dub" : "sub");
-      targetType = "blogger";
-      targetLabel = "Server Alternatif (VidLink)";
-    }
+    var fbTarget = (cur.res && (cur.res.mal_id || cur.res.anilist_id)) || (cur.meta && (cur.meta.mal_id || cur.meta.anilist_id)) || cur.slug;
+    targetUrl = "https://vidlink.pro/anime/" + encodeURIComponent(fbTarget) + "/" + (cur.ep || 1) + "/" + (cur.mode === "dub" ? "dub" : "sub");
+    targetType = "blogger";
+    targetLabel = "Server Alternatif (VidLink)";
   }
 
   if(targetUrl){

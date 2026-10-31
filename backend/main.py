@@ -1395,6 +1395,14 @@ async def resolve(slug: str = Query(""), ep: int = Query(1), mode: str = Query("
                         hit["outro"] = sk["outro"]
                 except Exception:
                     pass
+            if "vidlink" in (hit.get("master") or "") or "vidsrc" in (hit.get("master") or "") or "embed" in (hit.get("master") or ""):
+                hit["embedUrl"] = hit["master"]
+                hit["is_fallback"] = True
+                hit["source"] = "embed-fallback"
+                hit["embedServers"] = [
+                    {"id": "vidlink", "name": "Server 1: VidLink HD", "type": "iframe", "url": hit["master"]},
+                    {"id": "vidsrc", "name": "Server 2: VidSrc HD", "type": "iframe", "url": f"https://vidsrc.cc/v2/embed/anime/{hit.get('mal_id') or slug}/{ep}/{mode}"}
+                ]
             await _check_and_prewarm(hit)
             return ok(hit)
 
@@ -1432,7 +1440,53 @@ async def resolve(slug: str = Query(""), ep: int = Query(1), mode: str = Query("
                         pass
 
         if not got:
-            raise last_error or RuntimeError("Stream gagal di-resolve dari semua sumber")
+            # Fallback ke universal embed resolver (VidLink, VidSrc) jika sumber primer 404 / gagal
+            mal_id = ""
+            try:
+                if not maps:
+                    maps = await loop.run_in_executor(None, lambda: hi.hianime_episodes(slug))
+                for m in (maps or []):
+                    if int(m.get("ep", 0)) == int(ep):
+                        ep_id = m.get("ep_id")
+                        s_html = await loop.run_in_executor(None, lambda: hi._fetch(hi.SERVERS_API.format(ep_id)))
+                        p_srvs = hi._parse_servers(s_html, mode)
+                        for srv in p_srvs:
+                            mat = re.search(r'/mal/(\d+)', srv.get("embed", ""))
+                            if mat:
+                                mal_id = mat.group(1)
+                                break
+                        break
+            except Exception:
+                pass
+
+            target_id = mal_id or slug
+            vidlink_url = f"https://vidlink.pro/anime/{target_id}/{ep}/{mode}"
+            vidsrc_url = f"https://vidsrc.cc/v2/embed/anime/{target_id}/{ep}/{mode}"
+            embed_servers = [
+                {"id": "vidlink", "name": "Server 1: VidLink HD", "type": "iframe", "url": vidlink_url},
+                {"id": "vidsrc", "name": "Server 2: VidSrc HD", "type": "iframe", "url": vidsrc_url}
+            ]
+            got = {
+                "slug": slug,
+                "episode": ep,
+                "mode": mode,
+                "source": "embed-fallback",
+                "server": "Server 1: VidLink HD",
+                "master": vidlink_url,
+                "embedUrl": vidlink_url,
+                "embed_url": vidlink_url,
+                "embedServers": embed_servers,
+                "servers": embed_servers,
+                "episodeServers": {"blogger": vidlink_url, "mega": vidsrc_url, "native": "", "primary": vidlink_url},
+                "picked": {"q": "HD (Embed)", "url": vidlink_url},
+                "variants": [{"q": "HD (Embed)", "url": vidlink_url}],
+                "subtitles": [],
+                "intro": {"start": 0, "end": 0},
+                "outro": {"start": 0, "end": 0},
+                "cached": False,
+                "mal_id": mal_id,
+                "is_fallback": True
+            }
 
         got["source"] = active_source
         got["picked"] = hi.select_quality(got["variants"], q)

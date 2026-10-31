@@ -123,6 +123,34 @@ def test_banner_and_schedule():
         assert card_count > 0, "Schedule items must be rendered"
         print("[E2E] PASS: Realtime schedule UI renders correctly", flush=True)
 
+        # 7. Test unhosted / 404 anime fallback (e.g. Manin Densha)
+        page.evaluate("""() => {
+            if(window.closeTitle) window.closeTitle();
+            if(window.closePlayer) window.closePlayer();
+            App.openTitle("manin-densha", "Manin Densha", "", "OVA", "3/3", {
+                id: "manin-densha",
+                title: "Manin Densha"
+            });
+        }""")
+        page.wait_for_timeout(300)
+        page.locator("#tm-btn-play-primary").click()
+        page.wait_for_timeout(2500)
+
+        # Ensure player is not failing on a dead video element
+        player_active = page.evaluate("""() => {
+            var frame = document.getElementById('pm-embed-frame');
+            var status = document.getElementById('pm-status') ? document.getElementById('pm-status').textContent : '';
+            return {
+                frameVisible: frame && !frame.classList.contains('hidden') && frame.style.display !== 'none',
+                frameSrc: frame ? frame.src : '',
+                status: status
+            };
+        }""")
+        print("[E2E] Manin Densha Player state:", player_active, flush=True)
+        assert player_active["frameVisible"], "Embed frame must be visible for unhosted anime fallback"
+        assert "vidlink.pro" in player_active["frameSrc"] or "vidsrc" in player_active["frameSrc"], "Must stream via VidLink/VidSrc fallback"
+        print("[E2E] PASS: Unhosted anime fallback successfully activates VidLink embed", flush=True)
+
         browser.close()
         print("[E2E] ALL TESTS PASSED!")
 
