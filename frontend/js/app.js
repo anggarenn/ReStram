@@ -358,7 +358,8 @@ function playPrimaryEpisode(){
     targetEp = cur.eps[0];
   }
   if(targetEp){
-    openPlayer(targetEp);
+    var epNum = (typeof targetEp === "object" && targetEp !== null) ? (targetEp.ep || targetEp.episode || 1) : targetEp;
+    openPlayer(epNum);
   }
 }
 
@@ -1029,6 +1030,10 @@ function dismissResumeModal(){
 }
 
 function openPlayer(ep, resumeTime){
+  if(typeof ep === "object" && ep !== null){
+    ep = ep.ep || ep.episode || 1;
+  }
+  ep = parseInt(ep) || 1;
   if(resumeTime === undefined){
     var fetchToken = ++_playTokenCounter;
     cur.playToken = fetchToken;
@@ -3348,7 +3353,10 @@ function loadAnimeDatabase(){
         window.NET27_DATA.resolveStream = function(slug, ep, mode){
           ep = parseInt(ep) || 1;
           mode = (mode === "dub") ? "dub" : "sub";
-          var it = itemMap[slug] || normalized[0];
+          var it = itemMap[slug] || null;
+          if(!it){
+            return { success: false, error: "Stream anime offline tidak tersedia" };
+          }
           var srvs = extractEpisodeServers(it, ep);
           var primaryUrl = srvs.blogger || srvs.mega || srvs.native || "";
 

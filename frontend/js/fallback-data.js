@@ -38314,7 +38314,10 @@
   function resolveFallbackStream(slug, ep, mode){
     ep = (typeof ep === "number") ? ep : (parseInt(ep) || 1);
     mode = (mode === "dub") ? "dub" : "sub";
-    var item = ITEM_MAP[slug] || ITEMS[0];
+    var item = ITEM_MAP[slug] || null;
+    if(!item){
+      return { success: false, error: "Stream anime offline tidak tersedia" };
+    }
     var servers = getEmbedServers(item, ep, mode);
     var primary = servers[0] || { id: "unknown", name: "Default Stream", url: "" };
     var embedUrl = primary.url;
