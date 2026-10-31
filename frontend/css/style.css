@@ -332,10 +332,11 @@ main{width:100%;margin:0;padding:0 0 48px;position:relative;z-index:1;flex:1 0 a
   background:#0b1118;
 }
 .hero-backdrop-container{
-  position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:1;
+  position:absolute;inset:0;pointer-events:auto;cursor:pointer;overflow:hidden;z-index:1;
 }
 .hero-backdrop{
   position:absolute;inset:0;background-size:cover;background-position:center 25%;
+  pointer-events:auto;cursor:pointer;
   image-rendering:-webkit-optimize-contrast;image-rendering:crisp-edges;
   filter:contrast(1.05) brightness(0.96);
   transition:opacity .5s ease, transform .6s cubic-bezier(0.2,0.8,0.2,1);
@@ -1195,7 +1196,7 @@ main{width:100%;margin:0;padding:0 0 48px;position:relative;z-index:1;flex:1 0 a
 .tm-hero-wrap{
   position:relative;width:100%;
   aspect-ratio:21/9;min-height:220px;max-height:360px;
-  overflow:hidden;background:#080a0f;
+  overflow:hidden;background:#080a0f;cursor:pointer;
 }
 @media (max-width: 640px){
   .tm-hero-wrap{aspect-ratio:16/9;min-height:200px}
@@ -1207,18 +1208,20 @@ main{width:100%;margin:0;padding:0 0 48px;position:relative;z-index:1;flex:1 0 a
   image-rendering:-webkit-optimize-contrast;
   filter:contrast(1.05) brightness(0.92);
   transition:background-image .4s ease, opacity .3s ease;
+  cursor:pointer;
 }
 .tm-hero-vignette{
   position:absolute;inset:0;
   background:linear-gradient(to top, #11151e 4%, rgba(17,21,30,0.7) 35%, transparent 75%),
              linear-gradient(to right, #11151e 0%, rgba(17,21,30,0.65) 25%, transparent 60%);
+  pointer-events:none;
 }
 .tm-hero-info{
   position:absolute;inset-x:0;bottom:0;
-  padding:16px 24px;z-index:10;
+  padding:16px 24px;z-index:10;pointer-events:none;
 }
 .tm-hero-info-row{
-  display:flex;gap:18px;align-items:flex-end;
+  display:flex;gap:18px;align-items:flex-end;pointer-events:auto;
 }
 .tm-poster-wrapper{
   flex:0 0 auto;width:clamp(90px,12vw,120px);

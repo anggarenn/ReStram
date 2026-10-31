@@ -313,10 +313,9 @@ var Tui = (function () {
   }
 
   function createCardElement(a, idx){
-    var isUnavail=!a.id && !a.slug;
-    var targetId = a.id || a.slug;
+    var targetId = a.id || a.slug || (a.title ? a.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") : "anime");
     var d=document.createElement("div");
-    d.className="poster-card"+(idx===S.sel?" sel":"")+(isUnavail?" unmapped":"");
+    d.className="poster-card"+(idx===S.sel?" sel":"");
     d.tabIndex=0;
     if(idx != null){
       var idxSpan=document.createElement("span");idxSpan.className="pc-idx";idxSpan.textContent=String(idx+1).padStart(2,"0");d.appendChild(idxSpan);
@@ -344,13 +343,11 @@ var Tui = (function () {
     meta.textContent=m.join(" · ");
     body.appendChild(meta);
     d.appendChild(body);
-    if(!isUnavail){
-      d.addEventListener("click",function(){
-        if(typeof App!=="undefined"&&App.openTitle){
-          App.openTitle(targetId,a.title,a.poster,a.type,a.eps_counter,a);
-        }
-      });
-    }
+    d.addEventListener("click",function(){
+      if(typeof App!=="undefined"&&App.openTitle){
+        App.openTitle(targetId,a.title,a.poster,a.type,a.eps_counter,a);
+      }
+    });
     return d;
   }
 
@@ -1589,8 +1586,8 @@ var Tui = (function () {
             S.catalogFilter = { status: "releasing", sort: "popularity", type: "", year: "", season: "", month: "", genre: curGenre };
             break;
           case "latest":
-            S.catalogFilter = { sort: "latest", status: "", type: "", year: "", season: "", month: "", genre: curGenre };
-            break;
+            setView("terbaru");
+            return;
           case "top":
             S.catalogFilter = { sort: "score", status: "", type: "", year: "", season: "", month: "", genre: curGenre };
             break;
@@ -1742,5 +1739,7 @@ var Tui = (function () {
   window.renderSearchResults = renderResults;
   window.showSearchResults = exportsObj.showSearchResults;
   window.startSearch = startSearch;
+  window.setView = setView;
+  window.Tui = exportsObj;
   return exportsObj;
 })();

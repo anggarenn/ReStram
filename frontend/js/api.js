@@ -54,8 +54,36 @@ function mockJget(u){
     return { success: true, data: { items: list.slice(0, 30), page: 1, total_pages: Math.max(1, Math.ceil(list.length / 30)), cached: true } };
   }
   if(parsedUrl === "/api/schedule" || parsedUrl === "/api/upcoming-episodes"){
-    var day = params.day || "today";
-    return { success: true, data: { items: d.items.slice(0, 7), weekday: day, current_day: day, is_today: true } };
+    var day = (params.day || "today").toLowerCase();
+    var sData = window.SCHEDULE_DATA || null;
+    var dayKeys = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
+    var idMap = { "senin":"monday","selasa":"tuesday","rabu":"wednesday","kamis":"thursday","jumat":"friday","sabtu":"saturday","minggu":"sunday" };
+    var now = new Date();
+    var jsDay = now.getDay();
+    var todayKey = dayKeys[(jsDay + 6) % 7];
+    var targetKey = todayKey;
+    if(day === "today") targetKey = todayKey;
+    else if(day === "yesterday") targetKey = dayKeys[((jsDay + 5) % 7)];
+    else if(day === "tomorrow") targetKey = dayKeys[(jsDay % 7)];
+    else if(idMap[day]) targetKey = idMap[day];
+    else if(dayKeys.indexOf(day) >= 0) targetKey = day;
+
+    if(day === "all" && sData){
+      return { success: true, data: sData };
+    }
+    var items = (sData && sData[targetKey]) ? sData[targetKey] : d.items.slice(0, 7);
+    return {
+      success: true,
+      data: {
+        items: items,
+        day: day,
+        weekday: targetKey,
+        current_day: todayKey,
+        is_today: (targetKey === todayKey),
+        total: items.length,
+        cached: true
+      }
+    };
   }
   if(parsedUrl === "/api/search" || parsedUrl === "/api/hianime/search" || parsedUrl === "/api/otakudesu/search"){
     var q = params.q || "";

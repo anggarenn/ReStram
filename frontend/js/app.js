@@ -340,27 +340,14 @@ function setSynopsisLang(lang){
 }
 
 function playPrimaryEpisode(){
-  if(!cur.eps || !cur.eps.length){
-    toast("Memuat episode, silakan tunggu...");
-    return;
-  }
-  var targetEp = null;
+  var epNum = 1;
   if(cur.lastWatchedEp){
-    for(var i=0; i<cur.eps.length; i++){
-      var epNum = cur.eps[i].ep || cur.eps[i].episode || (i+1);
-      if(parseInt(epNum) === parseInt(cur.lastWatchedEp)){
-        targetEp = cur.eps[i];
-        break;
-      }
-    }
+    epNum = parseInt(cur.lastWatchedEp) || 1;
+  } else if(cur.eps && cur.eps.length){
+    var targetEp = cur.eps[0];
+    epNum = (typeof targetEp === "object" && targetEp !== null) ? (targetEp.ep || targetEp.episode || 1) : (parseInt(targetEp) || 1);
   }
-  if(!targetEp){
-    targetEp = cur.eps[0];
-  }
-  if(targetEp){
-    var epNum = (typeof targetEp === "object" && targetEp !== null) ? (targetEp.ep || targetEp.episode || 1) : targetEp;
-    openPlayer(epNum);
-  }
+  openPlayer(epNum);
 }
 
 function updatePlayPrimaryButton(){
@@ -520,6 +507,7 @@ function openTitle(slug,title,poster,type,epsCounter,meta){
   cur.watched={};
   cur.activeEpRange=null;
   cur.meta=meta||null;
+  cur.item=null;
   cur.playerServer=null;
   cur.trailerUrl=null;
   cur.synopsis_id=meta && meta.synopsis ? cleanSynopsis(meta.synopsis) : "";
@@ -566,11 +554,25 @@ function openTitle(slug,title,poster,type,epsCounter,meta){
   var heroBd = $("tm-hero-backdrop");
   if(heroBd){
     heroBd.style.backgroundImage = cur.poster ? "url('" + cur.poster + "')" : "none";
+    heroBd.style.cursor = "pointer";
+    heroBd.title = "Putar " + (title || "Anime");
+    heroBd.onclick = function(){ playPrimaryEpisode(); };
   }
   var posterImg = $("tm-poster-img");
   if(posterImg){
     posterImg.src = cur.poster || "";
     posterImg.alt = title;
+    posterImg.style.cursor = "pointer";
+    posterImg.title = "Putar " + (title || "Anime");
+    posterImg.onclick = function(){ playPrimaryEpisode(); };
+  }
+
+  var tmHeroWrap = document.querySelector(".tm-hero-wrap");
+  if(tmHeroWrap){
+    tmHeroWrap.onclick = function(e){
+      if(e.target.closest("button") || e.target.closest("a") || e.target.closest(".tm-poster-wrapper")) return;
+      playPrimaryEpisode();
+    };
   }
 
   // Primary Actions binding
@@ -1248,7 +1250,7 @@ function openPlayer(ep, resumeTime){
         return (it.title || "").toLowerCase().replace(/[^a-z0-9]/g, "") === cleanTitle;
       });
     }
-    var srvMap = (r.data && r.data.episodeServers) || extractEpisodeServers(item, ep);
+    var srvMap = (r.data && r.data.episodeServers) || (item && (item.slug === cur.slug || item.id === cur.slug) ? extractEpisodeServers(item, ep) : { blogger: "", mega: "", native: "", primary: "" });
     cur.episodeServers = srvMap;
 
     var embedUrl = (srvMap && srvMap.blogger) || (r.data && r.data.embedUrl) || "";
@@ -1256,7 +1258,7 @@ function openPlayer(ep, resumeTime){
       embedUrl = srvMap.mega;
     }
     if(!embedUrl){
-      var anilistId = (r.data && r.data.anilist_id) || (cur.item && cur.item.anilist_id) || (window.NET27_DATA && window.NET27_DATA.getItem(cur.slug) && window.NET27_DATA.getItem(cur.slug).anilist_id);
+      var anilistId = (r.data && r.data.anilist_id) || (cur.meta && cur.meta.anilist_id) || (window.NET27_DATA && window.NET27_DATA.getItem(cur.slug) && window.NET27_DATA.getItem(cur.slug).anilist_id);
       if(anilistId){
         embedUrl = "https://vidlink.pro/anime/" + anilistId + "/" + ep + "/" + (cur.mode === "dub" ? "dub" : "sub");
       }
@@ -1267,31 +1269,37 @@ function openPlayer(ep, resumeTime){
 
     if(cur.playerServer === "mega" && srvMap && srvMap.mega){
       applyEmbedPlayer(srvMap.mega, "mega");
-    } else if(cur.playerServer === "native" && streamUrl){
+    } else if(cur.playerServer === "blogger" && srvMap && srvMap.blogger){
+      applyEmbedPlayer(srvMap.blogger, "blogger");
+    } else if(streamUrl && (streamUrl.indexOf(".m3u8") >= 0 || streamUrl.indexOf("/hls") >= 0 || (!srvMap.blogger && !srvMap.mega))){
+      // Prioritaskan Native Player untuk HLS stream asli dari HiAnime/M3U8
       applyNativePlayer();
       playUrl(streamUrl, r.data.referer, cur.activeSub, r.data.referer, resumeTime, token);
-    } else {
-      // Default to Server 1: Blogger/Drive
-      if(embedUrl){
-        applyEmbedPlayer(embedUrl, "blogger");
-      } else {
-        applyNativePlayer();
-        playUrl(streamUrl, r.data.referer, cur.activeSub, r.data.referer, resumeTime, token);
-      }
+    } else if(embedUrl){
+      applyEmbedPlayer(embedUrl, "blogger");
+    } else if(streamUrl){
+      applyNativePlayer();
+      playUrl(streamUrl, r.data.referer, cur.activeSub, r.data.referer, resumeTime, token);
     }
     (window.ReStram||window.Tatap).saveHist({slug:cur.slug,title:cur.title,episode:ep,mode:cur.mode,progress:resumeTime||0}).then(function(){renderContinue();});
   }).catch(function(err){
     if(cur.playToken !== token || cur.slug !== reqSlug || $("player-modal").classList.contains("hidden")) return;
-    var item = (window.NET27_DATA && window.NET27_DATA.getItem(cur.slug)) || cur.meta || cur.item;
-    var srvMap = extractEpisodeServers(item, ep);
-    if(srvMap && (srvMap.blogger || srvMap.mega)){
-      cur.episodeServers = srvMap;
-      var fb = srvMap.blogger || srvMap.mega;
+    var item = (window.NET27_DATA && window.NET27_DATA.getItem(cur.slug)) || (cur.meta && (cur.meta.slug === cur.slug || cur.meta.id === cur.slug) ? cur.meta : null);
+    var srvMap = item ? extractEpisodeServers(item, ep) : null;
+    var fb = (srvMap && (srvMap.blogger || srvMap.mega)) ? (srvMap.blogger || srvMap.mega) : "";
+    if(!fb){
+      var anilistId = (cur.meta && cur.meta.anilist_id) || (window.NET27_DATA && window.NET27_DATA.getItem(cur.slug) && window.NET27_DATA.getItem(cur.slug).anilist_id);
+      if(anilistId){
+        fb = "https://vidlink.pro/anime/" + anilistId + "/" + ep + "/" + (cur.mode === "dub" ? "dub" : "sub");
+      }
+    }
+    if(fb){
+      cur.episodeServers = srvMap || { blogger: fb, mega: "", native: "", primary: fb };
       cur.embedUrl = fb;
-      cur.source = "anime-json";
+      cur.source = "fallback-stream";
       $("pm-meta").innerHTML = "ep " + ep + " · " + cur.mode.toUpperCase() + " · SERVER ALTERNATIF";
-      applyEmbedPlayer(fb, srvMap.blogger ? "blogger" : "mega");
-      toast("Koneksi gagal, beralih ke Server Cadangan...");
+      applyEmbedPlayer(fb, (srvMap && srvMap.mega) ? "mega" : "blogger");
+      toast("Server sibuk, beralih ke Server Alternatif...");
       return;
     }
     $("pm-spinner").classList.add("hidden");
@@ -3519,6 +3527,48 @@ var NetMirror = (function(){
     dots.forEach(function(dot, dIdx){
       dot.classList.toggle("active", dIdx === heroIndex);
     });
+
+    // Banner backdrop & title click action
+    var heroBd = $("hero-backdrop");
+    if(heroBd){
+      heroBd.style.cursor = "pointer";
+      heroBd.title = "Lihat detail " + a.title;
+      heroBd.onclick = function(){
+        if(typeof App !== "undefined" && App.openTitle){
+          App.openTitle(a.id || a.slug, a.title, a.poster, a.type, a.eps_counter, a);
+        }
+      };
+    }
+    var heroTitle = $("hero-title");
+    if(heroTitle){
+      heroTitle.style.cursor = "pointer";
+      heroTitle.title = "Lihat detail " + a.title;
+      heroTitle.onclick = function(){
+        if(typeof App !== "undefined" && App.openTitle){
+          App.openTitle(a.id || a.slug, a.title, a.poster, a.type, a.eps_counter, a);
+        }
+      };
+    }
+    var heroContainer = document.querySelector(".hero-backdrop-container");
+    if(heroContainer){
+      heroContainer.style.cursor = "pointer";
+      heroContainer.onclick = function(e){
+        if(e.target.closest("button") || e.target.closest(".hero-actions") || e.target.closest("#hero-dots")) return;
+        if(typeof App !== "undefined" && App.openTitle){
+          App.openTitle(a.id || a.slug, a.title, a.poster, a.type, a.eps_counter, a);
+        }
+      };
+    }
+    var netHero = $("net-hero");
+    if(netHero){
+      netHero.style.cursor = "pointer";
+      netHero.onclick = function(e){
+        if(e.target.closest("button") || e.target.closest(".hero-actions") || e.target.closest("#hero-dots") || e.target.closest("a")) return;
+        if(typeof App !== "undefined" && App.openTitle){
+          App.openTitle(a.id || a.slug, a.title, a.poster, a.type, a.eps_counter, a);
+        }
+      };
+    }
 
     // Button actions
     var btnPlay = $("hero-btn-play");

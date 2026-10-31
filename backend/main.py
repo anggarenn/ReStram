@@ -960,93 +960,84 @@ async def anime_schedule(day: str = Query("today")):
         sun_end_wib = mon_mid_wib + (7 * 86400) - 1
         sun_end_utc = sun_end_wib - tz_offset
 
-        cache_key = f"schedule_7days_v1_{mon_mid_wib}"
-        cached_data = await get_browse_cache(cache_key, ttl=3600 * 2)
+        cache_key = f"schedule_scrapling_v2_{mon_mid_wib}"
+        cached_data = await get_browse_cache(cache_key, ttl=3600 * 4)
 
         if not cached_data:
-            schedules = await loop.run_in_executor(
-                None, lambda: al.anilist_schedules_range(mon_mid_utc, sun_end_utc, max_pages=6)
-            )
+            from api.schedule_scraper import scrape_realtime_schedule
+            buckets = await loop.run_in_executor(None, scrape_realtime_schedule)
+            if not buckets or not any(len(v) > 0 for v in buckets.values()):
+                # Fallback ke AniList jika scraper offline
+                try:
+                    schedules = await loop.run_in_executor(
+                        None, lambda: al.anilist_schedules_range(mon_mid_utc, sun_end_utc, max_pages=6)
+                    )
+                    pending = []
+                    seen_ids = set()
+                    for s in (schedules or []):
+                        m = s.get("media") or {}
+                        mid = m.get("id")
+                        if not mid or mid in seen_ids:
+                            continue
+                        seen_ids.add(mid)
+                        t_en = (m.get("title") or {}).get("english") or ""
+                        t_ro = (m.get("title") or {}).get("romaji") or ""
+                        primary_title = t_en or t_ro or ""
+                        if not primary_title:
+                            continue
+                        alt_title = t_ro if primary_title != t_ro else ""
+                        pending.append((s, primary_title, alt_title))
 
-            pending = []
-            seen_ids = set()
-            for s in schedules:
-                m = s.get("media") or {}
-                mid = m.get("id")
-                if not mid or mid in seen_ids:
-                    continue
-                seen_ids.add(mid)
-                t_en = (m.get("title") or {}).get("english") or ""
-                t_ro = (m.get("title") or {}).get("romaji") or ""
-                primary_title = t_en or t_ro or ""
-                if not primary_title:
-                    continue
-                alt_title = t_ro if primary_title != t_ro else ""
-                pending.append((s, primary_title, alt_title))
+                    slug_pairs = await _match_slug_batch([(t, alt) for _, t, alt in pending]) if pending else []
+                    slug_by_title = {t: sl for t, sl in slug_pairs}
+                    buckets = {k: [] for k in DAYS_KEYS}
 
-            slug_pairs = await _match_slug_batch([(t, alt) for _, t, alt in pending]) if pending else []
-            slug_by_title = {t: sl for t, sl in slug_pairs}
-
-            buckets = {k: [] for k in DAYS_KEYS}
-
-            for s, title, _ in pending:
-                slug = slug_by_title.get(title)
-                # FILTER KETAT: Yang tidak ada di dalam app ReStram di-REMOVE dari jadwal
-                if not slug:
-                    continue
-
-                airing_at = int(s["airingAt"])
-                dt_wib = _dt.datetime.fromtimestamp(airing_at, _dt.timezone(_dt.timedelta(hours=7)))
-                time_str = dt_wib.strftime("%H:%M WIB")
-                date_str = dt_wib.strftime("%d %b")
-                item_weekday = dt_wib.weekday()
-                day_cat = DAYS_KEYS[item_weekday]
-                day_name = EN_TO_ID.get(day_cat, "Senin")
-
-                cover = (s.get("media") or {}).get("coverImage", {})
-                fmt = (s.get("media") or {}).get("format") or "TV"
-                score = (s.get("media") or {}).get("averageScore") or 0
-
-                item = {
-                    "id": slug,
-                    "title": title,
-                    "episode": s.get("episode") or 0,
-                    "airing_at": airing_at,
-                    "time": time_str,
-                    "date": date_str,
-                    "day": day_cat,
-                    "day_name": day_name,
-                    "poster": cover.get("large") or cover.get("medium") or "",
-                    "type": _format_to_type(fmt),
-                    "score": round(score / 10.0, 1) if score else 0.0,
-                    "matched": True,
-                }
-                buckets[day_cat].append(item)
-
-            for k in buckets:
-                buckets[k].sort(key=lambda x: x["airing_at"])
+                    for s, title, _ in pending:
+                        slug = slug_by_title.get(title)
+                        if not slug:
+                            continue
+                        airing_at = int(s["airingAt"])
+                        dt_wib = _dt.datetime.fromtimestamp(airing_at, _dt.timezone(_dt.timedelta(hours=7)))
+                        day_cat = DAYS_KEYS[dt_wib.weekday()]
+                        cover = (s.get("media") or {}).get("coverImage", {})
+                        buckets[day_cat].append({
+                            "id": slug,
+                            "title": title,
+                            "episode": s.get("episode") or 0,
+                            "airing_at": airing_at,
+                            "time": dt_wib.strftime("%H:%M WIB"),
+                            "date": dt_wib.strftime("%d %b"),
+                            "day": day_cat,
+                            "day_name": EN_TO_ID.get(day_cat, "Senin"),
+                            "poster": cover.get("large") or cover.get("medium") or "",
+                            "type": _format_to_type((s.get("media") or {}).get("format") or "TV"),
+                            "score": round(((s.get("media") or {}).get("averageScore") or 0) / 10.0, 1),
+                            "matched": True,
+                        })
+                except Exception as ex:
+                    buckets = {k: [] for k in DAYS_KEYS}
 
             cached_data = {
                 "week_start": mon_mid_utc,
                 "week_end": sun_end_utc,
                 "current_day": today_key,
-                "current_day_name": EN_TO_ID[today_key],
-                "days": {k: buckets[k] for k in DAYS_KEYS},
-                "monday": buckets["monday"],
-                "tuesday": buckets["tuesday"],
-                "wednesday": buckets["wednesday"],
-                "thursday": buckets["thursday"],
-                "friday": buckets["friday"],
-                "saturday": buckets["saturday"],
-                "sunday": buckets["sunday"],
-                "today": buckets[today_key],
-                "yesterday": buckets[yesterday_key],
-                "tomorrow": buckets[tomorrow_key],
+                "current_day_name": EN_TO_ID.get(today_key, "Hari Ini"),
+                "days": {k: buckets.get(k, []) for k in DAYS_KEYS},
+                "monday": buckets.get("monday", []),
+                "tuesday": buckets.get("tuesday", []),
+                "wednesday": buckets.get("wednesday", []),
+                "thursday": buckets.get("thursday", []),
+                "friday": buckets.get("friday", []),
+                "saturday": buckets.get("saturday", []),
+                "sunday": buckets.get("sunday", []),
+                "today": buckets.get(today_key, []),
+                "yesterday": buckets.get(yesterday_key, []),
+                "tomorrow": buckets.get(tomorrow_key, []),
                 "counts": {
-                    **{k: len(buckets[k]) for k in DAYS_KEYS},
-                    "today": len(buckets[today_key]),
-                    "yesterday": len(buckets[yesterday_key]),
-                    "tomorrow": len(buckets[tomorrow_key]),
+                    **{k: len(buckets.get(k, [])) for k in DAYS_KEYS},
+                    "today": len(buckets.get(today_key, [])),
+                    "yesterday": len(buckets.get(yesterday_key, [])),
+                    "tomorrow": len(buckets.get(tomorrow_key, [])),
                 },
                 "total": sum(len(v) for v in buckets.values()),
                 "cached": False,
