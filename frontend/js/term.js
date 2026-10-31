@@ -312,10 +312,207 @@ var Tui = (function () {
     renderPager();
   }
 
+  function createCardElement(a, idx){
+    var isUnavail=!a.id && !a.slug;
+    var targetId = a.id || a.slug;
+    var d=document.createElement("div");
+    d.className="poster-card"+(idx===S.sel?" sel":"")+(isUnavail?" unmapped":"");
+    d.tabIndex=0;
+    if(idx != null){
+      var idxSpan=document.createElement("span");idxSpan.className="pc-idx";idxSpan.textContent=String(idx+1).padStart(2,"0");d.appendChild(idxSpan);
+    }
+    if(a.badge || a.eps_counter || a.episodes || a.status){
+      var bgTag=document.createElement("span");
+      var isTam = a.badge === "TAMAT" || a.is_finished || a.status === "completed" || a.status === "finished";
+      var bgCol = isTam ? "rgba(5,150,105,0.92)" : "rgba(229,9,20,0.9)";
+      bgTag.className="pc-badge-tag";
+      bgTag.style.cssText="position:absolute;bottom:6px;left:6px;font-size:10px;font-weight:bold;padding:2px 5px;border-radius:3px;background:"+bgCol+";color:#fff;z-index:2;pointer-events:none;";
+      var bText = a.eps_counter ? ("EP " + a.eps_counter) : (a.badge || (a.status === "releasing" ? "AIRING" : (a.episodes ? (a.episodes + " EP") : "TV")));
+      bgTag.textContent=bText;
+      d.appendChild(bgTag);
+    }
+    if(isUnavail){var bad=document.createElement("span");bad.className="pc-bad";bad.textContent="?";bad.title="Tidak ada di hianime";d.appendChild(bad);}
+    if(a.poster){var im=document.createElement("img");im.loading="lazy";im.decoding="async";im.alt=a.title||"";im.src=a.poster;im.onerror=function(){this.style.display="none";};d.appendChild(im);}
+    var body=document.createElement("div");body.className="poster-body";
+    var b=document.createElement("b");b.textContent=a.title||"";body.appendChild(b);
+    var meta=document.createElement("div");meta.className="poster-meta";
+    var m=[];
+    if(a.type)m.push(a.type);
+    if(a.eps_counter)m.push("Ep "+a.eps_counter);
+    else if(a.eps)m.push(a.eps+" ep");
+    if(a.score)m.push("★ "+(parseFloat(a.score)||0).toFixed(1));
+    meta.textContent=m.join(" · ");
+    body.appendChild(meta);
+    d.appendChild(body);
+    if(!isUnavail){
+      d.addEventListener("click",function(){
+        if(typeof App!=="undefined"&&App.openTitle){
+          App.openTitle(targetId,a.title,a.poster,a.type,a.eps_counter,a);
+        }
+      });
+    }
+    return d;
+  }
+
+  function createHiAnimeBlock(title, sub, items, onViewAll){
+    var block = document.createElement("div");
+    block.className = "hianime-block";
+    var head = document.createElement("div");
+    head.className = "hianime-block-head";
+    head.innerHTML = '<h3 class="hianime-block-title"><span class="hianime-title-bar"></span> ' + esc(title) + '</h3>';
+    if(onViewAll){
+      var btn = document.createElement("button");
+      btn.className = "hianime-view-all";
+      btn.innerHTML = 'Lihat Semua <svg class="ui-icon"><use href="#icon-next"/></svg>';
+      btn.addEventListener("click", onViewAll);
+      head.appendChild(btn);
+    }
+    block.appendChild(head);
+
+    var grid = document.createElement("div");
+    grid.className = "poster-grid";
+    grid.style.cssText = "grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; padding: 4px 0;";
+    for(var i = 0; i < items.length; i++){
+      grid.appendChild(createCardElement(items[i], i));
+    }
+    block.appendChild(grid);
+    return block;
+  }
+
+  function renderHiAnimePortal(box){
+    var d = window.NET27_DATA || {};
+    var allItems = (d.items && d.items.length) ? d.items : (S.items || []);
+    if(!allItems.length){
+      box.innerHTML = "<p class='dim'>Memuat portal anime...</p>";
+      return;
+    }
+
+    var portal = document.createElement("div");
+    portal.className = "hianime-portal-layout";
+
+    // Main Column
+    var mainCol = document.createElement("div");
+    mainCol.className = "hianime-main-col";
+
+    // 1. Episode Terbaru (Recently Updated)
+    var latestItems = allItems.slice().reverse().slice(0, 6);
+    mainCol.appendChild(createHiAnimeBlock("⚡ Episode Terbaru", "Update episode terkini Subtitle Indonesia", latestItems, function(){
+      S.catalogFilter = { sort: "latest" };
+      setView("katalog");
+    }));
+
+    // 2. Sedang Tayang (Top Airing)
+    var airingItems = (d.rails && d.rails[1] && d.rails[1].items && d.rails[1].items.length) ? d.rails[1].items.slice(0, 6) : allItems.filter(function(x){ return x.status === "releasing" || (x.type === "TV" && x.episodes > 24); }).slice(0, 6);
+    mainCol.appendChild(createHiAnimeBlock("🌟 Sedang Tayang (Top Airing)", "Anime musim ini yang sedang on-going", airingItems, function(){
+      S.catalogFilter = { status: "releasing", sort: "popularity" };
+      setView("katalog");
+    }));
+
+    // 3. Paling Populer (Most Popular)
+    var popularItems = allItems.slice(0, 6);
+    mainCol.appendChild(createHiAnimeBlock("🔥 Paling Populer (Most Popular)", "Judul favorit sepanjang masa", popularItems, function(){
+      S.catalogFilter = { sort: "popularity" };
+      setView("katalog");
+    }));
+
+    // 4. Skor Tertinggi (Top Rated)
+    var topRatedItems = allItems.slice().sort(function(a, b){ return (parseFloat(b.score) || 0) - (parseFloat(a.score) || 0); }).slice(0, 6);
+    mainCol.appendChild(createHiAnimeBlock("🏆 Skor Tertinggi (Top Rated)", "Anime dengan penilaian rating terbaik", topRatedItems, function(){
+      S.catalogFilter = { sort: "score" };
+      setView("katalog");
+    }));
+
+    // 5. Anime Tamat (Completed)
+    var completedItems = allItems.filter(function(x){ return x.status === "completed" || (x.episodes && x.episodes <= 26); }).slice(0, 6);
+    mainCol.appendChild(createHiAnimeBlock("📦 Sudah Tamat (Completed)", "Siap maraton tanpa menunggu minggu depan", completedItems, function(){
+      S.catalogFilter = { status: "completed", sort: "popularity" };
+      setView("katalog");
+    }));
+
+    portal.appendChild(mainCol);
+
+    // Sidebar Column
+    var sideCol = document.createElement("aside");
+    sideCol.className = "hianime-side-col";
+
+    // Top 10 Box
+    var top10Box = document.createElement("div");
+    top10Box.className = "hianime-side-box";
+    top10Box.innerHTML = '<div class="hianime-side-head"><h4><svg class="ui-icon"><use href="#icon-fire"/></svg> Top 10 Anime</h4></div>';
+    var top10List = document.createElement("div");
+    top10List.className = "hianime-top10-list";
+    var top10Items = allItems.slice(0, 10);
+    for(var k = 0; k < top10Items.length; k++){
+      (function(item, rank){
+        var row = document.createElement("div");
+        row.className = "hianime-top10-item";
+        var rCls = rank === 1 ? "top1" : (rank === 2 ? "top2" : (rank === 3 ? "top3" : ""));
+        row.innerHTML = 
+          '<span class="hianime-rank ' + rCls + '">' + String(rank).padStart(2, "0") + '</span>' +
+          (item.poster ? '<img class="hianime-top-thumb" src="' + esc(item.poster) + '" alt="' + esc(item.title) + '" loading="lazy">' : '<div class="hianime-top-thumb"></div>') +
+          '<div class="hianime-top-info">' +
+            '<span class="hianime-top-title">' + esc(item.title) + '</span>' +
+            '<span class="hianime-top-meta">' + esc(item.type || "TV") + ' · ★ ' + (parseFloat(item.score) || 8.5).toFixed(1) + '</span>' +
+          '</div>';
+        row.addEventListener("click", function(){
+          if(typeof App !== "undefined" && App.openTitle){
+            App.openTitle(item.id || item.slug, item.title, item.poster, item.type, item.eps_counter, item);
+          }
+        });
+        top10List.appendChild(row);
+      })(top10Items[k], k + 1);
+    }
+    top10Box.appendChild(top10List);
+    sideCol.appendChild(top10Box);
+
+    // Genres Box
+    var genresBox = document.createElement("div");
+    genresBox.className = "hianime-side-box";
+    genresBox.innerHTML = '<div class="hianime-side-head"><h4><svg class="ui-icon"><use href="#icon-tag"/></svg> Genre Populer</h4></div>';
+    var genreCloud = document.createElement("div");
+    genreCloud.className = "hianime-genre-cloud";
+    var popularGenres = [
+      {slug: "action", name: "Action"}, {slug: "adventure", name: "Adventure"},
+      {slug: "comedy", name: "Comedy"}, {slug: "drama", name: "Drama"},
+      {slug: "fantasy", name: "Fantasy"}, {slug: "isekai", name: "Isekai"},
+      {slug: "romance", name: "Romance"}, {slug: "sci-fi", name: "Sci-Fi"},
+      {slug: "shounen", name: "Shounen"}, {slug: "supernatural", name: "Supernatural"},
+      {slug: "slice-of-life", name: "Slice of Life"}, {slug: "mystery", name: "Mystery"}
+    ];
+    for(var g = 0; g < popularGenres.length; g++){
+      (function(gen){
+        var chip = document.createElement("button");
+        chip.className = "hianime-genre-chip";
+        chip.textContent = gen.name;
+        chip.addEventListener("click", function(){
+          S.catalogFilter = { genre: gen.slug, sort: "popularity" };
+          setView("katalog");
+        });
+        genreCloud.appendChild(chip);
+      })(popularGenres[g]);
+    }
+    genresBox.appendChild(genreCloud);
+    sideCol.appendChild(genresBox);
+
+    portal.appendChild(sideCol);
+    box.appendChild(portal);
+  }
+
   function renderResults(){
     var box=$("results");box.innerHTML="";
     var sBar = $("schedule-days-bar");
     if(sBar) sBar.classList.toggle("hidden", S.view !== "terbaru");
+
+    var f = S.catalogFilter || {};
+    var isFilteredKatalog = (f.sort && f.sort !== "popularity") || f.status || f.type || f.genre || f.year || f.season || f.month || (S.page > 1);
+
+    if(S.view === "katalog" && !isFilteredKatalog){
+      $("results-title").textContent = "KATALOG ANIME (PORTAL UTAMA)";
+      $("results-meta").textContent = "5 Kategori Pilihan • HiAnime Layout";
+      $("pager").classList.add("hidden");
+      renderHiAnimePortal(box);
+      return;
+    }
     var isTxt = S.view==="terbaru";
     if(!S.items.length){
       var emptyMsg = S.view==="favorit" ? "Belum ada anime favorit tersimpan. Ketuk tombol + FAVORIT pada detail anime untuk menyimpannya ke sini." : "Kosong.";
@@ -468,6 +665,17 @@ var Tui = (function () {
       }
       box.appendChild(frag);
     } else {
+      if(S.view === "katalog" && isFilteredKatalog){
+        var backBar = document.createElement("div");
+        backBar.className = "hianime-back-banner";
+        backBar.innerHTML = '<span>Filter Kategori: <b>' + esc(getCatalogFilterTitle()) + '</b></span><button class="hianime-back-btn">← Kembali ke Beranda Anime</button>';
+        backBar.querySelector(".hianime-back-btn").addEventListener("click", function(){
+          S.catalogFilter = { sort: "popularity" };
+          syncCatalogFilterUI();
+          setView("katalog");
+        });
+        box.appendChild(backBar);
+      }
       var grid=document.createElement("div");grid.className="poster-grid";
       for(var j=0;j<S.items.length;j++){
         (function(a,idx){
