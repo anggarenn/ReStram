@@ -858,6 +858,51 @@ main{width:100%;margin:0;padding:0 0 48px;position:relative;z-index:1;flex:1 0 a
 .btn-cf-genre-clear:hover{background:rgba(239,68,68,0.15);border-color:#ef4444}
 .btn-cf-genre-clear.hidden{display:none}
 
+/* Quick Category Bar in Catalog */
+.catalog-category-bar{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  overflow-x:auto;
+  padding:4px 0 10px;
+  width:100%;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+}
+.catalog-category-bar::-webkit-scrollbar{display:none}
+.catalog-category-bar.hidden{display:none!important}
+.cat-pill{
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  color:#94a3b8;
+  border-radius:9999px;
+  padding:5px 13px;
+  font-size:11.5px;
+  font-weight:600;
+  cursor:pointer;
+  white-space:nowrap;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  transition:all .18s cubic-bezier(0.16,1,0.3,1);
+  flex:0 0 auto;
+  user-select:none;
+}
+.cat-pill:hover{
+  background:rgba(255,255,255,0.12);
+  color:#fff;
+  border-color:rgba(255,255,255,0.25);
+  transform:translateY(-1px);
+}
+.cat-pill.active{
+  background:var(--net-red, #e50914);
+  border-color:var(--net-red, #e50914);
+  color:#fff;
+  box-shadow:0 0 12px rgba(229,9,20,0.45);
+  font-weight:700;
+}
+.cat-pill .ui-icon{width:13px;height:13px}
+
 /* ---- Catalog Cross-Filter Modal & Header Button ---- */
 .catalog-filter-btn{background:var(--panel2);border:1px solid rgba(56,189,248,0.4);color:#38bdf8;padding:4px 10px;border-radius:var(--r);font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:4px;cursor:pointer;margin-left:8px;transition:all .15s}
 .catalog-filter-btn:hover{background:rgba(56,189,248,0.15);border-color:#38bdf8}
@@ -1303,6 +1348,8 @@ video::cue {
   .header-drawer-btn{padding:5px 8px;min-height:34px;min-width:34px;font-size:14px}
   .nav-pills-bar{padding:4px var(--pad-x) 8px;gap:6px}
   .nav-pill{padding:4px 11px;font-size:10.5px}
+  .catalog-category-bar{gap:6px;padding:2px 0 8px}
+  .cat-pill{padding:4px 10px;font-size:10.5px}
   #search-sec{padding:12px var(--pad-x) 32px}
   #results-title{font-size:18px}
 

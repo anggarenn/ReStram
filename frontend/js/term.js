@@ -115,9 +115,14 @@ var Tui = (function () {
     if(v === "terbaru") updateScheduleChips();
     var cfBtn = $("btn-catalog-filter");
     if(cfBtn) cfBtn.classList.toggle("hidden", v !== "katalog");
+    var catBar = $("catalog-category-bar");
+    if(catBar) {
+      catBar.classList.toggle("hidden", v !== "katalog");
+      if(v === "katalog") updateCatalogCategoryPills();
+    }
     switch(v){
       case "cari":$("results-title").textContent="Cari Anime";$("empty-state").style.display="";break;
-      case "musim":$("results-title").textContent="Tayang Musim Ini";break;
+      case "musim":$("results-title").textContent="Baru Rilis (Musim Ini)";break;
       case "trending":$("results-title").textContent="Trending Sekarang";break;
       case "populer":$("results-title").textContent="Top 10 Populer";break;
       case "movies":$("results-title").textContent="Film Barat & Hollywood";break;
@@ -127,7 +132,7 @@ var Tui = (function () {
       case "katalog":$("results-title").textContent=getCatalogFilterTitle();break;
       case "terbaru":{
         var lblDay = SCHEDULE_LABELS[S.scheduleDay] || S.scheduleDay || "Hari Ini";
-        $("results-title").textContent="Jadwal Rilis (" + lblDay + ")";
+        $("results-title").textContent="Episode Terbaru & Jadwal (" + lblDay + ")";
         break;
       }
       case "season-custom":{
@@ -139,6 +144,26 @@ var Tui = (function () {
     }
     $("sb-view").textContent="view: "+v;
     loadView();
+  }
+
+  function updateCatalogCategoryPills(){
+    var bar = $("catalog-category-bar");
+    if(!bar) return;
+    bar.classList.toggle("hidden", S.view !== "katalog");
+    if(S.view !== "katalog") return;
+    var f = S.catalogFilter || {};
+    var activeCat = "popular";
+    if(f.type === "movie") activeCat = "movie";
+    else if(f.status === "completed") activeCat = "completed";
+    else if(f.status === "releasing") activeCat = "airing";
+    else if(f.sort === "score") activeCat = "top";
+    else if(f.sort === "latest" || f.sort === "recently_updated") activeCat = "latest";
+    else if(f.sort === "popularity" || !f.sort) activeCat = "popular";
+
+    bar.querySelectorAll(".cat-pill").forEach(function(pill){
+      var c = pill.getAttribute("data-cat");
+      pill.classList.toggle("active", c === activeCat);
+    });
   }
 
   var _genreList=null;
@@ -159,7 +184,7 @@ var Tui = (function () {
       parts.push("Genre: " + getGenreTitle(f.genre));
     }
     if(f.sort && f.sort !== "popularity") {
-      var sNames = {score: "Skor Tertinggi", latest: "Terbaru", trending: "Trending", az: "A-Z", most_favorite: "Favorit"};
+      var sNames = {score: "Skor Tertinggi", latest: "Episode Terbaru", recently_updated: "Episode Terbaru", trending: "Trending", az: "A-Z", most_favorite: "Favorit"};
       parts.push(sNames[f.sort] || f.sort);
     }
     if(f.year) parts.push(f.year);
@@ -172,8 +197,8 @@ var Tui = (function () {
       var mi = parseInt(f.month);
       parts.push((mi >= 1 && mi <= 12) ? mNames[mi] : ("Bln " + f.month));
     }
-    if(f.type) parts.push(f.type.toUpperCase());
-    if(f.status) parts.push(f.status === "releasing" ? "Airing" : "Tamat");
+    if(f.type) parts.push(f.type === "movie" ? "Film Anime" : f.type.toUpperCase());
+    if(f.status) parts.push(f.status === "releasing" ? "Baru Rilis" : "Tamat");
     if(!parts.length) return "Katalog Populer";
     return "Katalog (" + parts.join(" · ") + ")";
   }
@@ -252,11 +277,13 @@ var Tui = (function () {
       }else{
         S.items=d.items||[];S.page=d.page||1;S.total=d.total_pages||1;S.sel=-1;
       }
-      var label=$("results-title").textContent;
+      var label = (S.view === "katalog") ? getCatalogFilterTitle() : $("results-title").textContent;
+      if(label === "Memuat...") label = (S.view === "katalog" ? getCatalogFilterTitle() : "Koleksi Anime");
       if(d.season) label+=" · "+String(d.season).toUpperCase();
       $("results-title").textContent=label;
       $("results-meta").textContent=S.items.length+" item"+(d.cached?" · cached":"");
       renderResults();renderPager();
+      if(S.view === "katalog") updateCatalogCategoryPills();
     }catch(e){log("err: "+(e&&e.message||e),"err");}
   }
 
@@ -664,6 +691,7 @@ var Tui = (function () {
       if(btnGenre) btnGenre.classList.remove("active");
       if(btnClearGenre) btnClearGenre.classList.add("hidden");
     }
+    updateCatalogCategoryPills();
   }
   function setGroupActive(containerId, activeVal){
     var box = $(containerId);
@@ -1339,6 +1367,38 @@ var Tui = (function () {
         openCatalogFilterModal();
       });
     }
+    document.querySelectorAll("#catalog-category-bar .cat-pill").forEach(function(pill){
+      pill.addEventListener("click", function(){
+        var cat = pill.getAttribute("data-cat");
+        if(!S.catalogFilter) S.catalogFilter = {};
+        S.page = 1;
+        var curGenre = S.catalogFilter.genre || "";
+        switch(cat){
+          case "popular":
+            S.catalogFilter = { sort: "popularity", type: "", status: "", year: "", season: "", month: "", genre: curGenre };
+            break;
+          case "airing":
+            S.catalogFilter = { status: "releasing", sort: "popularity", type: "", year: "", season: "", month: "", genre: curGenre };
+            break;
+          case "latest":
+            S.catalogFilter = { sort: "latest", status: "", type: "", year: "", season: "", month: "", genre: curGenre };
+            break;
+          case "top":
+            S.catalogFilter = { sort: "score", status: "", type: "", year: "", season: "", month: "", genre: curGenre };
+            break;
+          case "movie":
+            S.catalogFilter = { type: "movie", sort: "popularity", status: "", year: "", season: "", month: "", genre: curGenre };
+            break;
+          case "completed":
+            S.catalogFilter = { status: "completed", sort: "popularity", type: "", year: "", season: "", month: "", genre: curGenre };
+            break;
+        }
+        updateCatalogCategoryPills();
+        syncCatalogFilterUI();
+        $("results-title").textContent = getCatalogFilterTitle();
+        loadView();
+      });
+    });
     $("clear-hist").addEventListener("click",async function(){
       try{await fetch("/api/history",{method:"DELETE"});}catch(e){}
       App.renderContinue();log("riwayat dihapus","ok");

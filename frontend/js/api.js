@@ -24,7 +24,34 @@ function mockJget(u){
     return { success: true, data: { items: items, season: "WINTER 2025", page: 1, total_pages: 1, cached: true } };
   }
   if(parsedUrl === "/api/catalog" || parsedUrl === "/api/browse"){
-    return { success: true, data: { items: d.items, page: 1, total_pages: 1, cached: true } };
+    var list = (d.items || []).slice();
+    var sort = params.sort || "";
+    var status = params.status || "";
+    var type = params.type || "";
+    var genre = params.genre || "";
+
+    if(status === "releasing"){
+      if(d.rails && d.rails[1] && d.rails[1].items && d.rails[1].items.length){
+        list = d.rails[1].items.concat(list.filter(function(x){ return x.status === "releasing" || (x.type === "TV" && x.episodes > 24); }));
+      }
+    } else if(status === "completed"){
+      list = list.filter(function(x){ return x.status === "completed" || (x.episodes && x.episodes <= 26); });
+    }
+    if(type === "movie"){
+      list = list.filter(function(x){ return x.type === "movie" || /movie|film/i.test(x.title || ""); });
+    }
+    if(genre){
+      list = list.filter(function(x){
+        var gs = (x.genres || []).map(function(g){ return (typeof g === "string" ? g : (g.title||"")).toLowerCase(); });
+        return gs.indexOf(genre.toLowerCase()) >= 0;
+      });
+    }
+    if(sort === "score"){
+      list.sort(function(a, b){ return (parseFloat(b.score) || 0) - (parseFloat(a.score) || 0); });
+    } else if(sort === "latest" || sort === "recently_updated"){
+      list.reverse();
+    }
+    return { success: true, data: { items: list.slice(0, 30), page: 1, total_pages: Math.max(1, Math.ceil(list.length / 30)), cached: true } };
   }
   if(parsedUrl === "/api/schedule" || parsedUrl === "/api/upcoming-episodes"){
     var day = params.day || "today";

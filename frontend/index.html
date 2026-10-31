@@ -230,10 +230,12 @@
     <!-- Scrollable storefront navigation -->
     <nav class="nav-pills-bar" id="nav-pills-bar" aria-label="Filter Kategori">
       <button class="nav-pill active" data-view="home"><svg class="ui-icon"><use href="#icon-tv"/></svg> Beranda</button>
-      <button class="nav-pill" data-view="movies"><svg class="ui-icon"><use href="#icon-film"/></svg> Film</button>
       <button class="nav-pill" data-view="katalog"><svg class="ui-icon"><use href="#icon-catalog"/></svg> Anime</button>
-      <button class="nav-pill" data-view="ongoing"><svg class="ui-icon"><use href="#icon-circle-dot"/></svg> Serial TV</button>
+      <button class="nav-pill" data-view="musim"><svg class="ui-icon"><use href="#icon-star"/></svg> Baru Rilis</button>
+      <button class="nav-pill" data-view="terbaru"><svg class="ui-icon"><use href="#icon-clock"/></svg> Episode Terbaru</button>
       <button class="nav-pill" data-view="trending"><svg class="ui-icon"><use href="#icon-fire"/></svg> Trending</button>
+      <button class="nav-pill" data-view="movies"><svg class="ui-icon"><use href="#icon-film"/></svg> Film</button>
+      <button class="nav-pill" data-view="ongoing"><svg class="ui-icon"><use href="#icon-circle-dot"/></svg> Serial TV</button>
       <button class="nav-pill" data-view="favorit"><svg class="ui-icon"><use href="#icon-heart"/></svg> Daftar Tontonan</button>
     </nav>
   </div>
@@ -386,6 +388,14 @@
         <span id="results-meta" class="dim small"></span>
         <button id="btn-catalog-filter" class="icon-btn catalog-filter-btn hidden" title="Filter Katalog (Cross Filter Urutan + Tahun + Bulan)"><svg class="ui-icon"><use href="#icon-filter"/></svg> Filter</button>
       </div>
+      <div id="catalog-category-bar" class="catalog-category-bar hidden" role="group" aria-label="Kategori Anime">
+        <button class="cat-pill active" data-cat="popular"><svg class="ui-icon"><use href="#icon-fire"/></svg> Terpopuler</button>
+        <button class="cat-pill" data-cat="airing"><svg class="ui-icon"><use href="#icon-circle-dot"/></svg> Baru Rilis</button>
+        <button class="cat-pill" data-cat="latest"><svg class="ui-icon"><use href="#icon-clock"/></svg> Episode Terbaru</button>
+        <button class="cat-pill" data-cat="top"><svg class="ui-icon"><use href="#icon-star"/></svg> Skor Tertinggi</button>
+        <button class="cat-pill" data-cat="movie"><svg class="ui-icon"><use href="#icon-film"/></svg> Film Anime</button>
+        <button class="cat-pill" data-cat="completed"><svg class="ui-icon"><use href="#icon-check"/></svg> Tamat</button>
+      </div>
       <div id="schedule-days-bar" class="seg schedule-days-bar hidden" role="group" aria-label="Filter Hari Rilis">
         <button class="ep-range-chip" data-day="monday">Senin</button>
         <button class="ep-range-chip" data-day="tuesday">Selasa</button>
@@ -435,6 +445,14 @@
         <button class="drawer-item" data-view="katalog">
           <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-catalog"/></svg></span>
           <span class="drawer-item-label">Anime</span>
+        </button>
+        <button class="drawer-item" data-view="musim">
+          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-star"/></svg></span>
+          <span class="drawer-item-label">Baru Rilis (Musim Ini)</span>
+        </button>
+        <button class="drawer-item" data-view="terbaru">
+          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-clock"/></svg></span>
+          <span class="drawer-item-label">Episode Terbaru (Jadwal)</span>
         </button>
         <button class="drawer-item" data-view="ongoing">
           <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-circle-dot"/></svg></span>
