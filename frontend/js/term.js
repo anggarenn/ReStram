@@ -320,13 +320,13 @@ var Tui = (function () {
     if(idx != null){
       var idxSpan=document.createElement("span");idxSpan.className="pc-idx";idxSpan.textContent=String(idx+1).padStart(2,"0");d.appendChild(idxSpan);
     }
-    if(a.badge || a.eps_counter || a.episodes || a.status){
+    if(a.time || a.badge || a.eps_counter || a.episodes || a.status){
       var bgTag=document.createElement("span");
       var isTam = a.badge === "TAMAT" || a.is_finished || a.status === "completed" || a.status === "finished";
-      var bgCol = isTam ? "rgba(5,150,105,0.92)" : "rgba(229,9,20,0.9)";
+      var bgCol = a.time ? "rgba(14,165,233,0.92)" : (isTam ? "rgba(5,150,105,0.92)" : "rgba(229,9,20,0.9)");
       bgTag.className="pc-badge-tag";
       bgTag.style.cssText="position:absolute;bottom:6px;left:6px;font-size:10px;font-weight:bold;padding:2px 5px;border-radius:3px;background:"+bgCol+";color:#fff;z-index:2;pointer-events:none;";
-      var bText = a.eps_counter ? ("EP " + a.eps_counter) : (a.badge || (a.status === "releasing" ? "AIRING" : (a.episodes ? (a.episodes + " EP") : "TV")));
+      var bText = a.time ? (a.time + (a.episode ? (" · Ep " + a.episode) : "")) : (a.eps_counter ? ("EP " + a.eps_counter) : (a.badge || (a.status === "releasing" ? "AIRING" : (a.episodes ? (a.episodes + " EP") : "TV"))));
       bgTag.textContent=bText;
       d.appendChild(bgTag);
     }
@@ -335,10 +335,12 @@ var Tui = (function () {
     var b=document.createElement("b");b.textContent=a.title||"";body.appendChild(b);
     var meta=document.createElement("div");meta.className="poster-meta";
     var m=[];
-    if(a.type)m.push(a.type);
-    if(a.eps_counter)m.push("Ep "+a.eps_counter);
-    else if(a.eps)m.push(a.eps+" ep");
-    if(a.score)m.push("★ "+(parseFloat(a.score)||0).toFixed(1));
+    if(a.time) m.push(a.time);
+    if(a.type) m.push(a.type);
+    if(a.episode != null && a.episode !== undefined) m.push("Ep " + a.episode);
+    else if(a.eps_counter) m.push("Ep " + a.eps_counter);
+    else if(a.eps) m.push(a.eps + " ep");
+    if(a.score) m.push("★ "+(parseFloat(a.score)||0).toFixed(1));
     meta.textContent=m.join(" · ");
     body.appendChild(meta);
     d.appendChild(body);
@@ -509,7 +511,7 @@ var Tui = (function () {
       renderHiAnimePortal(box);
       return;
     }
-    var isTxt = S.view==="terbaru";
+    var isTxt = false;
     if(!S.items.length){
       var emptyMsg = S.view==="favorit" ? "Belum ada anime favorit tersimpan. Ketuk tombol + FAVORIT pada detail anime untuk menyimpannya ke sini." : "Kosong.";
       box.innerHTML="<p class='dim'>"+emptyMsg+"</p>";
