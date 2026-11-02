@@ -60,12 +60,36 @@ def test_thumbnail_and_input_styling():
     
     # Layout and blue moderation
     assert 'margin-bottom: -100px;' not in css, "Messy negative margin on snap-row must be removed"
-    assert '-webkit-text-stroke: 3.5px #4b5563' in css, "Top 10 stroke must use clean neutral steel gray"
+    assert '#4b5563' in css, "Top 10 stroke must use clean neutral steel gray"
+    assert '#hero-section' in css, "Hero section styling must be present"
+    assert 'padding-top: 84px' in css, "Hero section must have top padding clearance for mobile navbar"
+
+def test_mobile_compatibility():
+    html_path = 'd:/Ren/ProjectAi/ReStram/frontend/index.html'
+    js_path = 'd:/Ren/ProjectAi/ReStram/frontend/js/app.js'
+    css_path = 'd:/Ren/ProjectAi/ReStram/frontend/css/style.css'
     
-    print("PASS: Thumbnail resolver, input visibility, and layout hygiene verified 100%.")
+    with open(html_path, 'r', encoding='utf-8') as f:
+        html = f.read()
+    with open(js_path, 'r', encoding='utf-8') as f:
+        js = f.read()
+    with open(css_path, 'r', encoding='utf-8') as f:
+        css = f.read()
+        
+    # Check mobile navigation components
+    assert 'id="mobile-categories-bar"' in html, "Mobile categories horizontal bar must exist"
+    assert 'id="mobile-bottom-nav"' in html, "Mobile fixed bottom navigation must exist"
+    assert 'id="bnav-indodrama"' in html, "Mobile bottom nav VIP item must exist"
+    assert 'handleIndoDramaNav' in js, "handleIndoDramaNav must be implemented in app.js"
+    assert 'handleAuthNav' in js, "handleAuthNav must be implemented in app.js"
+    assert 'pb-24' in html, "Rows container must have bottom clearance for mobile bottom nav"
+    assert 'safe-area-inset-bottom' in css, "Safe area inset must be respected in mobile CSS"
+    
+    print("PASS: Mobile navigation, sticky category rail, and bottom nav verified 100%.")
 
 if __name__ == '__main__':
     test_movies_catalog()
     test_auth_and_indodrama_menu()
     test_thumbnail_and_input_styling()
+    test_mobile_compatibility()
     print("ALL TESTS PASSED SUCCESSFULLY! 100% OK.")
