@@ -388,12 +388,12 @@
                 const img = this.getPosterUrl(item.poster_path, false);
                 const num = idx + 1;
                 return `
-                    <div class="flex items-center shrink-0 group/top10card relative w-[140px] md:w-[220px] h-[165px] md:h-[255px] mr-2 md:mr-4 cursor-pointer" onclick='app.openPlayer(${JSON.stringify(item).replace(/'/g, "&#39;")})'>
-                        <div class="top10-num select-none z-10 mr-[-16px] md:mr-[-35px]">
+                    <div class="top10-item group/top10card" onclick='app.openPlayer(${JSON.stringify(item).replace(/'/g, "&#39;")})'>
+                        <div class="top10-num">
                             ${num}
                         </div>
-                        <div class="relative w-[98px] md:w-[150px] h-[150px] md:h-[230px] rounded-xl overflow-hidden shadow-2xl z-20 border border-white/10 group-hover/top10card:scale-105 group-hover/top10card:border-blue-500/80 transition-all duration-300 bg-[#141721] shrink-0">
-                            <img src="${img}" loading="lazy" alt="${item.title}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/300x450/141721/71717a?text=ReStram';">
+                        <div class="top10-poster-wrap">
+                            <img src="${img}" loading="lazy" alt="${item.title}" onerror="this.onerror=null;this.src='https://placehold.co/300x450/141721/71717a?text=ReStram';">
                             <div class="absolute inset-0 bg-blue-600/0 group-hover/top10card:bg-blue-600/15 transition-all"></div>
                         </div>
                     </div>
@@ -467,13 +467,13 @@
             const qual = vote >= 7.5 ? '4K' : 'HD';
 
             return `
-                <div class="w-[124px] sm:w-[150px] md:w-[175px] movie-card shrink-0 cursor-pointer" onclick='app.openPlayer(${JSON.stringify(item).replace(/'/g, "&#39;")})'>
-                    <div class="card-inner rounded-xl overflow-hidden shadow-xl bg-[#141721] border border-white/10 relative">
-                        <img src="${img}" loading="lazy" alt="${item.title}" class="card-poster w-full h-[180px] sm:h-[220px] md:h-[260px] object-cover transition-all duration-300" onerror="this.onerror=null;this.src='https://placehold.co/300x450/141721/71717a?text=ReStram';">
+                <div class="movie-card shrink-0 cursor-pointer" onclick='app.openPlayer(${JSON.stringify(item).replace(/'/g, "&#39;")})'>
+                    <div class="card-inner">
+                        <img src="${img}" loading="lazy" alt="${item.title}" class="card-poster" onerror="this.onerror=null;this.src='https://placehold.co/300x450/141721/71717a?text=ReStram';">
                         
                         <div class="card-play-icon absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity bg-black/45 z-10">
-                            <div class="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.8)] transform scale-90 hover:scale-105 transition-transform">
-                                <i class="fas fa-play text-sm ml-0.5"></i>
+                            <div class="w-10 h-10 md:w-11 md:h-11 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.8)] transform scale-90 hover:scale-105 transition-transform">
+                                <i class="fas fa-play text-xs md:text-sm ml-0.5"></i>
                             </div>
                         </div>
 

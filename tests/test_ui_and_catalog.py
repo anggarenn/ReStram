@@ -63,6 +63,9 @@ def test_thumbnail_and_input_styling():
     assert '#4b5563' in css, "Top 10 stroke must use clean neutral steel gray"
     assert '#hero-section' in css, "Hero section styling must be present"
     assert 'padding-top: 84px' in css, "Hero section must have top padding clearance for mobile navbar"
+    assert '.top10-item' in css and '.top10-poster-wrap' in css, "Top 10 proportional sizing classes must exist"
+    assert 'aspect-ratio: 2 / 3' in css, "Movie cards must enforce 2:3 aspect-ratio"
+    assert 'top10-item' in js, "app.js must render top10-item"
 
 def test_mobile_compatibility():
     html_path = 'd:/Ren/ProjectAi/ReStram/frontend/index.html'

@@ -1587,9 +1587,19 @@ body {
     background: linear-gradient(to bottom, rgba(12, 13, 18, 0.85) 0%, rgba(12, 13, 18, 0.3) 25%, transparent 50%) !important;
 }
 
-/* Top 10 Outline Styling - Clean Charcoal Outline, Blue on Card Hover */
+/* Top 10 Outline Styling & Proportional Sizing */
+.top10-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    width: 135px;
+    height: 155px;
+    margin-right: 10px;
+    cursor: pointer;
+}
 .top10-num {
-    font-size: 85px;
+    font-size: 80px;
     font-weight: 900;
     line-height: 1;
     color: #0c0d12;
@@ -1597,28 +1607,85 @@ body {
     text-shadow: none;
     letter-spacing: -4px;
     font-family: 'Plus Jakarta Sans', sans-serif;
+    user-select: none;
+    z-index: 10;
+    margin-right: -15px;
+    flex-shrink: 0;
     transition: all 0.25s ease;
 }
+.top10-poster-wrap {
+    position: relative;
+    width: 95px;
+    height: 142px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+    z-index: 20;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: #141721;
+    flex-shrink: 0;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.top10-poster-wrap img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+
 @media (min-width: 768px) {
+    .top10-item {
+        width: 185px;
+        height: 210px;
+        margin-right: 18px;
+    }
     .top10-num {
-        font-size: 175px;
-        -webkit-text-stroke: 4.5px #4b5563;
-        letter-spacing: -10px;
+        font-size: 130px;
+        -webkit-text-stroke: 4px #4b5563;
+        letter-spacing: -8px;
+        margin-right: -24px;
+    }
+    .top10-poster-wrap {
+        width: 125px;
+        height: 188px;
+        border-radius: 12px;
     }
 }
+
+.top10-item:hover .top10-num,
 .group\/top10card:hover .top10-num {
     color: #111827;
     -webkit-text-stroke: 4px #3b82f6 !important;
     text-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
 }
+.top10-item:hover .top10-poster-wrap,
+.group\/top10card:hover .top10-poster-wrap,
 .group\/top10card:hover > div:last-child {
-    border-color: rgba(59, 130, 246, 0.6) !important;
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.8), 0 0 16px rgba(37, 99, 235, 0.25);
+    transform: scale(1.05);
+    border-color: rgba(59, 130, 246, 0.7) !important;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.85), 0 0 18px rgba(37, 99, 235, 0.3);
 }
 
-/* Movie Card Refinements */
+/* Movie Card Refinements - Precise Proportions */
 .movie-card {
+    position: relative;
+    cursor: pointer;
+    flex-shrink: 0;
     transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.snap-row .movie-card {
+    width: 112px !important;
+    flex-shrink: 0 !important;
+}
+@media (min-width: 640px) {
+    .snap-row .movie-card {
+        width: 135px !important;
+    }
+}
+@media (min-width: 768px) {
+    .snap-row .movie-card {
+        width: 155px !important;
+    }
 }
 .movie-card:hover {
     transform: scale(1.04) translateY(-3px);
@@ -1632,6 +1699,14 @@ body {
     background: #141721 !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
     position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+}
+.card-poster {
+    width: 100% !important;
+    aspect-ratio: 2 / 3 !important;
+    object-fit: cover !important;
+    display: block !important;
 }
 
 /* Horizontal Snap Row */
