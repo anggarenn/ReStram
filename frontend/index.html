@@ -1,919 +1,362 @@
 <!DOCTYPE html>
-<html lang="id" style="background:#0b1118;color:#ffffff;">
+<html lang="id" class="dark">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b1118">
-<meta name="application-name" content="ReStram">
-<meta name="apple-mobile-web-app-title" content="ReStram">
-<title>ReStram — Nonton Anime Subtitle Indonesia</title>
-<link rel="stylesheet" href="./css/style.css?v=20261022_1">
-<link rel="icon" type="image/x-icon" href="./favicon.ico">
-<link rel="icon" type="image/png" sizes="192x192" href="./assets/icon-192.png">
-<link rel="apple-touch-icon" href="./assets/icon-512.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#07090e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="application-name" content="ReStram Play">
+    <meta name="description" content="Streaming film layar lebar dan series favorit kualitas 4K Ultra HD tanpa buffering. Koleksi terlengkap dari seluruh genre dengan aksen Cobalt Blue.">
+    
+    <title>ReStram Play – Streaming Film & Series Premium</title>
+
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Stylesheet: FirKaizen Layout with Signature Blue Theme -->
+    <link rel="stylesheet" href="./css/style.css?v=20261103_blue">
+    <link rel="icon" type="image/x-icon" href="./favicon.ico">
 </head>
-<body class="no-crt" style="background:#0b1118;color:#ffffff;">
-<svg xmlns="http://www.w3.org/2000/svg" style="display:none" id="restram-icons">
-  <defs>
-    <!-- Check: Prime Video verified checkmark -->
-    <symbol id="icon-check" viewBox="0 0 24 24">
-      <polyline points="20 6 9 17 4 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </symbol>
-    <!-- Plus: Watchlist add -->
-    <symbol id="icon-plus" viewBox="0 0 24 24">
-      <line x1="12" y1="5" x2="12" y2="19" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-      <line x1="5" y1="12" x2="19" y2="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-    </symbol>
-    <!-- Menu: 3 sleek horizontal bars -->
-    <symbol id="icon-menu" viewBox="0 0 24 24">
-      <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
-    </symbol>
-    <!-- Close: clean X -->
-    <symbol id="icon-close" viewBox="0 0 24 24">
-      <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
-    </symbol>
-    <!-- Search: magnifying glass -->
-    <symbol id="icon-search" viewBox="0 0 24 24">
-      <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/>
-      <path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
-    </symbol>
-    <!-- Season: cherry blossom / calendar flower -->
-    <symbol id="icon-season" viewBox="0 0 24 24">
-      <path d="M12 2C9.5 5 9.5 8 12 10c2.5-2 2.5-5 0-8zm-2 10c-3-2.5-6-2.5-8 .5 3 2.5 6 2.5 8-.5zm4 0c2 3 5 3 8 0-2-3-5-3-8 0zm-5 2c-1 3 0 6 3 8 1-3 0-6-3-8zm6 0c-3 2-4 5-3 8 3-2 4-5 3-8z" fill="currentColor"/>
-    </symbol>
-    <!-- Clock / Schedule -->
-    <symbol id="icon-clock" viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/>
-      <polyline points="12 7 12 12 15 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    </symbol>
-    <!-- TV / Screen -->
-    <symbol id="icon-tv" viewBox="0 0 24 24">
-      <rect x="2" y="7" width="20" height="13" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
-      <polyline points="17 3 12 7 7 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    </symbol>
-    <!-- Star (Outline) -->
-    <symbol id="icon-star" viewBox="0 0 24 24">
-      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/>
-    </symbol>
-    <!-- Star (Filled) -->
-    <symbol id="icon-star-filled" viewBox="0 0 24 24">
-      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="currentColor"/>
-    </symbol>
-    <!-- Catalog / Books -->
-    <symbol id="icon-catalog" viewBox="0 0 24 24">
-      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-    </symbol>
-    <!-- Filter: tuning sliders -->
-    <symbol id="icon-filter" viewBox="0 0 24 24">
-      <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
-    </symbol>
-    <!-- Tag / Genre -->
-    <symbol id="icon-tag" viewBox="0 0 24 24">
-      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/>
-      <circle cx="7" cy="7" r="1.5" fill="currentColor"/>
-    </symbol>
-    <!-- Switch / Arrows -->
-    <symbol id="icon-switch" viewBox="0 0 24 24">
-      <path d="M17 4l4 4-4 4M21 8H3M7 20l-4-4 4-4M3 16h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    </symbol>
-    <!-- Help / Terminal -->
-    <symbol id="icon-help" viewBox="0 0 24 24">
-      <polyline points="4 17 10 11 4 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-      <line x1="12" y1="19" x2="20" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-    </symbol>
-    <!-- Update / Rocket -->
-    <symbol id="icon-update" viewBox="0 0 24 24">
-      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09zM12 15l-3-3m5-7a6 6 0 0 1 7 7c-.5 2.5-3 5-6 6l-3-3c1-3 3.5-5.5 6-6a6 6 0 0 0-4-4z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    </symbol>
-    <!-- Prev / Chevron left -->
-    <symbol id="icon-prev" viewBox="0 0 24 24">
-      <polyline points="15 18 9 12 15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    </symbol>
-    <!-- Next / Chevron right -->
-    <symbol id="icon-next" viewBox="0 0 24 24">
-      <polyline points="9 18 15 12 9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    </symbol>
-    <!-- Step Prev (Bar + Triangle) -->
-    <symbol id="icon-step-prev" viewBox="0 0 24 24">
-      <path d="M6 5v14M18 5L8 12l10 7V5z" fill="currentColor"/>
-    </symbol>
-    <!-- Step Next (Triangle + Bar) -->
-    <symbol id="icon-step-next" viewBox="0 0 24 24">
-      <path d="M18 5v14M6 5l10 7-10 7V5z" fill="currentColor"/>
-    </symbol>
-    <!-- Skip (Double Triangle + Bar) -->
-    <symbol id="icon-skip" viewBox="0 0 24 24">
-      <path d="M5 4l8 8-8 8V4zm8 0l8 8-8 8V4zm8 0h2v16h-2V4z" fill="currentColor"/>
-    </symbol>
-    <!-- Fullscreen -->
-    <symbol id="icon-fullscreen" viewBox="0 0 24 24">
-      <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    </symbol>
-    <!-- Play -->
-    <symbol id="icon-play" viewBox="0 0 24 24">
-      <polygon points="6 4 19 12 6 20 6 4" fill="currentColor"/>
-    </symbol>
-    <!-- Subtitles / CC -->
-    <symbol id="icon-subtitles" viewBox="0 0 24 24">
-      <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
-      <path d="M7 15h3M14 15h3M7 11h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
-    </symbol>
-    <!-- Globe / Language -->
-    <symbol id="icon-globe" viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/>
-      <line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="2"/>
-      <path d="M12 3a15.3 15.3 0 0 1 4 9 15.3 15.3 0 0 1-4 9 15.3 15.3 0 0 1-4-9 15.3 15.3 0 0 1 4-9z" stroke="currentColor" stroke-width="2" fill="none"/>
-    </symbol>
-    <!-- Fire / Popularity -->
-    <symbol id="icon-fire" viewBox="0 0 24 24">
-      <path d="M12 2c1 3 4 5 4 9a6 6 0 0 1-12 0c0-4 3-7 4-9 1 2 2 3 4 0z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/>
-    </symbol>
-    <!-- Trending / Arrow up-right -->
-    <symbol id="icon-trending" viewBox="0 0 24 24">
-      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-      <polyline points="17 6 23 6 23 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
-    </symbol>
-    <!-- Sort A-Z -->
-    <symbol id="icon-sort-az" viewBox="0 0 24 24">
-      <path d="M3 6h4l-4 6h4M3 18l2-6 2 6M3.7 16h2.6M15 6v12M19 14l-4 4-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    </symbol>
-    <!-- Heart / Favorite -->
-    <symbol id="icon-heart" viewBox="0 0 24 24">
-      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/>
-    </symbol>
-    <!-- Film / Movie -->
-    <symbol id="icon-film" viewBox="0 0 24 24">
-      <rect x="2" y="2" width="20" height="20" rx="2.18" stroke="currentColor" stroke-width="2" fill="none"/>
-      <line x1="7" y1="2" x2="7" y2="22" stroke="currentColor" stroke-width="2"/>
-      <line x1="17" y1="2" x2="17" y2="22" stroke="currentColor" stroke-width="2"/>
-      <line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="2"/>
-      <line x1="2" y1="7" x2="7" y2="7" stroke="currentColor" stroke-width="2"/>
-      <line x1="2" y1="17" x2="7" y2="17" stroke="currentColor" stroke-width="2"/>
-      <line x1="17" y1="17" x2="22" y2="17" stroke="currentColor" stroke-width="2"/>
-      <line x1="17" y1="7" x2="22" y2="7" stroke="currentColor" stroke-width="2"/>
-    </symbol>
-    <!-- Disc / OVA -->
-    <symbol id="icon-disc" viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/>
-      <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
-    </symbol>
-    <!-- Sparkles / Special -->
-    <symbol id="icon-sparkles" viewBox="0 0 24 24">
-      <path d="M12 2l2.4 5.6L20 10l-5.6 2.4L12 18l-2.4-5.6L4 10l5.6-2.4L12 2zM19 17l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2z" fill="currentColor"/>
-    </symbol>
-    <!-- Circle Dot / Sedang Tayang -->
-    <symbol id="icon-circle-dot" viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2" fill="none"/>
-      <circle cx="12" cy="12" r="3" fill="currentColor"/>
-    </symbol>
-    <!-- Flag / Sudah Tamat -->
-    <symbol id="icon-flag" viewBox="0 0 24 24">
-      <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    </symbol>
-    <!-- Volume High -->
-    <symbol id="icon-volume-high" viewBox="0 0 24 24">
-      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" stroke="currentColor" stroke-width="2" fill="none"/>
-      <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
-    </symbol>
-    <!-- Volume Mid -->
-    <symbol id="icon-volume-mid" viewBox="0 0 24 24">
-      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" stroke="currentColor" stroke-width="2" fill="none"/>
-      <path d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
-    </symbol>
-    <!-- Volume Mute -->
-    <symbol id="icon-volume-mute" viewBox="0 0 24 24">
-      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" stroke="currentColor" stroke-width="2" fill="none"/>
-      <line x1="23" y1="9" x2="17" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      <line x1="17" y1="9" x2="23" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-    </symbol>
-    <!-- Sun / Brightness -->
-    <symbol id="icon-sun" viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2" fill="none"/>
-      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
-    </symbol>
-    <!-- Double Chevron Left (Rewind 10s) -->
-    <symbol id="icon-rewind" viewBox="0 0 24 24">
-      <polygon points="11 19 2 12 11 5 11 19" fill="currentColor"/>
-      <polygon points="22 19 13 12 22 5 22 19" fill="currentColor"/>
-    </symbol>
-    <!-- Double Chevron Right (Forward 10s) -->
-    <symbol id="icon-forward" viewBox="0 0 24 24">
-      <polygon points="13 19 22 12 13 5 13 19" fill="currentColor"/>
-      <polygon points="2 19 11 12 2 5 2 19" fill="currentColor"/>
-    </symbol>
-  </defs>
-</svg>
-<div id="crt" aria-hidden="true"></div>
-<div id="bg-glow" aria-hidden="true"></div>
+<body class="bg-[#07090e] text-white font-['Plus_Jakarta_Sans',sans-serif] min-h-screen select-none antialiased">
 
-<header class="tui-head net-navbar" id="net-navbar">
-  <div class="nav-container">
-    <div class="nav-main-row">
-      <div class="head-brand" id="nav-brand-logo" role="button" tabindex="0" title="Beranda ReStram">
-        <span class="brand-name net-logo">ReStram</span>
-        <span class="brand-ver" id="brand-ver">v3.0</span>
-      </div>
-      
-      <!-- Rounded-full search pill in center -->
-      <div class="nav-search-pill" id="nav-search-wrap">
-        <span class="search-pill-icon"><svg class="ui-icon"><use href="#icon-search"/></svg></span>
-        <input id="nav-search-input" type="search" placeholder="Cari anime, genre, atau judul..." autocomplete="off" spellcheck="false" autocapitalize="off" aria-label="Cari anime">
-        <button id="nav-search-clear" class="search-pill-clear hidden" title="Hapus pencarian" aria-label="Hapus pencarian"><svg class="ui-icon"><use href="#icon-close"/></svg></button>
-      </div>
-      
-      <div class="head-actions">
-        <button id="btn-drawer-head" class="icon-btn header-drawer-btn nav-menu-btn" title="Buka Menu & Navigasi" aria-label="Menu">
-          <span class="drawer-btn-icon"><svg class="ui-icon"><use href="#icon-menu"/></svg></span>
-          <span class="header-menu-label">Menu</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Scrollable storefront navigation -->
-    <nav class="nav-pills-bar" id="nav-pills-bar" aria-label="Filter Kategori">
-      <button class="nav-pill active" data-view="home"><svg class="ui-icon"><use href="#icon-tv"/></svg> Beranda</button>
-      <button class="nav-pill" data-view="katalog"><svg class="ui-icon"><use href="#icon-catalog"/></svg> Anime</button>
-      <button class="nav-pill" data-view="musim"><svg class="ui-icon"><use href="#icon-star"/></svg> Baru Rilis</button>
-      <button class="nav-pill" data-view="terbaru"><svg class="ui-icon"><use href="#icon-clock"/></svg> Episode Terbaru</button>
-      <button class="nav-pill" data-view="trending"><svg class="ui-icon"><use href="#icon-fire"/></svg> Trending</button>
-      <button class="nav-pill" data-view="movies"><svg class="ui-icon"><use href="#icon-film"/></svg> Film</button>
-      <button class="nav-pill" data-view="ongoing"><svg class="ui-icon"><use href="#icon-circle-dot"/></svg> Serial TV</button>
-      <button class="nav-pill" data-view="favorit"><svg class="ui-icon"><use href="#icon-heart"/></svg> Daftar Tontonan</button>
-    </nav>
-  </div>
-</header>
-
-<main>
-  <!-- NETFLIX / NETMIRROR HOME SECTION -->
-  <div id="net-home-container" class="net-home-container">
-    <!-- HERO SECTION: CINEMATIC CAROUSEL (70-80vh) -->
-    <section id="net-hero" class="net-hero" aria-label="Sorotan Anime">
-      <div class="hero-backdrop-container">
-        <div id="hero-backdrop" class="hero-backdrop" style="background-image: url('https://s4.anilist.co/file/anilistcdn/media/anime/banner/176496-5oY4k2NRqlYs.jpg');"></div>
-        <div class="hero-vignette-bottom"></div>
-        <div class="hero-vignette-left"></div>
-        <div class="hero-vignette-top"></div>
-      </div>
-      <div class="hero-content">
-        <div class="hero-badge-wrap">
-          <span class="hero-badge-top"><svg class="ui-icon"><use href="#icon-star-filled"/></svg> PILIHAN UTAMA</span>
-          <span class="hero-age-badge">16+</span>
-          <span id="hero-score" class="hero-score-badge"><svg class="ui-icon"><use href="#icon-star-filled"/></svg> <b id="hero-score-val">8.9</b></span>
-          <span id="hero-type" class="hero-type-badge">TV Series</span>
-          <span id="hero-season" class="hero-season-badge dim">Winter 2025</span>
-          <span class="hero-quality-badge">UHD • HDR</span>
-          <span class="hero-sub-badge">Sub Indo</span>
-        </div>
-        <h1 id="hero-title" class="hero-title">Solo Leveling Season 2: Arise from the Shadow</h1>
-        <p id="hero-synopsis" class="hero-synopsis">
-          Sung Jinwoo melanjutkan perjalanannya sebagai Shadow Monarch yang mengendalikan pasukan bayangan. Ancaman Dungeon misterius semakin dekat ke dunia manusia.
-        </p>
-        <div class="hero-actions">
-          <button id="hero-btn-play" class="hero-btn-play btn-play" title="Tonton sekarang">
-            <svg class="ui-icon"><use href="#icon-play"/></svg> Putar Sekarang
-          </button>
-          <button id="hero-btn-watchlist" class="hero-btn-circle" title="Tambahkan ke Daftar Tontonan" aria-label="Watchlist">
-            <svg class="ui-icon"><use href="#icon-plus"/></svg>
-          </button>
-          <button id="hero-btn-detail" class="hero-btn-circle" title="Lihat detail & episode" aria-label="Detail">
-            <svg class="ui-icon"><use href="#icon-tv"/></svg>
-          </button>
-        </div>
-      </div>
-      <div class="hero-controls">
-        <button id="hero-prev" class="hero-arrow-btn prev" title="Slide sebelumnya" aria-label="Slide sebelumnya"><svg class="ui-icon"><use href="#icon-prev"/></svg></button>
-        <div id="hero-dots" class="hero-dots" role="tablist" aria-label="Indikator Carousel"></div>
-        <button id="hero-next" class="hero-arrow-btn next" title="Slide berikutnya" aria-label="Slide berikutnya"><svg class="ui-icon"><use href="#icon-next"/></svg></button>
-      </div>
-    </section>
-
-    <!-- HORIZONTAL CONTENT RAILS -->
-    <div id="net-rails-container" class="net-rails-container">
-      <!-- Rail 1: Lanjutkan Menonton -->
-      <section id="continue-sec" class="net-rail hidden">
-        <div class="rail-header">
-          <div class="rail-title-wrap">
-            <h2 class="rail-title"><svg class="ui-icon"><use href="#icon-clock"/></svg> Lanjutkan Menonton</h2>
-          </div>
-          <button class="rail-link-btn" id="clear-hist" title="Hapus riwayat tontonan">Hapus Riwayat</button>
-        </div>
-        <div class="rail-slider-wrapper">
-          <button class="rail-nav-btn prev" aria-label="Scroll ke kiri"><svg class="ui-icon"><use href="#icon-prev"/></svg></button>
-          <div id="continue-row" class="rail-track"></div>
-          <button class="rail-nav-btn next" aria-label="Scroll ke kanan"><svg class="ui-icon"><use href="#icon-next"/></svg></button>
-        </div>
-      </section>
-
-      <!-- Rail 2: Film Box Office & Hollywood -->
-      <section id="lane-season-sec" class="net-rail">
-        <div class="rail-header">
-          <div class="rail-title-wrap">
-            <h2 id="lane-season-title" class="rail-title"><svg class="ui-icon"><use href="#icon-film"/></svg> Film Box Office & Hollywood</h2>
-          </div>
-          <button class="rail-see-all-btn" data-rail-view="movies">Lihat Semua Film <svg class="ui-icon"><use href="#icon-next"/></svg></button>
-        </div>
-        <div class="rail-slider-wrapper">
-          <button class="rail-nav-btn prev" aria-label="Scroll ke kiri"><svg class="ui-icon"><use href="#icon-prev"/></svg></button>
-          <div id="lane-season" class="rail-track"></div>
-          <button class="rail-nav-btn next" aria-label="Scroll ke kanan"><svg class="ui-icon"><use href="#icon-next"/></svg></button>
-        </div>
-      </section>
-
-      <!-- Rail 3: Serial TV Terpopuler -->
-      <section id="lane-latest-sec" class="net-rail">
-        <div class="rail-header">
-          <div class="rail-title-wrap">
-            <h2 class="rail-title"><svg class="ui-icon"><use href="#icon-circle-dot"/></svg> Serial TV Terpopuler</h2>
-          </div>
-          <button class="rail-see-all-btn" data-rail-view="ongoing">Semua Serial <svg class="ui-icon"><use href="#icon-next"/></svg></button>
-        </div>
-        <div class="rail-slider-wrapper">
-          <button class="rail-nav-btn prev" aria-label="Scroll ke kiri"><svg class="ui-icon"><use href="#icon-prev"/></svg></button>
-          <div id="lane-latest" class="rail-track"></div>
-          <button class="rail-nav-btn next" aria-label="Scroll ke kanan"><svg class="ui-icon"><use href="#icon-next"/></svg></button>
-        </div>
-      </section>
-
-      <!-- Rail 4: Anime Populer Pilihan -->
-      <section id="lane-popular-sec" class="net-rail">
-        <div class="rail-header">
-          <div class="rail-title-wrap">
-            <h2 class="rail-title"><svg class="ui-icon"><use href="#icon-star"/></svg> Anime Populer Pilihan</h2>
-          </div>
-          <button class="rail-see-all-btn" data-rail-view="katalog">Katalog Anime <svg class="ui-icon"><use href="#icon-next"/></svg></button>
-        </div>
-        <div class="rail-slider-wrapper">
-          <button class="rail-nav-btn prev" aria-label="Scroll ke kiri"><svg class="ui-icon"><use href="#icon-prev"/></svg></button>
-          <div id="lane-popular" class="rail-track"></div>
-          <button class="rail-nav-btn next" aria-label="Scroll ke kanan"><svg class="ui-icon"><use href="#icon-next"/></svg></button>
-        </div>
-      </section>
-
-      <!-- Rail 5: Serial Anime Masih Tayang (Ongoing) -->
-      <section id="lane-still-sec" class="net-rail hidden">
-        <div class="rail-header">
-          <div class="rail-title-wrap">
-            <h2 class="rail-title"><svg class="ui-icon"><use href="#icon-circle-dot"/></svg> Serial Anime Masih Tayang (Ongoing)</h2>
-          </div>
-          <button class="rail-see-all-btn" data-rail-view="lanjutan">Lihat Semua <svg class="ui-icon"><use href="#icon-next"/></svg></button>
-        </div>
-        <div class="rail-slider-wrapper">
-          <button class="rail-nav-btn prev" aria-label="Scroll ke kiri"><svg class="ui-icon"><use href="#icon-prev"/></svg></button>
-          <div id="lane-still" class="rail-track"></div>
-          <button class="rail-nav-btn next" aria-label="Scroll ke kanan"><svg class="ui-icon"><use href="#icon-next"/></svg></button>
-        </div>
-      </section>
-
-      <!-- Rail 6: Daftar Tontonan Saya (Watchlist) -->
-      <section id="lane-favorites-sec" class="net-rail hidden">
-        <div class="rail-header">
-          <div class="rail-title-wrap">
-            <h2 class="rail-title"><svg class="ui-icon"><use href="#icon-heart"/></svg> Daftar Tontonan Saya (Watchlist)</h2>
-          </div>
-          <button class="rail-see-all-btn" data-rail-view="favorit">Semua Favorit <svg class="ui-icon"><use href="#icon-next"/></svg></button>
-        </div>
-        <div class="rail-slider-wrapper">
-          <button class="rail-nav-btn prev" aria-label="Scroll ke kiri"><svg class="ui-icon"><use href="#icon-prev"/></svg></button>
-          <div id="lane-favorites" class="rail-track"></div>
-          <button class="rail-nav-btn next" aria-label="Scroll ke kanan"><svg class="ui-icon"><use href="#icon-next"/></svg></button>
-        </div>
-      </section>
-    </div>
-  </div>
-
-  <!-- SEARCH & FULL CATALOG GRID VIEW -->
-  <section id="search-sec" class="hidden">
-    <div id="log" class="log hidden"></div>
-    <div class="sec-head">
-      <div class="sec-title-wrap">
-        <h2 id="results-title">siap</h2>
-        <span id="results-meta" class="dim small"></span>
-        <button id="btn-catalog-filter" class="icon-btn catalog-filter-btn hidden" title="Filter Katalog (Cross Filter Urutan + Tahun + Bulan)"><svg class="ui-icon"><use href="#icon-filter"/></svg> Filter</button>
-      </div>
-      <div id="catalog-category-bar" class="catalog-category-bar hidden" role="group" aria-label="Kategori Anime">
-        <button class="cat-pill active" data-cat="popular"><svg class="ui-icon"><use href="#icon-fire"/></svg> Terpopuler</button>
-        <button class="cat-pill" data-cat="airing"><svg class="ui-icon"><use href="#icon-circle-dot"/></svg> Baru Rilis</button>
-        <button class="cat-pill" data-cat="latest"><svg class="ui-icon"><use href="#icon-clock"/></svg> Episode Terbaru</button>
-        <button class="cat-pill" data-cat="top"><svg class="ui-icon"><use href="#icon-star"/></svg> Skor Tertinggi</button>
-        <button class="cat-pill" data-cat="movie"><svg class="ui-icon"><use href="#icon-film"/></svg> Film Anime</button>
-        <button class="cat-pill" data-cat="completed"><svg class="ui-icon"><use href="#icon-check"/></svg> Tamat</button>
-      </div>
-      <div id="schedule-days-bar" class="seg schedule-days-bar hidden" role="group" aria-label="Filter Hari Rilis">
-        <button class="ep-range-chip" data-day="monday">Senin</button>
-        <button class="ep-range-chip" data-day="tuesday">Selasa</button>
-        <button class="ep-range-chip" data-day="wednesday">Rabu</button>
-        <button class="ep-range-chip" data-day="thursday">Kamis</button>
-        <button class="ep-range-chip" data-day="friday">Jumat</button>
-        <button class="ep-range-chip" data-day="saturday">Sabtu</button>
-        <button class="ep-range-chip" data-day="sunday">Minggu</button>
-      </div>
-    </div>
-    <div id="results"></div>
-    <div id="pager" class="pager hidden" role="navigation" aria-label="Navigasi Halaman">
-      <button id="pg-prev" class="pager-btn" title="Halaman sebelumnya ([)"><svg class="ui-icon"><use href="#icon-prev"/></svg> Sebelumnya</button>
-      <span id="pg-info" class="pager-info"></span>
-      <button id="pg-next" class="pager-btn" title="Halaman berikutnya (])">Berikutnya <svg class="ui-icon"><use href="#icon-next"/></svg></button>
-    </div>
-    <div id="empty-state" class="empty">
-      <div class="empty-art">[ ]</div>
-      <p>ketik judul lalu <b>Enter</b>. <span class="dim">(:bantuan untuk daftar perintah, :update untuk cek pembaruan)</span></p>
-    </div>
-  </section>
-</main>
-
-<!-- DRAWER NAVIGATION PANEL -->
-<div id="drawer-panel" class="drawer-overlay hidden" role="dialog" aria-modal="true">
-  <div class="drawer-backdrop" id="drawer-backdrop"></div>
-  <aside class="drawer-content">
-    <div class="drawer-head">
-      <div class="drawer-title">
-        <span class="brand-name net-logo" style="font-size:22px;">ReStram</span>
-        <span class="brand-ver" id="drawer-ver">v3.0</span>
-      </div>
-      <button class="icon-btn drawer-close-btn" id="drawer-close" title="Tutup Menu (Esc)" aria-label="Tutup Menu"><svg class="ui-icon"><use href="#icon-close"/></svg></button>
-    </div>
-
-    <div class="drawer-body">
-      <div class="drawer-group">
-        <div class="drawer-group-label">NAVIGASI UTAMA</div>
-        <button class="drawer-item" data-view="home">
-          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-tv"/></svg></span>
-          <span class="drawer-item-label">Beranda Utama</span>
-        </button>
-        <button class="drawer-item" data-view="movies">
-          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-film"/></svg></span>
-          <span class="drawer-item-label">Film (Hollywood & Barat)</span>
-        </button>
-        <button class="drawer-item" data-view="katalog">
-          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-catalog"/></svg></span>
-          <span class="drawer-item-label">Anime</span>
-        </button>
-        <button class="drawer-item" data-view="musim">
-          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-star"/></svg></span>
-          <span class="drawer-item-label">Baru Rilis (Musim Ini)</span>
-        </button>
-        <button class="drawer-item" data-view="terbaru">
-          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-clock"/></svg></span>
-          <span class="drawer-item-label">Episode Terbaru (Jadwal)</span>
-        </button>
-        <button class="drawer-item" data-view="ongoing">
-          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-circle-dot"/></svg></span>
-          <span class="drawer-item-label">Serial TV</span>
-        </button>
-        <button class="drawer-item" data-view="trending">
-          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-fire"/></svg></span>
-          <span class="drawer-item-label">Trending Sekarang</span>
-        </button>
-        <button class="drawer-item" data-view="favorit">
-          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-heart"/></svg></span>
-          <span class="drawer-item-label">Daftar Tontonan</span>
-        </button>
-      </div>
-
-      <div class="drawer-group">
-        <div class="drawer-group-label">KONTROL & FILTER</div>
-        <button class="drawer-item" id="drawer-catalog-filter">
-          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-filter"/></svg></span>
-          <span class="drawer-item-label">Filter Katalog (Tahun/Bulan/Tipe)</span>
-        </button>
-        <button class="drawer-item" id="drawer-genre">
-          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-tag"/></svg></span>
-          <span class="drawer-item-label">Filter Genre</span>
-        </button>
-        <button class="drawer-item" id="drawer-help">
-          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-help"/></svg></span>
-          <span class="drawer-item-label">Pintasan Keyboard</span>
-        </button>
-      </div>
-
-      <div class="drawer-group">
-        <div class="drawer-group-label">SISTEM</div>
-        <button class="drawer-item highlight" id="drawer-update">
-          <span class="drawer-item-icon"><svg class="ui-icon"><use href="#icon-update"/></svg></span>
-          <span class="drawer-item-label">Periksa Pembaruan</span>
-        </button>
-      </div>
-    </div>
-
-    <div class="drawer-foot">
-      <div class="drawer-foot-row">
-        <span>Status Layanan:</span>
-        <span id="drawer-health-text" class="dim">Online</span>
-      </div>
-      <div class="dim small" style="margin-top:4px;">ReStram • Streaming Modern Bebas Iklan</div>
-    </div>
-  </aside>
-</div>
-
-<!-- UPDATE MODAL DIALOG -->
-<div id="update-modal" class="overlay hidden" role="dialog" aria-modal="true">
-  <div class="sheet update-sheet">
-    <div class="sheet-head">
-      <div>
-        <div class="eyebrow" id="um-eyebrow">PEMBARUAN APLIKASI</div>
-        <h2 id="um-title">ReStram Update</h2>
-        <div class="dim small" id="um-sub">Versi rilis resmi</div>
-      </div>
-      <button class="icon-btn big" id="um-close" title="Tutup (Esc)"><svg class="ui-icon"><use href="#icon-close"/></svg></button>
-    </div>
-    <div class="update-body">
-      <div id="um-content" class="update-notes"></div>
-      <div class="update-actions" id="um-actions"></div>
-    </div>
-  </div>
-</div>
-
-<div id="resume-modal" class="overlay hidden" role="dialog" aria-modal="true">
-  <div class="sheet resume-sheet">
-    <div class="sheet-head">
-      <div style="min-width:0;flex:1">
-        <div class="eyebrow" id="rm-eyebrow">LANJUTKAN TONTONAN</div>
-        <h2 id="rm-title" class="rm-anime-title">Lanjutkan Menonton?</h2>
-        <div class="dim small" id="rm-sub">Episode tersimpan pada posisi terakhir</div>
-      </div>
-      <button class="icon-btn big" id="rm-close" title="Batal (Esc)"><svg class="ui-icon"><use href="#icon-close"/></svg></button>
-    </div>
-    <div class="resume-body">
-      <div class="rm-progress-wrap" id="rm-progress-wrap">
-        <div class="rm-progress-track">
-          <div id="rm-progress-fill" class="rm-progress-fill" style="width: 0%"></div>
-        </div>
-        <div class="rm-progress-labels">
-          <span id="rm-time-current" class="rm-time-val">00:00</span>
-          <span id="rm-percent-badge" class="rm-percent-badge">0% selesai</span>
-          <span id="rm-time-total" class="rm-time-total dim small">00:00</span>
-        </div>
-      </div>
-      <p id="rm-desc" class="dim">Episode ini sebelumnya ditonton hingga menit <b id="rm-time" style="color:var(--txt)">00:00</b>. Pilih lanjutkan dari posisi terakhir atau putar ulang dari awal.</p>
-      <div class="resume-actions">
-        <button id="rm-btn-resume" class="btn-resume-primary" tabindex="1" autofocus>
-          <svg class="ui-icon"><use href="#icon-play"/></svg> <span id="rm-resume-label">Lanjutkan (00:00)</span>
-        </button>
-        <button id="rm-btn-restart" class="btn-resume-secondary" tabindex="2">
-          <svg class="ui-icon"><use href="#icon-rewind"/></svg> <span>Mulai dari Awal (00:00)</span>
-        </button>
-        <button id="rm-btn-cancel" class="btn-resume-cancel" tabindex="3" title="Kembali ke Daftar Episode (Esc)">
-          <svg class="ui-icon"><use href="#icon-close"/></svg> <span>Batal</span>
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="help-overlay" class="overlay hidden" role="dialog" aria-modal="true">
-  <div class="help-sheet">
-    <div class="sec-head"><h2>perintah</h2><button class="link-btn" id="help-close">tutup</button></div>
-    <pre id="help-body" class="help-body"></pre>
-  </div>
-</div>
-
-<div id="genre-modal" class="overlay hidden" role="dialog" aria-modal="true">
-  <div class="genre-sheet">
-    <div class="sec-head">
-      <div>
-        <div class="eyebrow">FILTER GENRE ANIME</div>
-        <h2>Pilih Genre</h2>
-      </div>
-      <button class="icon-btn" id="genre-close" title="Tutup (Esc)"><svg class="ui-icon"><use href="#icon-close"/></svg></button>
-    </div>
-    <div class="genre-search-row">
-      <input id="genre-search" placeholder="Cari genre… (cth: isekai, action, romance)" autocapitalize="off" autocomplete="off" spellcheck="false">
-      <button class="btn btn-muted btn-genre-reset" id="genre-reset-btn" title="Hapus filter genre aktif">Reset Genre</button>
-    </div>
-    <div class="genre-status-bar">
-      <span id="genre-active-status" class="dim small">Tidak ada genre aktif (semua anime)</span>
-    </div>
-    <div id="genre-list" class="genre-list"></div>
-  </div>
-</div>
-
-<!-- CATALOG CROSS-FILTER MODAL -->
-<div id="catalog-filter-modal" class="overlay hidden" role="dialog" aria-modal="true">
-  <div class="sheet catalog-filter-sheet">
-    <div class="sheet-head">
-      <div>
-        <div class="eyebrow">FILTER KATALOG ANIME</div>
-        <h2>Cross Filter: Urutan, Tahun, Musim, Bulan, Tipe &amp; Status</h2>
-        <div class="dim small">Kombinasikan kriteria untuk menemukan anime spesifik</div>
-      </div>
-      <button class="icon-btn big" id="cf-close" title="Tutup (Esc)"><svg class="ui-icon"><use href="#icon-close"/></svg></button>
-    </div>
-
-    <div class="cf-body">
-      <!-- 1. Urutan (Sort) -->
-      <div class="cf-group">
-        <label class="cf-label">URUTAN (SORT)</label>
-        <div class="cf-chips" id="cf-chips-sort">
-          <button class="cf-chip active" data-val="popularity"><svg class="ui-icon"><use href="#icon-fire"/></svg> Terpopuler</button>
-          <button class="cf-chip" data-val="score"><svg class="ui-icon"><use href="#icon-star"/></svg> Skor Tertinggi</button>
-          <button class="cf-chip" data-val="latest"><svg class="ui-icon"><use href="#icon-clock"/></svg> Terbaru</button>
-          <button class="cf-chip" data-val="trending"><svg class="ui-icon"><use href="#icon-trending"/></svg> Trending</button>
-          <button class="cf-chip" data-val="az"><svg class="ui-icon"><use href="#icon-sort-az"/></svg> A-Z</button>
-          <button class="cf-chip" data-val="most_favorite"><svg class="ui-icon"><use href="#icon-heart"/></svg> Favorit</button>
-        </div>
-      </div>
-
-      <!-- 2. Tahun (Year) -->
-      <div class="cf-group">
-        <label class="cf-label">TAHUN RILIS</label>
-        <div class="cf-chips" id="cf-chips-year">
-          <button class="cf-chip active" data-val="">Semua Tahun</button>
-          <button class="cf-chip" data-val="2026">2026</button>
-          <button class="cf-chip" data-val="2025">2025</button>
-          <button class="cf-chip" data-val="2024">2024</button>
-          <button class="cf-chip" data-val="2023">2023</button>
-          <button class="cf-chip" data-val="2022">2022</button>
-          <button class="cf-chip" data-val="2021">2021</button>
-          <button class="cf-chip" data-val="2020">2020</button>
-          <button class="cf-chip" data-val="2015-2019">2015-2019</button>
-          <button class="cf-chip" data-val="2010-2014">2010-2014</button>
-          <button class="cf-chip" data-val="2000-2009">2000-2009</button>
-          <button class="cf-chip" data-val="<2000">&lt;2000</button>
-        </div>
-      </div>
-
-      <!-- 3. Musim (Season) -->
-      <div class="cf-group">
-        <label class="cf-label">MUSIM PENAYANGAN (SEASON)</label>
-        <div class="cf-chips" id="cf-chips-season">
-          <button class="cf-chip active" data-val="">Semua Musim</button>
-          <button class="cf-chip" data-val="spring"><svg class="ui-icon"><use href="#icon-season"/></svg> Musim Semi (Spring)</button>
-          <button class="cf-chip" data-val="summer"><svg class="ui-icon"><use href="#icon-sun"/></svg> Musim Panas (Summer)</button>
-          <button class="cf-chip" data-val="fall"><svg class="ui-icon"><use href="#icon-season"/></svg> Musim Gugur (Fall)</button>
-          <button class="cf-chip" data-val="winter"><svg class="ui-icon"><use href="#icon-sparkles"/></svg> Musim Dingin (Winter)</button>
-        </div>
-      </div>
-
-      <!-- 4. Bulan (Month) -->
-      <div class="cf-group">
-        <label class="cf-label">BULAN RILIS</label>
-        <div class="cf-chips" id="cf-chips-month">
-          <button class="cf-chip active" data-val="">Semua Bulan</button>
-          <button class="cf-chip" data-val="1">Jan (1)</button>
-          <button class="cf-chip" data-val="2">Feb (2)</button>
-          <button class="cf-chip" data-val="3">Mar (3)</button>
-          <button class="cf-chip" data-val="4">Apr (4)</button>
-          <button class="cf-chip" data-val="5">Mei (5)</button>
-          <button class="cf-chip" data-val="6">Jun (6)</button>
-          <button class="cf-chip" data-val="7">Jul (7)</button>
-          <button class="cf-chip" data-val="8">Agu (8)</button>
-          <button class="cf-chip" data-val="9">Sep (9)</button>
-          <button class="cf-chip" data-val="10">Okt (10)</button>
-          <button class="cf-chip" data-val="11">Nov (11)</button>
-          <button class="cf-chip" data-val="12">Des (12)</button>
-        </div>
-      </div>
-
-      <!-- 5. Format / Tipe -->
-      <div class="cf-group">
-        <label class="cf-label">FORMAT / TIPE</label>
-        <div class="cf-chips" id="cf-chips-type">
-          <button class="cf-chip active" data-val="">Semua Format</button>
-          <button class="cf-chip" data-val="tv"><svg class="ui-icon"><use href="#icon-tv"/></svg> TV Series</button>
-          <button class="cf-chip" data-val="movie"><svg class="ui-icon"><use href="#icon-film"/></svg> Movie</button>
-          <button class="cf-chip" data-val="ova"><svg class="ui-icon"><use href="#icon-disc"/></svg> OVA</button>
-          <button class="cf-chip" data-val="ona"><svg class="ui-icon"><use href="#icon-globe"/></svg> ONA</button>
-          <button class="cf-chip" data-val="special"><svg class="ui-icon"><use href="#icon-sparkles"/></svg> Special</button>
-        </div>
-      </div>
-
-      <!-- 6. Status -->
-      <div class="cf-group">
-        <label class="cf-label">STATUS PENAYANGAN</label>
-        <div class="cf-chips" id="cf-chips-status">
-          <button class="cf-chip active" data-val="">Semua Status</button>
-          <button class="cf-chip" data-val="releasing"><svg class="ui-icon"><use href="#icon-circle-dot"/></svg> Sedang Tayang</button>
-          <button class="cf-chip" data-val="completed"><svg class="ui-icon"><use href="#icon-flag"/></svg> Sudah Tamat</button>
-        </div>
-      </div>
-
-      <!-- 7. Genre -->
-      <div class="cf-group">
-        <label class="cf-label">GENRE ANIME</label>
-        <div class="cf-genre-bar">
-          <button type="button" class="btn-cf-genre" id="cf-btn-pick-genre">
-            <svg class="ui-icon"><use href="#icon-tag"/></svg> <span id="cf-btn-genre-label">Semua Genre (Pilih...)</span>
-          </button>
-          <button type="button" class="btn-cf-genre-clear hidden" id="cf-btn-genre-clear" title="Reset Pilihan Genre">
-            <svg class="ui-icon"><use href="#icon-close"/></svg>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="sheet-foot cf-foot">
-      <button class="btn btn-muted" id="cf-reset-btn">Hapus Filter</button>
-      <button class="btn btn-primary" id="cf-apply-btn">Terapkan Filter</button>
-    </div>
-  </div>
-</div>
-
-<!-- Hidden compatibility layer for legacy script bindings -->
-<div id="hidden-compat" style="display:none!important;" aria-hidden="true">
-  <input id="cmd" autocomplete="off" spellcheck="false" autocapitalize="off">
-  <span id="health" class="health"></span>
-  <span id="sb-source" class="sb-source"></span>
-  <span id="sb-view" class="sb-view"></span>
-  <span id="nav-source-label"></span>
-  <button id="btn-cli-toggle"></button>
-  <button id="btn-cli-close"></button>
-  <footer id="bottom-bar" class="collapsed"></footer>
-</div>
-
-<!-- TITLE / EPISODE MODAL (NetMirror / net27.cc Cinematic Style) -->
-<div id="title-modal" class="overlay hidden title-modal-overlay" role="dialog" aria-modal="true">
-  <div class="sheet title-modal-card">
-    <!-- Sticky top bar with Back & Close -->
-    <div class="title-modal-top-bar">
-      <button id="tm-back-btn" class="tm-top-btn" title="Kembali (Esc)" aria-label="Kembali">
-        <svg class="ui-icon"><use href="#icon-prev"/></svg> <span>Kembali</span>
-      </button>
-      <div id="tm-top-title" class="tm-top-title truncate"></div>
-      <button class="icon-btn big tm-top-close" id="tm-close" title="Tutup (Esc)" aria-label="Tutup">
-        <svg class="ui-icon"><use href="#icon-close"/></svg>
-      </button>
-    </div>
-
-    <!-- Hero Backdrop Banner -->
-    <div class="tm-hero-wrap">
-      <div id="tm-hero-backdrop" class="tm-hero-backdrop"></div>
-      <div class="tm-hero-vignette"></div>
-
-      <!-- Poster + Title Block (overlapping into bottom gradient) -->
-      <div class="tm-hero-info">
-        <div class="tm-hero-info-row">
-          <div class="tm-poster-wrapper">
-            <img id="tm-poster-img" class="tm-poster-img" src="" alt="" loading="lazy">
-          </div>
-          <div class="tm-hero-text">
-            <div class="eyebrow"><span id="tm-eyebrow">DETAIL ANIME</span></div>
-            <h2 id="tm-title" class="tm-title">–</h2>
-            <div id="tm-alt-title" class="tm-alt-title dim small"></div>
+    <!-- Fixed Top Navbar -->
+    <nav id="navbar" class="fixed top-0 w-full z-50 px-4 md:px-8 py-3.5 transition-all duration-300 bg-gradient-to-b from-[#07090e]/95 to-transparent">
+        <div class="flex items-center justify-between gap-4 max-w-7xl mx-auto">
             
-            <div class="tm-meta-pills">
-              <span id="tm-score" class="badge-score hidden">⭐ <b id="tm-score-val">8.4</b></span>
-              <span id="tm-status" class="badge-status hidden">TAMAT</span>
-              <span id="tm-year" class="tm-badge-year hidden"></span>
-              <span id="tm-eps-badge" class="tm-badge-eps hidden"></span>
-              <span class="tm-badge-quality">HD • SUB INDO</span>
+            <!-- Left: Logo & Category Navigation -->
+            <div class="flex items-center gap-6 min-w-0">
+                <div class="fk-logo shrink-0" onclick="app.loadHome()">
+                    <span>ReStram</span>
+                    <span class="fk-logo-play">PLAY</span>
+                </div>
+
+                <ul class="hidden lg:flex items-center gap-4 text-[13px] font-semibold text-gray-400">
+                    <li class="cursor-pointer hover:text-white transition-colors" onclick="app.loadHome()">Beranda</li>
+                    <li id="nav-item-indodrama" class="hidden cursor-pointer hover:text-blue-300 font-bold transition-colors" onclick="app.openCategoryGrid('indodrama_stream', 'IndoDrama21 VIP Stream (Sub Indo)')">
+                        <span class="bg-blue-600/30 text-blue-300 border border-blue-500/40 px-1.5 py-0.5 rounded text-[10px] font-black mr-1 shadow-[0_0_8px_rgba(37,99,235,0.5)]">VIP</span>IndoDrama21
+                    </li>
+                    <li class="cursor-pointer hover:text-blue-400 transition-colors" onclick="app.openCategoryGrid('top_today', 'Top 10 Film Populer Hari Ini')">Top 10</li>
+                    <li class="cursor-pointer hover:text-blue-400 transition-colors" onclick="app.openCategoryGrid('new_releases', 'Film Baru Rilis')">Film Baru</li>
+                    <li class="cursor-pointer hover:text-blue-400 transition-colors" onclick="app.openCategoryGrid('indonesia_movies', 'Bioskop Indonesia Terbaik')">Indonesia</li>
+                    <li class="cursor-pointer hover:text-blue-400 transition-colors" onclick="app.openCategoryGrid('action_movies', 'Action & Adrenalin')">Action</li>
+                    <li class="cursor-pointer hover:text-blue-400 transition-colors" onclick="app.openCategoryGrid('horror_movies', 'Horror & Thriller')">Horror</li>
+                    <li class="cursor-pointer hover:text-blue-400 transition-colors" onclick="app.openCategoryGrid('romance_movies', 'Romansa & Drama')">Romance</li>
+                    <li class="cursor-pointer hover:text-blue-400 transition-colors" onclick="app.openCategoryGrid('scifi_movies', 'Fiksi Ilmiah')">Sci-Fi</li>
+                    <li class="cursor-pointer hover:text-blue-400 transition-colors" onclick="app.openCategoryGrid('fantasy_movies', 'Dunia Fantasi')">Fantasy</li>
+                    <li class="cursor-pointer hover:text-blue-400 transition-colors" onclick="app.openCategoryGrid('popular_series', 'Series Populer')">Series</li>
+                </ul>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Modal Body Content -->
-    <div class="title-modal-body">
-      <!-- Primary Actions (NetMirror style) -->
-      <div class="tm-actions-row">
-        <button id="tm-btn-play-primary" class="tm-btn-play" title="Putar Sekarang">
-          <svg class="ui-icon"><use href="#icon-play"/></svg> <span id="tm-btn-play-label">Putar Sekarang</span>
-        </button>
-        <button id="tm-bookmark-btn" class="tm-bookmark-btn" title="Simpan ke Favorit">
-          <svg class="ui-icon"><use href="#icon-star"/></svg> <span id="tm-bookmark-label">+ DAFTAR TONTONAN</span>
-        </button>
-        <button id="tm-trailer-btn" class="tm-trailer-btn hidden" title="Tonton Trailer Resmi">
-          <svg class="ui-icon"><use href="#icon-film"/></svg> <span>Trailer</span>
-        </button>
-      </div>
+            <!-- Right: Search Bar & Watchlist Action -->
+            <div class="flex items-center gap-3">
+                <div class="relative flex items-center">
+                    <i class="fas fa-search absolute left-3.5 text-xs text-gray-400 pointer-events-none"></i>
+                    <input id="nav-search-input" type="search" placeholder="Cari film, series..." autocomplete="off"
+                           class="w-36 md:w-56 focus:w-64 md:focus:w-72 bg-white/5 focus:bg-slate-900/90 border border-white/10 focus:border-blue-500 rounded-full pl-9 pr-8 py-1.5 text-xs text-white placeholder-gray-400 transition-all outline-none backdrop-blur-md shadow-inner">
+                    <button id="nav-search-clear" class="hidden absolute right-2.5 text-gray-400 hover:text-white text-xs" aria-label="Hapus">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
 
-      <!-- 2-Column Info Grid: Synopsis on left, Studio/Season/Genres on right -->
-      <div id="tm-detail-meta" class="tm-details-grid">
-        <div class="tm-synopsis-col">
-          <div class="tm-synopsis-header">
-            <div class="bar-accent"></div>
-            <span class="tm-synopsis-label">SINOPSIS</span>
-            <div class="tm-synopsis-lang-switch">
-              <button id="tm-syn-id-btn" class="tm-syn-btn active" title="Sinopsis Bahasa Indonesia">IND</button>
-              <button id="tm-syn-mal-btn" class="tm-syn-btn" title="Sinopsis MyAnimeList (English)">MAL</button>
+                <button onclick="app.openCategoryGrid('watchlist', 'Daftar Tontonan Saya')"
+                        class="relative p-2 text-gray-300 hover:text-white rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors" title="Daftar Tontonan" aria-label="Watchlist">
+                    <i class="fas fa-bookmark text-sm"></i>
+                    <span id="nav-watchlist-count" class="hidden absolute -top-1 -right-1 bg-blue-600 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-black shadow">0</span>
+                </button>
+
+                <!-- Auth / Login Button -->
+                <div id="nav-auth-container" class="flex items-center">
+                    <button id="nav-login-btn" onclick="app.openLoginModal()" class="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-[0_0_12px_rgba(37,99,235,0.4)] active:scale-95">
+                        <i class="fas fa-sign-in-alt text-xs"></i>
+                        <span>Masuk</span>
+                    </button>
+                    <div id="nav-user-menu" class="hidden flex items-center gap-2">
+                        <span class="flex items-center gap-1 bg-blue-600/20 border border-blue-500/40 text-blue-300 px-2.5 py-1 rounded-full text-xs font-bold">
+                            <i class="fas fa-crown text-yellow-400 text-[10px]"></i>
+                            <span id="nav-username">VIP</span>
+                        </span>
+                        <button onclick="app.logout()" class="p-1.5 text-gray-400 hover:text-red-400 rounded-full hover:bg-white/5 transition-colors" title="Keluar">
+                            <i class="fas fa-sign-out-alt text-xs"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
-          </div>
-          <p id="tm-synopsis" class="tm-synopsis-text clamped"></p>
-          <button id="tm-synopsis-toggle" class="tm-synopsis-toggle">Selengkapnya ▼</button>
         </div>
-        
-        <div class="tm-sidebar-col">
-          <div class="tm-meta-item" id="tm-studio-wrap">
-            <span class="tm-meta-label">Studio</span>
-            <span id="tm-studio-val" class="tm-meta-val">–</span>
-          </div>
-          <div class="tm-meta-item" id="tm-season-wrap">
-            <span class="tm-meta-label">Musim / Rilis</span>
-            <span id="tm-season-val" class="tm-meta-val">–</span>
-          </div>
-          <div class="tm-meta-item">
-            <span class="tm-meta-label">Genre</span>
-            <div id="tm-genres" class="detail-genres-row"></div>
-          </div>
-        </div>
-      </div>
+    </nav>
 
-      <!-- Seasons & Related Anime -->
-      <div id="tm-seasons" class="seasons-bar hidden">
-        <div class="seasons-header">
-          <div class="bar-accent"></div>
-          <span class="seasons-label">SEASON & TERKAIT</span>
-        </div>
-        <div id="tm-seasons-chips" class="seasons-chips"></div>
-      </div>
+    <!-- Main Container -->
+    <div id="app-container" class="relative">
 
-      <!-- Episode Section -->
-      <div class="tm-episodes-section">
-        <div class="sheet-controls">
-          <div class="tm-episodes-heading">
-            <div class="bar-accent"></div>
-            <span class="tm-episodes-label">DAFTAR EPISODE</span>
-            <span id="tm-count" class="dim small"></span>
-          </div>
-          <div class="tm-episodes-tools">
-            <div class="seg" id="mode-seg">
-              <button data-mode="sub" class="active">SUB</button><button data-mode="dub">DUB</button>
+        <!-- Hero Section -->
+        <header id="hero-section" class="relative w-full h-[76vh] md:h-[84vh] bg-cover bg-center hidden">
+            <!-- Triple Gradients -->
+            <div class="hero-overlay absolute inset-0"></div>
+            <div class="hero-overlay-top absolute inset-0"></div>
+            <div class="hero-overlay-side absolute inset-0"></div>
+
+            <!-- Hero Dots Pagination -->
+            <div class="hero-dots-container absolute bottom-8 right-6 md:right-12 z-30 flex items-center gap-1.5" id="hero-dots"></div>
+
+            <!-- Hero Content Info -->
+            <div class="absolute bottom-16 md:bottom-20 left-4 md:left-12 max-w-2xl md:max-w-3xl z-20 space-y-3.5">
+                <div class="flex items-center gap-2">
+                    <span id="hero-type-badge" class="bg-blue-600/25 border border-blue-500/40 text-blue-400 text-[10px] md:text-[11px] font-black tracking-widest uppercase px-2.5 py-0.5 rounded backdrop-blur-md">MOVIE</span>
+                    <span class="bg-white/10 border border-white/10 text-gray-300 text-[10px] font-extrabold px-2 py-0.5 rounded">4K ULTRA HD</span>
+                </div>
+
+                <h1 id="hero-title" class="text-3xl md:text-5xl lg:text-6xl font-black tracking-tighter leading-none text-white drop-shadow-[0_4px_25px_rgba(0,0,0,0.9)]">
+                    Loading...
+                </h1>
+
+                <div class="flex flex-wrap items-center gap-2.5 text-xs md:text-sm font-bold text-gray-300">
+                    <span id="hero-year" class="text-blue-400">2024</span>
+                    <span class="text-gray-600">•</span>
+                    <span class="border border-blue-500/40 text-blue-400 text-[10px] font-black px-2 py-0.5 rounded uppercase">13+</span>
+                    <span class="text-gray-600">•</span>
+                    <span id="hero-rating" class="flex items-center gap-1 text-yellow-400 font-extrabold"></span>
+                </div>
+
+                <p id="hero-desc" class="text-gray-300 text-xs md:text-sm lg:text-base leading-relaxed line-clamp-3 max-w-xl drop-shadow-md">
+                    Streaming film favorit dengan visual memukau tanpa batas.
+                </p>
+
+                <div id="hero-genre-tags" class="flex flex-wrap gap-2 pt-1 hidden"></div>
+
+                <div class="flex items-center gap-3 pt-2">
+                    <button id="hero-play-btn" class="btn-primary-blue px-6 md:px-8 py-3 rounded-xl font-black flex items-center gap-2.5 text-sm md:text-base shadow-2xl">
+                        <i class="fas fa-play text-xs"></i>
+                        <span>PUTAR SEKARANG</span>
+                    </button>
+                    <button id="hero-list-btn" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-5 md:px-6 py-3 rounded-xl font-bold flex items-center gap-2 text-sm md:text-base backdrop-blur-md transition-all active:scale-95">
+                        <i class="fas fa-plus"></i>
+                        <span>Daftar</span>
+                    </button>
+                    <button id="hero-trailer-btn" class="bg-black/40 hover:bg-black/60 border border-white/15 text-gray-200 px-4 md:px-5 py-3 rounded-xl font-semibold flex items-center gap-2 text-sm backdrop-blur-md transition-all active:scale-95" title="Tonton Trailer">
+                        <i class="fab fa-youtube text-red-500 text-base"></i>
+                        <span class="hidden sm:inline">Trailer</span>
+                    </button>
+                </div>
             </div>
-            <div class="seg" id="quality-seg">
-              <button data-q="best" class="active">BEST</button><button data-q="1080p">1080p</button><button data-q="720p">720p</button><button data-q="480p">480p</button>
+        </header>
+
+        <!-- Dynamic Category Rows -->
+        <main id="rows-container" class="pb-28 relative z-10 min-h-screen pt-4"></main>
+
+        <!-- Full Category Grid View -->
+        <div id="category-grid-view" class="hidden pt-28 px-4 md:px-10 min-h-screen pb-24 max-w-7xl mx-auto">
+            <div class="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
+                <div class="flex items-center gap-3">
+                    <span class="w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)]"></span>
+                    <h2 id="category-grid-title" class="text-xl md:text-3xl font-black text-white"></h2>
+                </div>
+                <button onclick="app.loadHome()" class="text-xs md:text-sm text-gray-400 hover:text-white px-3.5 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:border-white/20 transition-all flex items-center gap-1.5">
+                    <i class="fas fa-arrow-left text-xs"></i>
+                    <span>Kembali ke Beranda</span>
+                </button>
             </div>
-            <input id="ep-filter" placeholder="Cari episode..." inputmode="numeric">
-          </div>
+            <div id="category-grid-content" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
         </div>
-        <div id="tm-ep-ranges" class="ep-ranges hidden"></div>
-        <div id="tm-eps" class="ep-grid"></div>
-      </div>
-    </div>
-  </div>
-</div>
 
-<!-- PLAYER MODAL -->
-<div id="player-modal" class="overlay hidden" role="dialog" aria-modal="true">
-  <div class="player-shell">
-    <div class="player-head">
-      <div class="player-title"><span id="pm-title">–</span><span id="pm-meta" class="dim"></span></div>
-      <div class="player-head-btns">
-        <div class="seg player-server-seg" id="pm-server-seg">
-          <button id="pm-server-embed" class="active" title="Server 1: Blogger/Drive" data-server="blogger"><span class="srv-num">Server 1</span><span class="srv-name">: Blogger/Drive</span></button>
-          <button id="pm-server-mega" title="Server 2: Mega" data-server="mega"><span class="srv-num">Server 2</span><span class="srv-name">: Mega</span></button>
-          <button id="pm-server-native" title="Server 3: HLS Native" data-server="native"><span class="srv-num">Server 3</span><span class="srv-name">: HLS Native</span></button>
+        <!-- Realtime Search View -->
+        <div id="search-view" class="hidden pt-28 px-4 md:px-10 min-h-screen pb-24 max-w-7xl mx-auto">
+            <div class="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
+                <h2 class="text-xl md:text-2xl font-bold text-gray-200">
+                    Hasil Pencarian: <span id="search-query-text" class="text-blue-400 font-black"></span>
+                </h2>
+                <button onclick="app.loadHome()" class="text-xs md:text-sm text-gray-400 hover:text-white px-3.5 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:border-white/20 transition-all flex items-center gap-1.5">
+                    <i class="fas fa-arrow-left text-xs"></i>
+                    <span>Tutup Pencarian</span>
+                </button>
+            </div>
+            <div id="search-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
         </div>
-        <select id="pm-speed-select" class="speed-select" title="Kecepatan Putar Video ([ / ])" aria-label="Kecepatan">
-          <option value="0.5">0.5x</option>
-          <option value="0.75">0.75x</option>
-          <option value="1" selected>1.0x</option>
-          <option value="1.25">1.25x</option>
-          <option value="1.5">1.5x</option>
-          <option value="1.75">1.75x</option>
-          <option value="2">2.0x</option>
-        </select>
-        <select id="pm-quality-select" class="quality-select hidden" title="Pilih Resolusi Video" aria-label="Resolusi"></select>
-        <button id="pm-mpv" title="Putar di MPV (lokal)"><svg class="ui-icon"><use href="#icon-play"/></svg> MPV</button>
-        <button id="pm-fs" title="Layar Penuh / Fullscreen (f)"><svg class="ui-icon"><use href="#icon-fullscreen"/></svg> <span class="fs-text">FULL</span></button>
-        <button id="pm-close" class="icon-btn big" title="Tutup (Esc)"><svg class="ui-icon"><use href="#icon-close"/></svg></button>
-      </div>
-    </div>
-    <div class="ambient-stage">
-      <div id="ambient-fallback" aria-hidden="true"></div>
-      <canvas id="ambient" width="96" height="54" aria-hidden="true"></canvas>
-      <video id="vid" controls playsinline preload="auto"></video>
-      <iframe id="pm-embed-frame" class="embed-player hidden" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope" frameborder="0"></iframe>
-      <div id="pm-gesture-stage" class="gesture-stage" aria-hidden="true">
-        <div id="pm-ripple-left" class="gesture-ripple left"><span class="ripple-icon"><svg class="ui-icon"><use href="#icon-rewind"/></svg></span><span class="ripple-text">-10s</span></div>
-        <div id="pm-ripple-right" class="gesture-ripple right"><span class="ripple-icon"><svg class="ui-icon"><use href="#icon-forward"/></svg></span><span class="ripple-text">+10s</span></div>
-        <div id="pm-gesture-osd" class="gesture-osd hidden">
-          <span id="pm-osd-icon" class="osd-icon"><svg class="ui-icon"><use href="#icon-volume-high"/></svg></span>
-          <div class="osd-bar-wrap"><div id="pm-osd-bar" class="osd-bar" style="width:50%"></div></div>
-          <span id="pm-osd-val" class="osd-val">50%</span>
-        </div>
-      </div>
-      <div id="pm-subs-overlay" class="subs-overlay sz-m" aria-hidden="true"><span></span></div>
-      <!-- Floating Skip Opening / Ending Button -->
-      <button id="pm-skip-btn" class="pm-skip-btn hidden" title="Lewati (Tekan S)">
-        <svg class="ui-icon"><use href="#icon-skip"/></svg>
-        <span id="pm-skip-label">Lewati Opening</span>
-      </button>
-      <div id="pm-spinner" class="spinner hidden"><div class="ring"></div><p id="pm-status">resolving…</p></div>
-    </div>
-    <div class="player-foot">
-      <button id="pm-prev" title="Episode sebelumnya (p)"><svg class="ui-icon"><use href="#icon-step-prev"/></svg> PREV</button>
-      <div id="pm-variants" class="variants"></div>
-      <div id="pm-subs-wrap" class="sub-picker hidden" title="Pilih Subtitle">
-        <span class="sub-icon" aria-hidden="true"><svg class="ui-icon"><use href="#icon-subtitles"/></svg></span>
-        <select id="pm-subs" aria-label="Subtitle"></select>
-        <div class="sub-size" role="group" aria-label="Ukuran subtitle">
-          <button data-subsize="s" title="Subtitle kecil">S</button><button data-subsize="m" title="Subtitle sedang">M</button><button data-subsize="l" title="Subtitle besar">L</button>
-        </div>
-        <button id="pm-translate" class="sub-translate" data-on="0" aria-label="Toggle translate ID">
-          <svg class="ui-icon"><use href="#icon-globe"/></svg><span class="tr-label">ID</span>
-        </button>
-      </div>
-      <button id="pm-next" title="Episode berikutnya (n)">NEXT <svg class="ui-icon"><use href="#icon-step-next"/></svg></button>
-    </div>
-    <div class="player-hint dim small">Space play/pause · ←/→ seek 5 dtk · f fullscreen · [ / ] kecepatan · n/p ganti episode · m mute · Esc tutup</div>
-  </div>
-</div>
 
-<div id="toast" class="toast hidden"><span id="toast-msg"></span></div>
+    </div>
 
-<script src="./js/vendor/hls.min.js"></script>
-<script src="./js/fallback-data.js?v=20261101_4"></script>
-<script src="./js/schedule-data.js?v=20261101_4"></script>
-<script src="./js/api.js?v=20261101_4"></script>
-<script src="./js/term.js?v=20261101_4"></script>
-<script src="./js/app.js?v=20261101_5"></script>
+    <!-- Detail & Streaming Modal -->
+    <div id="detail-modal" class="fixed inset-0 z-[85] hidden items-start justify-center overflow-y-auto py-4 px-2 md:py-8 md:px-4">
+        <!-- Backdrop Blur -->
+        <div class="fixed inset-0 bg-black/85 backdrop-blur-md" onclick="app.closeDetailModal()"></div>
+
+        <!-- Modal Inner Card -->
+        <div class="detail-modal-inner relative z-10 w-full max-w-4xl rounded-2xl overflow-hidden my-auto shadow-2xl">
+            
+            <!-- Sticky Close Button -->
+            <div class="sticky top-0 z-50 w-full flex justify-end p-3 pointer-events-none">
+                <button onclick="app.closeDetailModal()" class="pointer-events-auto w-9 h-9 bg-black/60 hover:bg-blue-600 rounded-full flex items-center justify-center text-white text-base font-black transition-all ring-1 ring-white/20 shadow-xl backdrop-blur-md" aria-label="Tutup">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Banner Header -->
+            <div class="relative w-full h-[240px] md:h-[340px] overflow-hidden -mt-12 bg-neutral-900">
+                <img id="detail-banner-img" src="" alt="Banner" class="w-full h-full object-cover">
+                <div class="detail-banner-grad-bottom"></div>
+                <div class="detail-banner-grad-side"></div>
+
+                <div class="absolute bottom-5 left-6 z-20 flex items-center gap-2">
+                    <span id="detail-type-pill" class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full tracking-widest uppercase shadow-[0_0_12px_rgba(37,99,235,0.7)]">MOVIE</span>
+                    <span class="bg-black/60 border border-white/20 text-blue-300 text-[10px] font-black px-2.5 py-0.5 rounded backdrop-blur-sm">4K ULTRA HD</span>
+                </div>
+            </div>
+
+            <!-- Modal Content Body -->
+            <div class="p-6 md:p-8 relative z-20">
+                
+                <h2 id="detail-title" class="text-2xl md:text-4xl font-black text-white mb-3 leading-tight drop-shadow-md"></h2>
+
+                <div class="flex flex-wrap items-center gap-2.5 mb-4 text-xs md:text-sm">
+                    <span id="detail-year" class="text-blue-400 font-extrabold">2024</span>
+                    <span class="text-gray-600">•</span>
+                    <span id="detail-age-badge" class="border text-[10px] font-black px-2 py-0.5 rounded uppercase">13+</span>
+                    <span class="text-gray-600">•</span>
+                    <span id="detail-duration" class="text-gray-400 font-semibold">Film Layar Lebar</span>
+                    <span class="text-gray-600">•</span>
+                    <div id="detail-rating" class="flex items-center gap-1.5"></div>
+                </div>
+
+                <p id="detail-overview" class="text-gray-300 text-sm md:text-base leading-relaxed mb-6 max-w-3xl"></p>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-wrap items-center gap-3 mb-6">
+                    <button id="detail-play-btn" onclick="app.startPlayback()" class="btn-primary-blue px-7 py-3 rounded-xl font-black text-sm flex items-center gap-2.5 shadow-xl">
+                        <i class="fas fa-play text-xs"></i>
+                        <span>PUTAR SEKARANG</span>
+                    </button>
+                    <button id="detail-trailer-btn" onclick="app.openTrailer()" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-5 py-3 rounded-xl font-bold text-sm flex items-center gap-2 transition-all backdrop-blur-md">
+                        <i class="fab fa-youtube text-red-500 text-base"></i>
+                        <span>Trailer</span>
+                    </button>
+                    <button id="detail-wl-btn" onclick="app.toggleWatchlist(app.state.currentMedia)" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-5 py-3 rounded-xl font-bold text-sm flex items-center gap-2 transition-all backdrop-blur-md">
+                        <i class="fas fa-plus"></i>
+                        <span>Watchlist</span>
+                    </button>
+                </div>
+
+                <!-- TV Series Episode / Season Selectors -->
+                <div id="detail-tv-selectors" class="hidden mb-6 p-4 rounded-xl bg-slate-900/60 border border-white/10 flex flex-wrap items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <label for="detail-season-select" class="text-xs font-bold text-gray-400 uppercase tracking-wider">Musim:</label>
+                        <select id="detail-season-select" class="bg-slate-800 text-white border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-semibold outline-none focus:border-blue-500"></select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label for="detail-episode-select" class="text-xs font-bold text-gray-400 uppercase tracking-wider">Episode:</label>
+                        <select id="detail-episode-select" class="bg-slate-800 text-white border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-semibold outline-none focus:border-blue-500"></select>
+                    </div>
+                </div>
+
+                <!-- Streaming Player Section -->
+                <div id="detail-player-section" class="hidden border-t border-white/10 pt-6 mt-4">
+                    <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                        <h3 class="text-xs font-black text-blue-400 uppercase tracking-widest flex items-center gap-2">
+                            <i class="fas fa-play-circle text-blue-500 text-base"></i>
+                            <span>Player Stream Aktif</span>
+                        </h3>
+                        <button onclick="app.closePlayerSection()" class="text-xs text-gray-400 hover:text-white flex items-center gap-1.5 transition-colors">
+                            <i class="fas fa-chevron-up text-[10px]"></i>
+                            <span>Tutup Player</span>
+                        </button>
+                    </div>
+
+                    <!-- Multi-Server Selector Tabs -->
+                    <div id="server-tabs-container" class="flex flex-wrap items-center gap-2 mb-4">
+                        <span class="text-[11px] text-gray-400 uppercase tracking-wider font-bold mr-1">Server:</span>
+                        <button onclick="app.setServer('vidfast')" id="dsrv-vidfast" class="server-btn active">S1 (VidFast)</button>
+                        <button onclick="app.setServer('videasy')" id="dsrv-videasy" class="server-btn">S2 (VidEasy)</button>
+                        <button onclick="app.setServer('vidsrcme')" id="dsrv-vidsrcme" class="server-btn">S3 (VidSrc)</button>
+                        <button onclick="app.setServer('vidzee')" id="dsrv-vidzee" class="server-btn">S4 (VidZee)</button>
+                        <button onclick="app.setServer('vidrock')" id="dsrv-vidrock" class="server-btn">S5 (VidRock)</button>
+                        <button onclick="app.setServer('embedapi')" id="dsrv-embedapi" class="server-btn">S6 (EmbedAPI)</button>
+                        <button onclick="app.setServer('vidlink')" id="dsrv-vidlink" class="server-btn">S7 (VidLink)</button>
+                    </div>
+
+                    <!-- Iframe Container -->
+                    <div id="detail-iframe-container" class="w-full"></div>
+                </div>
+
+                <!-- Rekomendasi Section inside modal -->
+                <div class="border-t border-white/10 pt-6 mt-8">
+                    <h3 class="text-base font-bold text-white mb-4 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                        <span>Rekomendasi Serupa</span>
+                    </h3>
+                    <div id="modal-recommended-row" class="snap-row hide-scroll flex overflow-x-auto gap-3 pb-2"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- YouTube Trailer Modal -->
+    <div id="trailer-modal" class="fixed inset-0 z-[99999] hidden items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+        <div class="relative w-full max-w-3xl aspect-video rounded-2xl overflow-hidden border border-white/20 shadow-2xl bg-black">
+            <button onclick="app.closeTrailer()" class="absolute top-3 right-3 z-30 w-8 h-8 rounded-full bg-black/70 hover:bg-red-600 text-white flex items-center justify-center transition-colors shadow">
+                <i class="fas fa-times"></i>
+            </button>
+            <iframe id="trailer-iframe" src="" class="w-full h-full" frameborder="0" allowfullscreen allow="autoplay; fullscreen"></iframe>
+        </div>
+    </div>
+
+
+    <!-- Login Modal -->
+    <div id="auth-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div class="relative w-full max-w-sm rounded-2xl bg-[#0e1422] border border-blue-500/30 p-6 shadow-2xl shadow-blue-950/40">
+            <button onclick="app.closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-sm" aria-label="Tutup">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="text-center mb-6">
+                <div class="fk-logo justify-center mb-2">
+                    <span>ReStram</span>
+                    <span class="fk-logo-play">VIP</span>
+                </div>
+                <h3 class="text-lg font-bold text-white">Akses IndoDrama21</h3>
+                <p class="text-xs text-gray-400 mt-1">Masuk untuk membuka menu khusus film IndoDrama21</p>
+            </div>
+            <form id="auth-form" onsubmit="app.handleLoginSubmit(event)" class="space-y-4">
+                <div id="auth-error" class="hidden p-2.5 rounded-lg bg-red-900/40 border border-red-500/50 text-red-300 text-xs text-center font-medium"></div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 mb-1.5">Username</label>
+                    <input id="login-username" type="text" placeholder="Masukkan username" required
+                           class="w-full bg-slate-900/90 border border-slate-700 focus:border-blue-500 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 mb-1.5">Password</label>
+                    <input id="login-password" type="password" placeholder="Masukkan password" required
+                           class="w-full bg-slate-900/90 border border-slate-700 focus:border-blue-500 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none">
+                </div>
+                <button type="submit" class="w-full btn-primary-blue py-2.5 rounded-xl text-xs font-black tracking-wide shadow-lg">
+                    MASUK SEKARANG
+                </button>
+                <div class="text-[11px] text-gray-500 text-center pt-2 border-t border-white/5 space-y-0.5">
+                    <p>Akun VIP:</p>
+                    <p class="font-mono text-gray-400"><span class="text-blue-400">reno</span> / <span class="text-blue-400">restram2026</span></p>
+                    <p class="font-mono text-gray-400"><span class="text-blue-400">admin</span> / <span class="text-blue-400">admin123</span></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-[#05070a] border-t border-white/5 py-12 px-6 text-center text-xs text-gray-500">
+        <div class="max-w-4xl mx-auto space-y-3">
+            <div class="fk-logo justify-center mb-4 cursor-default">
+                <span>ReStram</span>
+                <span class="fk-logo-play">PLAY</span>
+            </div>
+            <p class="text-gray-400">Streaming Film & Series Premium kualitas HD & 4K Ultra HD tanpa buffering.</p>
+            <p>ReStram Play tidak menyimpan file video di server. Semua konten disajikan melalui layanan pihak ketiga terpercaya.</p>
+            <p class="text-[11px] text-gray-600">© 2026 ReStram Play. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Movie Data & Core Engine Scripts -->
+    <script src="./js/movies-data.js?v=20261103_1"></script>
+    <script src="./js/app.js?v=20261103_1"></script>
 </body>
 </html>

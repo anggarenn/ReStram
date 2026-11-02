@@ -2428,6 +2428,90 @@ async def get_translate_logs_api():
     from api.translate import get_translate_logs
     return {"success": True, "data": {"logs": get_translate_logs()}}
 
+@app.get("/api/stream/indodrama")
+async def resolve_indodrama_stream(slug: str = "", url: str = ""):
+    """Ekstraksi live multi-server streaming dari https://85.121.5.10/"""
+    import urllib.parse
+    import urllib3
+    urllib3.disable_warnings()
+    from scrapling.fetchers import Fetcher
+    from scrapling.parser import Selector
+    
+    target_url = url.strip()
+    if not target_url and slug:
+        target_url = f"https://85.121.5.10/{slug.strip('/')}/"
+    if not target_url:
+        return {"success": False, "error": "Missing slug or url parameter"}
+        
+    try:
+        res = Fetcher.get(target_url, verify=False, timeout=12)
+        if res.status != 200:
+            return {"success": False, "error": f"Failed with status {res.status}"}
+            
+        sel = Selector(res.body.decode('utf-8', 'ignore'))
+        title = (sel.css('h1.entry-title::text, h1::text').get() or 'Film').strip()
+        
+        ifr1 = sel.css('iframe::attr(src)').get()
+        streams = []
+        if ifr1:
+            direct1 = ifr1
+            if 'url=' in ifr1:
+                m = re.search(r'url=([^&]+)', ifr1)
+                if m:
+                    direct1 = urllib.parse.unquote(m.group(1))
+            streams.append({
+                "server": "Server 1 (Abyss / PutarIn)",
+                "url": ifr1,
+                "direct_url": direct1
+            })
+            
+        try:
+            r2 = Fetcher.get(f"{target_url.rstrip('/')}/?player=2", verify=False, timeout=8)
+            if r2.status == 200:
+                s2 = Selector(r2.body.decode('utf-8', 'ignore'))
+                ifr2 = s2.css('iframe::attr(src)').get()
+                if ifr2 and ifr2 != ifr1:
+                    direct2 = ifr2
+                    if 'url=' in ifr2:
+                        m = re.search(r'url=([^&]+)', ifr2)
+                        if m:
+                            direct2 = urllib.parse.unquote(m.group(1))
+                    streams.append({
+                        "server": "Server 2 (HGCloud)",
+                        "url": ifr2,
+                        "direct_url": direct2
+                    })
+        except Exception:
+            pass
+
+        try:
+            r3 = Fetcher.get(f"{target_url.rstrip('/')}/?player=3", verify=False, timeout=8)
+            if r3.status == 200:
+                s3 = Selector(r3.body.decode('utf-8', 'ignore'))
+                ifr3 = s3.css('iframe::attr(src)').get()
+                if ifr3 and ifr3 not in [ifr1]:
+                    direct3 = ifr3
+                    if 'url=' in ifr3:
+                        m = re.search(r'url=([^&]+)', ifr3)
+                        if m:
+                            direct3 = urllib.parse.unquote(m.group(1))
+                    streams.append({
+                        "server": "Server 3 (Morencius)",
+                        "url": ifr3,
+                        "direct_url": direct3
+                    })
+        except Exception:
+            pass
+
+        return {
+            "success": True,
+            "title": title,
+            "url": target_url,
+            "streams": streams
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
 if os.path.isdir(os.path.join(frontend_dir, "js")):
     app.mount("/js", StaticFiles(directory=os.path.join(frontend_dir, "js")), name="js")
 if os.path.isdir(os.path.join(frontend_dir, "css")):
