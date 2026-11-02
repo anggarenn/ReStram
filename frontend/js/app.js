@@ -246,6 +246,18 @@
             });
         },
 
+        getPosterUrl: function (path, isBackdrop) {
+            if (!path) return 'https://placehold.co/300x450/141721/71717a?text=ReStram';
+            if (typeof path !== 'string') return 'https://placehold.co/300x450/141721/71717a?text=ReStram';
+            if (path.startsWith('http://85.121.5.10') || path.startsWith('https://85.121.5.10')) {
+                const clean = path.replace('https://', 'http://');
+                return 'https://wsrv.nl/?url=' + encodeURIComponent(clean) + (isBackdrop ? '&w=1280&output=webp' : '&w=300&output=webp');
+            }
+            if (path.startsWith('http')) return path;
+            const prefix = isBackdrop ? 'https://image.tmdb.org/t/p/original' : 'https://image.tmdb.org/t/p/w500';
+            return path.startsWith('/') ? (prefix + path) : (prefix + '/' + path);
+        },
+
         renderHero: function (item) {
             if (!item) return;
             const hero = document.getElementById('hero-section');
@@ -259,7 +271,7 @@
             const listBtn = document.getElementById('hero-list-btn');
             const trailerBtn = document.getElementById('hero-trailer-btn');
 
-            const bd = item.backdrop_path ? `https://image.tmdb.org/t/p/original${item.backdrop_path}` : '';
+            const bd = item.backdrop_path ? this.getPosterUrl(item.backdrop_path, true) : (item.poster_path ? this.getPosterUrl(item.poster_path, true) : '');
             if (hero && bd) {
                 hero.style.backgroundImage = `url('${bd}')`;
             }
@@ -343,7 +355,7 @@
             const top10 = items.slice(0, 10);
 
             const cardsHtml = top10.map((item, idx) => {
-                const img = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'https://via.placeholder.com/300x450/111827/4b5563?text=ReStram';
+                const img = this.getPosterUrl(item.poster_path, false);
                 const num = idx + 1;
                 return `
                     <div class="flex items-center shrink-0 group/top10card relative w-[170px] md:w-[230px] h-[195px] md:h-[263px] mr-4 cursor-pointer" onclick='app.openPlayer(${JSON.stringify(item).replace(/'/g, "&#39;")})'>
@@ -351,7 +363,7 @@
                             ${num}
                         </div>
                         <div class="relative w-[115px] md:w-[155px] h-[175px] md:h-[235px] rounded-xl overflow-hidden shadow-2xl z-20 border border-white/10 group-hover/top10card:scale-105 group-hover/top10card:border-blue-500/80 transition-all duration-300 bg-neutral-900 shrink-0">
-                            <img src="${img}" loading="lazy" alt="${item.title}" class="w-full h-full object-cover">
+                            <img src="${img}" loading="lazy" alt="${item.title}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/300x450/141721/71717a?text=ReStram';">
                             <div class="absolute inset-0 bg-blue-600/0 group-hover/top10card:bg-blue-600/15 transition-all"></div>
                         </div>
                     </div>
@@ -419,7 +431,7 @@
         },
 
         createCardHtml: function (item) {
-            const img = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'https://via.placeholder.com/300x450/111827/4b5563?text=ReStram';
+            const img = this.getPosterUrl(item.poster_path, false);
             const year = (item.release_date || '').split('-')[0] || '2024';
             const vote = item.vote_average || 0;
             const qual = vote >= 7.5 ? '4K' : 'HD';
@@ -427,7 +439,7 @@
             return `
                 <div class="w-[130px] md:w-[175px] movie-card shrink-0 cursor-pointer" onclick='app.openPlayer(${JSON.stringify(item).replace(/'/g, "&#39;")})'>
                     <div class="card-inner rounded-xl overflow-hidden shadow-xl bg-[#0f172a] border border-white/5 relative">
-                        <img src="${img}" loading="lazy" alt="${item.title}" class="card-poster w-full h-[195px] md:h-[263px] object-cover transition-all duration-300">
+                        <img src="${img}" loading="lazy" alt="${item.title}" class="card-poster w-full h-[195px] md:h-[263px] object-cover transition-all duration-300" onerror="this.onerror=null;this.src='https://placehold.co/300x450/141721/71717a?text=ReStram';">
                         
                         <div class="card-play-icon absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity bg-black/45 z-10">
                             <div class="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.8)] transform scale-90 hover:scale-105 transition-transform">
@@ -585,9 +597,15 @@
             const wlBtn = document.getElementById('detail-wl-btn');
 
             const isTv = item.media_type === 'tv';
-            const bd = item.backdrop_path ? `https://image.tmdb.org/t/p/original${item.backdrop_path}` : (item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : '');
+            const bd = item.backdrop_path ? this.getPosterUrl(item.backdrop_path, true) : (item.poster_path ? this.getPosterUrl(item.poster_path, true) : '');
             
-            if (banner) banner.src = bd;
+            if (banner) {
+                banner.src = bd;
+                banner.onerror = function () {
+                    this.onerror = null;
+                    this.src = 'https://placehold.co/1280x720/141721/71717a?text=ReStram';
+                };
+            }
             if (titleEl) titleEl.innerText = item.title;
             if (yearEl) yearEl.innerText = (item.release_date || '').split('-')[0] || '2024';
             if (typePill) typePill.innerText = isTv ? 'SERIES' : 'MOVIE';

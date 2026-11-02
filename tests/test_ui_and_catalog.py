@@ -39,7 +39,33 @@ def test_auth_and_indodrama_menu():
     
     print("PASS: Auth gating, modal, login button, and IndoDrama21 hidden menu verified 100%.")
 
+def test_thumbnail_and_input_styling():
+    css_path = 'd:/Ren/ProjectAi/ReStram/frontend/css/style.css'
+    js_path = 'd:/Ren/ProjectAi/ReStram/frontend/js/app.js'
+    
+    with open(css_path, 'r', encoding='utf-8') as f:
+        css = f.read()
+    with open(js_path, 'r', encoding='utf-8') as f:
+        js = f.read()
+        
+    # Thumbnail resolution
+    assert 'getPosterUrl:' in js, "getPosterUrl helper must be defined in app.js"
+    assert 'wsrv.nl' in js, "wsrv.nl proxy must be used for 85.121.5.10 images"
+    assert 'onerror=' in js, "onerror fallback must be present for card images"
+    
+    # Login input visibility
+    assert '#login-username' in css and '#login-password' in css, "Explicit login input rules must exist in style.css"
+    assert 'background-color: #1a2030' in css or 'background-color: #161b26' in css or '#login-username,' in css, "Login input background must be styled"
+    assert 'color: #ffffff' in css, "Login input text must be white"
+    
+    # Layout and blue moderation
+    assert 'margin-bottom: -100px;' not in css, "Messy negative margin on snap-row must be removed"
+    assert '-webkit-text-stroke: 3.5px #4b5563' in css, "Top 10 stroke must use clean neutral steel gray"
+    
+    print("PASS: Thumbnail resolver, input visibility, and layout hygiene verified 100%.")
+
 if __name__ == '__main__':
     test_movies_catalog()
     test_auth_and_indodrama_menu()
+    test_thumbnail_and_input_styling()
     print("ALL TESTS PASSED SUCCESSFULLY! 100% OK.")

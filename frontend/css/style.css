@@ -300,11 +300,11 @@
         =========================== */
         .snap-row {
             display: flex;
-            overflow-x: scroll;
-            overflow-y: visible;  /* Allow card-expand-panel to show below */
-            gap: 10px;
-            padding: 20px 16px 120px; /* extra bottom padding for expand panel */
-            margin-bottom: -100px;   /* pull back the extra space */
+            overflow-x: auto;
+            overflow-y: hidden;
+            gap: 12px;
+            padding: 8px 0 14px 0;
+            margin: 0;
             scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch;
         }
@@ -1486,18 +1486,18 @@ span[onclick^="app.loadByGenre"].border-red-500\/40 {
 
 
 /* =====================================================================
-   RESTRAM PLAY - SIGNATURE BLUE THEME ENHANCEMENTS
+   RESTRAM PLAY - CINEMA DARK THEME (REFINED BLUE ACCENTS)
    ===================================================================== */
 :root {
-    --cn-canvas: #07090e;
-    --cn-surface: #0e1422;
-    --cn-surface-2: #162035;
-    --cn-border: #1e293b;
-    --cn-border-soft: rgba(30, 41, 59, 0.8);
+    --cn-canvas: #0c0d12;
+    --cn-surface: #141721;
+    --cn-surface-2: #1b202e;
+    --cn-border: rgba(255, 255, 255, 0.08);
+    --cn-border-soft: rgba(255, 255, 255, 0.05);
     --cn-primary: #2563EB;
     --cn-primary-hover: #3B82F6;
     --cn-primary-active: #1D4ED8;
-    --cn-primary-glow: rgba(37, 99, 235, 0.5);
+    --cn-primary-glow: rgba(37, 99, 235, 0.35);
     --cn-text: #FFFFFF;
     --cn-text-2: #94A3B8;
     --cn-text-3: #64748B;
@@ -1505,7 +1505,7 @@ span[onclick^="app.loadByGenre"].border-red-500\/40 {
 }
 
 body {
-    background-color: #07090e !important;
+    background-color: #0c0d12 !important;
     color: #ffffff;
     font-family: 'Plus Jakarta Sans', sans-serif;
     margin: 0;
@@ -1515,7 +1515,7 @@ body {
 
 /* Brand Logo */
 .fk-logo {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 900;
     letter-spacing: -0.5px;
     display: inline-flex;
@@ -1530,83 +1530,86 @@ body {
     opacity: 0.9;
 }
 .fk-logo-play {
-    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #38bdf8 100%);
+    background: #2563eb;
     color: #ffffff;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 900;
     letter-spacing: 1.5px;
-    padding: 3px 8px;
-    border-radius: 5px;
+    padding: 3px 7px;
+    border-radius: 4px;
     text-transform: uppercase;
-    box-shadow: 0 0 16px rgba(37, 99, 235, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 12px rgba(37, 99, 235, 0.4);
 }
 
-/* Top 10 Outline Styling */
+/* Top 10 Outline Styling - Clean Charcoal Outline, Blue on Card Hover */
 .top10-num {
     font-size: 110px;
     font-weight: 900;
     line-height: 1;
-    color: #07090e;
-    -webkit-text-stroke: 3.5px #1e3a8a;
-    text-shadow: 0 0 16px rgba(30, 58, 138, 0.7);
+    color: #0c0d12;
+    -webkit-text-stroke: 3.5px #4b5563;
+    text-shadow: none;
     letter-spacing: -6px;
     font-family: 'Plus Jakarta Sans', sans-serif;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.25s ease;
 }
 @media (min-width: 768px) {
     .top10-num {
         font-size: 175px;
-        -webkit-text-stroke: 4.5px #1e3a8a;
+        -webkit-text-stroke: 4.5px #4b5563;
         letter-spacing: -10px;
     }
 }
 .group\/top10card:hover .top10-num {
+    color: #111827;
     -webkit-text-stroke: 4px #3b82f6 !important;
-    text-shadow: 0 0 25px rgba(59, 130, 246, 0.9);
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
 }
 .group\/top10card:hover > div:last-child {
-    border-color: rgba(59, 130, 246, 0.8) !important;
-    box-shadow: 0 0 25px rgba(37, 99, 235, 0.45);
+    border-color: rgba(59, 130, 246, 0.6) !important;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.8), 0 0 16px rgba(37, 99, 235, 0.25);
 }
 
 /* Movie Card Hover */
+.movie-card {
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
 .movie-card:hover {
-    transform: scale(1.12) translateY(-6px);
-    z-index: 40;
-    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.9), 0 0 25px rgba(37, 99, 235, 0.35);
+    transform: scale(1.04) translateY(-4px);
+    z-index: 30;
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.85), 0 0 18px rgba(37, 99, 235, 0.25);
 }
 .movie-card:hover .card-inner {
-    border: 1px solid rgba(59, 130, 246, 0.75);
+    border-color: rgba(59, 130, 246, 0.5) !important;
 }
-.card-play-icon .card-play-btn {
-    background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
-    box-shadow: 0 0 20px rgba(37, 99, 235, 0.8);
+.card-inner {
+    background: #141721 !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
-/* Hero Overlays with Deep Blue Tint */
+/* Hero Overlays - Deep Neutral Cinema Gradient */
 .hero-overlay {
-    background: linear-gradient(to top, #07090e 12%, rgba(7, 9, 14, 0.85) 45%, transparent 75%) !important;
+    background: linear-gradient(to top, #0c0d12 10%, rgba(12, 13, 18, 0.85) 45%, transparent 75%) !important;
 }
 .hero-overlay-side {
-    background: linear-gradient(to right, rgba(7, 9, 14, 0.96) 0%, rgba(7, 9, 14, 0.75) 30%, rgba(7, 9, 14, 0.3) 55%, transparent 80%) !important;
+    background: linear-gradient(to right, rgba(12, 13, 18, 0.95) 0%, rgba(12, 13, 18, 0.7) 35%, rgba(12, 13, 18, 0.2) 60%, transparent 80%) !important;
 }
 .hero-overlay-top {
-    background: linear-gradient(to bottom, rgba(7, 9, 14, 0.75) 0%, rgba(7, 9, 14, 0.2) 25%, transparent 45%) !important;
+    background: linear-gradient(to bottom, rgba(12, 13, 18, 0.8) 0%, rgba(12, 13, 18, 0.2) 25%, transparent 45%) !important;
 }
 
 /* Primary Play Button */
 .btn-primary-blue {
-    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%) !important;
+    background: #2563eb !important;
     color: #ffffff !important;
-    box-shadow: 0 6px 24px rgba(37, 99, 235, 0.45) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 4px 18px rgba(37, 99, 235, 0.35) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 .btn-primary-blue:hover {
-    background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%) !important;
-    box-shadow: 0 8px 30px rgba(37, 99, 235, 0.7) !important;
-    transform: translateY(-2px);
+    background: #1d4ed8 !important;
+    box-shadow: 0 6px 24px rgba(37, 99, 235, 0.55) !important;
+    transform: translateY(-1px);
 }
 .btn-primary-blue:active {
     transform: scale(0.97);
@@ -1614,30 +1617,71 @@ body {
 
 /* Server Tab Active State */
 .server-btn.active {
-    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%) !important;
+    background: #2563eb !important;
     color: #ffffff !important;
     border-color: #60a5fa !important;
-    box-shadow: 0 0 14px rgba(37, 99, 235, 0.6) !important;
+    box-shadow: 0 0 12px rgba(37, 99, 235, 0.4) !important;
 }
 
 /* Dots indicator */
 .hero-dot.active {
-    width: 28px !important;
+    width: 24px !important;
     background: #3b82f6 !important;
-    box-shadow: 0 0 12px rgba(59, 130, 246, 0.8) !important;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.6) !important;
     border-radius: 9999px !important;
 }
 
 /* Badge highlights */
 .badge-blue {
-    background: rgba(37, 99, 235, 0.18);
-    border: 1px solid rgba(59, 130, 246, 0.45);
-    color: #60a5fa;
+    background: rgba(37, 99, 235, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.35);
+    color: #93c5fd;
 }
 
 /* Modal Inner */
 .detail-modal-inner {
-    background: #0d121f !important;
-    border: 1px solid rgba(59, 130, 246, 0.25) !important;
-    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.95), 0 0 40px rgba(37, 99, 235, 0.2) !important;
+    background: #11141e !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.95) !important;
+}
+
+/* =====================================================================
+   AUTH / LOGIN MODAL & INPUT VISIBILITY FIX
+   ===================================================================== */
+#auth-modal {
+    background: rgba(0, 0, 0, 0.85) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+}
+#auth-modal > div {
+    background: #131722 !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.95), 0 0 20px rgba(37, 99, 235, 0.15) !important;
+}
+#login-username,
+#login-password {
+    background-color: #1a2030 !important;
+    border: 1px solid #334155 !important;
+    color: #ffffff !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    border-radius: 10px !important;
+    padding: 10px 14px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    display: block !important;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s !important;
+}
+#login-username:focus,
+#login-password:focus {
+    background-color: #222b40 !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+    outline: none !important;
+    color: #ffffff !important;
+}
+#login-username::placeholder,
+#login-password::placeholder {
+    color: #94a3b8 !important;
+    opacity: 1 !important;
 }
